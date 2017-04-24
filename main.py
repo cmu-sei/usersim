@@ -1,11 +1,16 @@
 import traceback
 
+import behaviors.attime
 import behaviors.frequency
 import behaviors.printstuff
-import behavior
 
 
 def main():
+    type_dict = {}
+    type_dict.update(behaviors.attime.type_dict)
+    type_dict.update(behaviors.frequency.type_dict)
+    type_dict.update(behaviors.printstuff.type_dict)
+
     conf_dict = {'type': 'frequency',
                  'config': {'frequency': 720,
                             'repetitions': 10,
@@ -13,7 +18,9 @@ def main():
                                          'config': {}}}}
 
     behavior_set = set()
-    behavior_set.add(behaviors.frequency.Frequency.config(conf_dict['config']))
+
+    new_behavior = type_dict[conf_dict['type']].config(conf_dict['config'])
+    behavior_set.add(new_behavior)
 
     while behavior_set:
         new_behaviors = set()
@@ -31,7 +38,8 @@ def main():
                         delete_behaviors.add(task)
                 else:
                     try:
-                        behavior_obj = behaviors.printstuff.PrintStuff.config(result['config'])
+                        behavior_obj = type_dict[result['type']].config(result['config'])
+                        #behavior_obj = behaviors.printstuff.PrintStuff.config(result['config'])
                     except KeyError as e:
                         print(e)
                     except ValueError as e:
@@ -39,7 +47,6 @@ def main():
                     else:
                         new_behaviors.add(behavior_obj)
 
-        #behavior_set = behavior_set | new_behaviors - delete_behaviors
         behavior_set |= new_behaviors
         behavior_set -= delete_behaviors
 

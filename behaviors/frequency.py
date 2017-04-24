@@ -3,6 +3,7 @@ import time
 
 import behavior
 
+
 class Frequency(behavior.Behavior):
     def __init__(self, freq, reps, behavior):
         """
@@ -80,3 +81,5 @@ class Frequency(behavior.Behavior):
             behavior = conf_dict['behavior']
 
         return cls(freq, reps, behavior)
+
+type_dict = {'frequency': Frequency}

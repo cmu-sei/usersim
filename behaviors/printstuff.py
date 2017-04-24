@@ -1,5 +1,6 @@
 import behavior
 
+
 class PrintStuff(behavior.Behavior):
     def __init__(self):
         pass
@@ -16,3 +17,5 @@ class PrintStuff(behavior.Behavior):
     @classmethod
     def config(cls, conf_dict):
         return cls()
+
+type_dict = {'printstuff': PrintStuff}

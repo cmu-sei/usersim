@@ -3,8 +3,6 @@ import datetime
 import behavior
 
 
-type_dict = {'attime': AtTime}
-
 class AtTime(behavior.Behavior):
     def __init__(self, behavior, trigger_time):
         if datetime.datetime.now() > trigger_time:
@@ -64,3 +62,5 @@ class AtTime(behavior.Behavior):
             behavior = conf_dict['behavior']
 
         return cls(behavior, datetime.datetime.combine(date_obj, time_obj))
+
+type_dict = {'attime': AtTime}
