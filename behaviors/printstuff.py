@@ -1,4 +1,4 @@
-import behavior
+from behaviors import behavior
 
 
 class PrintStuff(behavior.Behavior):

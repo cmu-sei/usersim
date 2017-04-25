@@ -1,7 +1,7 @@
 import random
 import time
 
-import behavior
+from behaviors import behavior
 
 
 class Frequency(behavior.Behavior):

@@ -1,6 +1,6 @@
 import datetime
 
-import behavior
+from behaviors import behavior
 
 
 class AtTime(behavior.Behavior):
