@@ -39,7 +39,6 @@ def main():
                 else:
                     try:
                         behavior_obj = type_dict[result['type']].config(result['config'])
-                        #behavior_obj = behaviors.printstuff.PrintStuff.config(result['config'])
                     except KeyError as e:
                         print(e)
                     except ValueError as e:
