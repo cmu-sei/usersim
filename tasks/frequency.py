@@ -81,5 +81,3 @@ class Frequency(task.Task):
             behavior = conf_dict['behavior']
 
         return cls(freq, reps, behavior)
-
-type_dict = {'frequency': Frequency}

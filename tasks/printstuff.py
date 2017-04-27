@@ -17,5 +17,3 @@ class PrintStuff(task.Task):
     @classmethod
     def config(cls, conf_dict):
         return cls()
-
-type_dict = {'printstuff': PrintStuff}

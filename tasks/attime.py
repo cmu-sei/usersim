@@ -62,5 +62,3 @@ class AtTime(task.Task):
             behavior = conf_dict['behavior']
 
         return cls(behavior, datetime.datetime.combine(date_obj, time_obj))
-
-type_dict = {'attime': AtTime}
