@@ -1,7 +1,7 @@
-from behaviors import behavior
+from tasks import task
 
 
-class PrintStuff(behavior.Behavior):
+class PrintStuff(task.Task):
     def __init__(self):
         pass
 

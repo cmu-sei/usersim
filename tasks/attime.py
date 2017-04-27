@@ -1,9 +1,9 @@
 import datetime
 
-from behaviors import behavior
+from tasks import task
 
 
-class AtTime(behavior.Behavior):
+class AtTime(task.Task):
     def __init__(self, behavior, trigger_time):
         if datetime.datetime.now() > trigger_time:
             # If the trigger time has passed for today, just trigger it tomorrow at that time.

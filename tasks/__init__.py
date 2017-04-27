@@ -9,7 +9,7 @@ py_files = os.listdir(os.path.dirname(__file__))
 for candidate in py_files:
     if candidate == '__init__.py' or candidate[-3:] != '.py':
         continue
-    module = 'modules.' + candidate[:-3]
+    module = 'tasks.' + candidate[:-3]
     try:
         loaded_module = importlib.import_module(module)
     except ImportError:

@@ -1,15 +1,15 @@
 import traceback
 
-import behaviors.attime
-import behaviors.frequency
-import behaviors.printstuff
+import tasks.attime
+import tasks.frequency
+import tasks.printstuff
 
 
 def main():
     type_dict = {}
-    type_dict.update(behaviors.attime.type_dict)
-    type_dict.update(behaviors.frequency.type_dict)
-    type_dict.update(behaviors.printstuff.type_dict)
+    type_dict.update(tasks.attime.type_dict)
+    type_dict.update(tasks.frequency.type_dict)
+    type_dict.update(tasks.printstuff.type_dict)
 
     conf_dict = {'type': 'frequency',
                  'config': {'frequency': 720,

@@ -1,4 +1,4 @@
-class Behavior(object):
+class Task(object):
     def __init__(self):
         raise NotImplementedError("Not yet implemented.")
 
@@ -9,8 +9,8 @@ class Behavior(object):
         entail. This method may return at most one config dict.
 
         Returns:
-            dict or None: If this behavior wants another behavior to be scheduled, this call should return the
-                configuration for that behavior as a dict. Otherwise, it should not return anything, which is equivalent
+            dict or None: If this task wants another task to be scheduled, this call should return the
+                configuration for that task as a dict. Otherwise, it should not return anything, which is equivalent
                 to returning None.
         """
         raise NotImplementedError("Not yet implemented.")
@@ -26,7 +26,7 @@ class Behavior(object):
         raise NotImplementedError("Not yet implemented.")
 
     def stop(self):
-        """ Each time the behavior runs, the scheduler subsequently calls this method to check if the Behavior object
+        """ Each time the task runs, the scheduler subsequently calls this method to check if the Task object
         should be descheduled.
 
         Returns:
@@ -36,7 +36,7 @@ class Behavior(object):
 
     @classmethod
     def config(cls, conf_dict):
-        """ Converts a configuration into an actual Behavior object.
+        """ Converts a configuration into an actual Task object.
 
         Args:
             conf_dict (dict): A dictionary of the configuration options for this class.
@@ -46,6 +46,6 @@ class Behavior(object):
             ValueError: If a configuration's value is not valid.
 
         Returns:
-            Behavior: A configured Behavior object.
+            Task: A configured Task object.
         """
         raise NotImplementedError("Not yet implemented.")

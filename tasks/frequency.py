@@ -1,10 +1,10 @@
 import random
 import time
 
-from behaviors import behavior
+from tasks import task
 
 
-class Frequency(behavior.Behavior):
+class Frequency(task.Task):
     def __init__(self, freq, reps, behavior):
         """
         Args:
