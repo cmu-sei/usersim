@@ -6,7 +6,7 @@ class Task(object):
         """ Inheriting classes must implement this method.
 
         Periodically called while the object is scheduled. This gives the object its behavior, whatever that may
-        entail. This method may return at most one config dict.
+        entail.
 
         Returns:
             dict or None: If this task wants another task to be scheduled, this call should return the
