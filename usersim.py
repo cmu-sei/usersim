@@ -1,4 +1,5 @@
 import threading
+import traceback
 
 
 class States(object):
@@ -17,6 +18,7 @@ class _UserSim(object):
     def __init__(self):
         self._scheduled = dict()
         self._paused = dict()
+        # TODO: Should there be a stopped tasks dict to preserve old task IDs, and then a method to clear them manually?
 
         self._to_schedule = dict()
         self._to_pause = dict()
@@ -25,12 +27,26 @@ class _UserSim(object):
         self._operation_lock = threading.Lock()
 
     def loop_cycle(self):
+        feedback = list()
+
         for task_id, task in self._scheduled.items():
-            task()
+
+            try:
+                task()
+            except Exception:
+                result = traceback.format_exc()
+            else:
+                result = 'Success'
+
+            # TODO: Needs further consideration.
+            feedback.append((task_id, result))
+
             if task.stop():
                 self.stop_task(task_id)
 
         self._resolve_actions()
+
+        return feedback
 
     def new_task(self, task, start_paused=False):
         with self._operation_lock:
@@ -46,7 +62,7 @@ class _UserSim(object):
 
     def pause_task(self, task_id):
         with self._operation_lock:
-            self._pause_single(task_id)
+            return self._pause_single(task_id)
 
     def status_all(self):
         status_list = list()
@@ -54,6 +70,8 @@ class _UserSim(object):
         with self._operation_lock:
             for key in list(self._scheduled):
                 status_list.append(self._status_single(key))
+
+        return status_list
 
     def status_task(self, task_id):
         with self._operation_lock:
@@ -66,7 +84,7 @@ class _UserSim(object):
 
     def stop_task(self, task_id):
         with self._operation_lock:
-            self._stop_single(task_id)
+            return self._stop_single(task_id)
 
     def unpause_all(self):
         with self._operation_lock:
@@ -75,7 +93,7 @@ class _UserSim(object):
 
     def unpause_task(self, task_id):
         with self._operation_lock:
-            self._unpause_single(task_id)
+            return self._unpause_single(task_id)
 
     def _pause_single(self, task_id):
         if task_id in self._scheduled:
@@ -166,4 +184,7 @@ class _UserSim(object):
                 # If this raises, how did this happen?
                 assert task_ is task
                 task.cleanup()
+            # TODO: This should allow the memory to be freed from the stopped tasks, but some tasks could conceivably
+            # not fully free their held references from the cleanup method, especially if they use other modules not
+            # written in Python. How can I diagnose this before accepting a pull request?
             self._to_stop = dict()
