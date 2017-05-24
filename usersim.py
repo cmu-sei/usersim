@@ -3,7 +3,14 @@ import traceback
 
 
 class States(object):
-    SCHEDULED, PAUSED, TO_SCHEDULE, TO_PAUSE, TO_STOP, UNKNOWN = range(6)
+    SCHEDULED = 'Scheduled'
+    PAUSED = 'Paused'
+    STOPPED = 'Stopped'
+    NEW = 'New'
+    TO_SCHEDULE = 'Scheduling'
+    TO_PAUSE = 'Paused'
+    TO_STOP = 'Stopping'
+    UNKNOWN = 'Unknown'
 
 class UserSim(object):
     """ Share one _UserSim object to act like a singleton.
@@ -209,13 +216,19 @@ class _UserSim(object):
             state = States.UNKNOWN
 
         if task:
-            task_type = task.__module__.split('.')[-1]
+            task_type = self._get_task_type(task)
+            status = task.status()
+        elif state == States.STOPPED:
+            task_type = self._stopped[task_id]
+            status = 'dead'
         else:
             task_type = 'unknown'
+            status = 'unknown'
 
         status_dict['id'] = task_id
         status_dict['state'] = state
         status_dict['type'] = task_type
+        status_dict['status'] = status
 
         return status_dict
 
