@@ -1,20 +1,22 @@
 import random
 import time
 
+import api
 from tasks import task
 
 
 class Frequency(task.Task):
-    def __init__(self, freq, reps, behavior):
+    def __init__(self, freq, reps, task):
         """
         Args:
             freq (float > 0): Average number of occurences per hour.
             reps (int >= 0): Maximum number of times to trigger. 0 imposes no limit.
+            task (dict): A configuration dictionary for any task.
         """
         self._time_per_trigger = 3600 / freq
         self._reps = reps
         self._triggered = 0
-        self._behavior = behavior
+        self._task = task
         self._last_check = time.time()
 
     def __call__(self):
@@ -25,7 +27,7 @@ class Frequency(task.Task):
         trigger_probability = slept / self._time_per_trigger
         if random.random() < trigger_probability:
             self._triggered += 1
-            return self._behavior
+            api.new_task(self._task)
 
     def cleanup(self):
         pass
@@ -44,7 +46,7 @@ class Frequency(task.Task):
             conf_dict (dict): Configuration dictionary with the following keys:
                 frequency (float > 0): Average number of occurences per hour.
                 repetitions (int >= 0): Maximum number of times to trigger. 0 indicates no maximum.
-                behavior (dict): Configuration for a nested behavior.
+                task (dict): Configuration for a nested task.
 
         Returns:
             Frequency: A constructed Frequency object.
@@ -75,9 +77,9 @@ class Frequency(task.Task):
             if reps < 0:
                 raise ValueError(invalid_input % ('repetitions', '%s <= 0' % str(reps)))
 
-        if 'behavior' not in conf_dict:
-            raise KeyError(param_missing % 'behavior')
+        if 'task' not in conf_dict:
+            raise KeyError(param_missing % 'task')
         else:
-            behavior = conf_dict['behavior']
+            task = conf_dict['task']
 
-        return cls(freq, reps, behavior)
+        return cls(freq, reps, task)
