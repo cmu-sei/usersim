@@ -1,11 +1,11 @@
 class Task(object):
+    """ All methods must be overridden by subclasses.
+    """
     def __init__(self):
         raise NotImplementedError("Not yet implemented.")
 
     def __call__(self):
-        """ Inheriting classes must implement this method.
-
-        Periodically called while the object is scheduled. This gives the object its behavior, whatever that may
+        """ Periodically called while the object is scheduled. This gives the object its behavior, whatever that may
         entail.
 
         Returns:
@@ -16,10 +16,8 @@ class Task(object):
         raise NotImplementedError("Not yet implemented.")
 
     def cleanup(self):
-        """ Inheriting classes must implement this method.
-
-        Called in the event __call__ raises an exception or when the stop method returns True. This method should never
-        raise an exception. Use this method to handle cleaning up any open handles, files, or whatever needs to be
+        """ Called in the event __call__ raises an exception or when the stop method returns True. This method should
+        never raise an exception. Use this method to handle cleaning up any open handles, files, or whatever needs to be
         closed in order to free up the memory that this object is using. This method must be overridden, but it is fine
         for it not to actually do anything if that is intended functionality.
         """
