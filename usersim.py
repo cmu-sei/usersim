@@ -46,12 +46,14 @@ class _UserSim(object):
             try:
                 task()
             except Exception:
-                result = traceback.format_exc()
+                result = 'Failure'
+                exception = traceback.format_exc()
             else:
                 result = 'Success'
+                exception = None
 
-            # TODO: Needs further consideration.
-            feedback.append((task_id, result))
+            # TODO: This should probably construct a feedback message object - NYI.
+            feedback.append((task_id, result, exception))
 
             if task.stop():
                 self.stop_task(task_id)
