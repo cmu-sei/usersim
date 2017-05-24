@@ -23,10 +23,18 @@ class UserSim(object):
         return cls._instance
 
 class _UserSim(object):
+    """ Manages Task objects internally. No Task should ever reference an object of this class, nor need to.
+    """
     def __init__(self):
         self._scheduled = dict()
         self._paused = dict()
-        # TODO: Should there be a stopped tasks dict to preserve old task IDs, and then a method to clear them manually?
+        # TODO: If we keep track of dead tasks, that means that the simulator WILL eventually run out of memory.
+        # It's nice keeping track of the types of dead tasks, but this must be handled in a better way. Maybe clean
+        # this dict out periodically, or just use the current highest ID to determine if a task is stopped.
+        self._stopped = dict()
+
+        # Used in order to keep the sanity checks in _resolve_actions.
+        self._new = dict()
 
         self._to_schedule = dict()
         self._to_pause = dict()
@@ -44,6 +52,8 @@ class _UserSim(object):
         for task_id, task in self._scheduled.items():
 
             try:
+                # TODO: This should have a watchdog timer - unsure if individual tasks should set their own timers or
+                # if the timer should be a guaranteed global.
                 task()
             except Exception:
                 result = 'Failure'
@@ -110,7 +120,13 @@ class _UserSim(object):
         status_list = list()
 
         with self._operation_lock:
-            for key in list(self._scheduled):
+            for key in self._scheduled:
+                status_list.append(self._status_single(key))
+            for key in self._paused:
+                status_list.append(self._status_single(key))
+            for key in self._stopped:
+                status_list.append(self._status_single(key))
+            for key in self._new:
                 status_list.append(self._status_single(key))
 
         return status_list
@@ -135,7 +151,9 @@ class _UserSim(object):
         """ Stop all tasks that are currently scheduled or paused. Guaranteed thread-safe.
         """
         with self._operation_lock:
-            for key in list(self._scheduled):
+            for key in self._scheduled:
+                self._stop_single(key)
+            for key in self._paused:
                 self._stop_single(key)
 
     def stop_task(self, task_id):
@@ -154,7 +172,7 @@ class _UserSim(object):
         """ Unpause all tasks that are currently paused. Guaranteed thread-safe.
         """
         with self._operation_lock:
-            for key in list(self._scheduled):
+            for key in self._scheduled:
                 self._unpause_single(key)
 
     def unpause_task(self, task_id):
@@ -286,7 +304,11 @@ class _UserSim(object):
         with self._operation_lock:
             for task_id, task in self._to_pause.items():
                 # If these three lines raise, something has gone wrong and we should know about it.
-                task_ = self._scheduled.pop(task_id)
+                try:
+                    task_ = self._scheduled.pop(task_id)
+                except KeyError:
+                    # When a task is new, it will be in _to_pause without having ever been in _scheduled.
+                    task_ = self._new.pop(task_id)
                 assert task_ is task
                 assert task_id not in self._paused
                 self._paused[task_id] = task
@@ -294,7 +316,11 @@ class _UserSim(object):
 
             for task_id, task in self._to_schedule.items():
                 # As above, if the following three lines raise, something is wrong.
-                task_ = self._paused.pop(task_id)
+                try:
+                    task_ = self._paused.pop(task_id)
+                except KeyError:
+                    # When a task is new, it will be in _to_schedule without having ever been in _paused.
+                    task_ = self._new.pop(task_id)
                 assert task_ is task
                 assert task_id not in self._scheduled
                 self._scheduled[task_id] = task
