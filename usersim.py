@@ -6,7 +6,8 @@ class States(object):
     SCHEDULED, PAUSED, TO_SCHEDULE, TO_PAUSE, TO_STOP, UNKNOWN = range(6)
 
 class UserSim(object):
-    # Share one _UserSim object to act like a singleton.
+    """ Share one _UserSim object to act like a singleton.
+    """
     _instance = None
 
     def __new__(cls):
@@ -26,7 +27,11 @@ class _UserSim(object):
 
         self._operation_lock = threading.Lock()
 
-    def loop_cycle(self):
+        self._id_gen = self._new_id()
+
+    def cycle(self):
+        """ Work through one simulation cycle.
+        """
         feedback = list()
 
         for task_id, task in self._scheduled.items():
@@ -49,6 +54,15 @@ class _UserSim(object):
         return feedback
 
     def new_task(self, task, start_paused=False):
+        """ Manage a task.
+
+        Arguments:
+            task (tasks.task.Task): A constructed Task object that is ready to run.
+            start_paused (bool): Whether the given task will start scheduled (True) or paused (False).
+
+        Returns:
+            int: A value uniquely associated with the given task.
+        """
         with self._operation_lock:
             if start_paused:
                 self._to_pause[id(task)] = task
@@ -56,15 +70,34 @@ class _UserSim(object):
                 self._to_schedule[id(task)] = task
 
     def pause_all(self):
+        """ Pause all tasks that are currently scheduled. Guaranteed thread-safe.
+        """
         with self._operation_lock:
             for key in list(self._scheduled):
                 self._pause_single(key)
 
     def pause_task(self, task_id):
+        """ Pause an individual task. Guaranteed thread-safe.
+
+        Arguments:
+            task_id (int): The value returned by the new_task method when the task to be paused was added.
+
+        Returns:
+            bool: True if the operation was successful, False otherwise.
+        """
         with self._operation_lock:
             return self._pause_single(task_id)
 
     def status_all(self):
+        """ Get a list of the status of all managed tasks. Guaranteed thread-safe.
+
+        Returns:
+            list of dicts: Each dictionary will have the following key:value pairs:
+                'id':int
+                'type':str
+                'state':str
+                'status':str
+        """
         status_list = list()
 
         with self._operation_lock:
@@ -74,34 +107,86 @@ class _UserSim(object):
         return status_list
 
     def status_task(self, task_id):
+        """ Return the status of a particular task. Guaranteed thread-safe.
+
+        Arguments:
+            task_id (int): The value returned by the new_task method when the task to be paused was added.
+
+        Returns:
+            dict: A dictionary with the following key:value pairs:
+                'id':int
+                'type':str
+                'state':str
+                'status':str
+        """
         with self._operation_lock:
             return self._status_single(task_id)
 
     def stop_all(self):
+        """ Stop all tasks that are currently scheduled or paused. Guaranteed thread-safe.
+        """
         with self._operation_lock:
             for key in list(self._scheduled):
                 self._stop_single(key)
 
     def stop_task(self, task_id):
+        """ Stop a particular task. Guaranteed thread-safe.
+
+        Arguments:
+            task_id (int): The value returned by the new_task method when the task to be paused was added.
+
+        Returns:
+            bool: True if the operation was successful, False otherwise.
+        """
         with self._operation_lock:
             return self._stop_single(task_id)
 
     def unpause_all(self):
+        """ Unpause all tasks that are currently paused. Guaranteed thread-safe.
+        """
         with self._operation_lock:
             for key in list(self._scheduled):
                 self._unpause_single(key)
 
     def unpause_task(self, task_id):
+        """ Unpause a particular task. Guaranteed thread-safe.
+
+        Arguments:
+            task_id (int): The value returned by the new_task method when the task to be paused was added.
+
+        Returns:
+            bool: True if the operation was successful, False otherwise.
+        """
         with self._operation_lock:
             return self._unpause_single(task_id)
 
     def _pause_single(self, task_id):
+        """ Pause an individual task. NOT guaranteed thread-safe.
+
+        Arguments:
+            task_id (int): The value returned by the new_task method when the task to be paused was added.
+
+        Returns:
+            bool: True if the operation was successful, False otherwise.
+        """
         if task_id in self._scheduled:
             self._to_pause[task_id] = self._scheduled[task_id]
             return True
         return False
 
     def _status_single(self, task_id):
+        """ Return the status of a particular task. NOT guaranteed thread-safe.
+
+        Arguments:
+            task_id (int): The value returned by the new_task method when the task to be paused was added.
+
+        Returns:
+            dict: A dictionary with the following key:value pairs:
+                'id':int
+                'type':str
+                'state':str
+                'status':str
+        """
         status_dict = dict()
 
         if task_id in self._scheduled:
@@ -135,6 +220,14 @@ class _UserSim(object):
         return status_dict
 
     def _stop_single(self, task_id):
+        """ Stop a particular task. NOT guaranteed thread-safe.
+
+        Arguments:
+            task_id (int): The value returned by the new_task method when the task to be paused was added.
+
+        Returns:
+            bool: True if the operation was successful, False otherwise.
+        """
         if task_id in self._scheduled:
             self._to_stop[task_id] = self._scheduled[task_id]
         elif task_id in self._paused:
@@ -149,12 +242,23 @@ class _UserSim(object):
         return True
 
     def _unpause_single(self, task_id):
+        """ Unpause a particular task. NOT guaranteed thread-safe.
+
+        Arguments:
+            task_id (int): The value returned by the new_task method when the task to be paused was added.
+
+        Returns:
+            bool: True if the operation was successful, False otherwise.
+        """
         if task_id in self._paused:
             self._to_stop[task_id] = self._paused[task_id]
             return True
         return False
 
     def _resolve_actions(self):
+        """ Handle all changes in scheduling. Guaranteed thread-safe.
+        """
+        # Definitely want to lock to prevent any changes to these structures while resolving.
         with self._operation_lock:
             for task_id, task in self._to_pause.items():
                 # If these three lines raise, something has gone wrong and we should know about it.
@@ -188,3 +292,10 @@ class _UserSim(object):
             # not fully free their held references from the cleanup method, especially if they use other modules not
             # written in Python. How can I diagnose this before accepting a pull request?
             self._to_stop = dict()
+
+    @staticmethod
+    def _get_task_type(task):
+        """ Return the type of the given task.
+        """
+        return task.__module__.split('.')[-1]
+
