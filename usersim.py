@@ -83,16 +83,21 @@ class _UserSim(object):
             int: A value uniquely associated with the given task.
         """
         with self._operation_lock:
+            task_id = next(self._id_gen)
             if start_paused:
-                self._to_pause[id(task)] = task
+                self._to_pause[task_id] = task
             else:
-                self._to_schedule[id(task)] = task
+                self._to_schedule[task_id] = task
+
+            self._new[task_id] = task
+
+        return task_id
 
     def pause_all(self):
         """ Pause all tasks that are currently scheduled. Guaranteed thread-safe.
         """
         with self._operation_lock:
-            for key in list(self._scheduled):
+            for key in self._scheduled:
                 self._pause_single(key)
 
     def pause_task(self, task_id):
@@ -338,10 +343,18 @@ class _UserSim(object):
                 # If this raises, how did this happen?
                 assert task_ is task
                 task.cleanup()
-            # TODO: This should allow the memory to be freed from the stopped tasks, but some tasks could conceivably
-            # not fully free their held references from the cleanup method, especially if they use other modules not
-            # written in Python. How can I diagnose this before accepting a pull request?
+
+                # Still keep tracking the ID and task type so we can report the task's stopped status.
+                self._stopped[task_id] = self._get_task_type(task)
+
             self._to_stop = dict()
+
+    @staticmethod
+    def _new_id():
+        current_id = 0
+        while True:
+            current_id += 1
+            yield current_id
 
     @staticmethod
     def _get_task_type(task):
