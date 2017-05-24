@@ -198,13 +198,7 @@ class _UserSim(object):
         """
         status_dict = dict()
 
-        if task_id in self._scheduled:
-            task = self._scheduled[task_id]
-            state = States.SCHEDULED
-        elif task_id in self._paused:
-            task = self._paused[task_id]
-            state = States.PAUSED
-        elif task_id in self._to_schedule:
+        if task_id in self._to_schedule:
             task = self._to_schedule[task_id]
             state = States.TO_SCHEDULE
         elif task_id in self._to_pause:
@@ -213,6 +207,21 @@ class _UserSim(object):
         elif task_id in self._to_stop:
             task = self._to_stop[task_id]
             state = States.TO_STOP
+        elif task_id in self._scheduled:
+            task = self._scheduled[task_id]
+            state = States.SCHEDULED
+        elif task_id in self._paused:
+            task = self._paused[task_id]
+            state = States.PAUSED
+        elif task_id in self._stopped:
+            # Stopped task references have been dropped.
+            task = None
+            state = States.STOPPED
+        elif task_id in self._new:
+            # Actually, new tasks will always be in _to_pause or _to_schedule, so we should never get this status.
+            # It's fine to leave it for now.
+            task = self._new[task_id]
+            state = States.NEW
         else:
             task = None
             state = States.UNKNOWN
