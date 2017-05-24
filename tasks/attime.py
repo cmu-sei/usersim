@@ -34,7 +34,7 @@ class AtTime(task.Task):
             try:
                 time_obj = datetime.datetime.strptime(time, '%H%M').time()
             except Exception:
-                raise ValueError('Given time value %s is invalid. It should be in 24-hour HHMM format' % time)
+                raise ValueError('Given time value %s is invalid. It should be in 24-hour HHMM format' % str(time))
 
         if 'seconds' in conf_dict:
             try:
@@ -42,7 +42,7 @@ class AtTime(task.Task):
                 # It makes no sense for this value to be 0.
                 assert 0 < seconds and seconds < 60
             except Exception:
-                raise ValueError('Given seconds value %s is invalid. It must be between 0 and 60.' % seconds)
+                raise ValueError('Given seconds value %s is invalid. It must be between 0 and 60.' % str(seconds))
             else:
                 seconds_obj = datetime.timedelta(seconds=seconds)
                 time_obj += seconds_obj
@@ -52,7 +52,7 @@ class AtTime(task.Task):
             try:
                 date_obj = datetime.datetime.strptime(date, '%Y-%m-%d').date()
             except Exception:
-                raise ValueError('Given date value %s is invalid. It must be in the format YYYY-MM-DD.' % date)
+                raise ValueError('Given date value %s is invalid. It must be in the format YYYY-MM-DD.' % str(date))
         else:
             date_obj = datetime.datetime.today().date()
 
