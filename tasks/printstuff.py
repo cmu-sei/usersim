@@ -14,6 +14,9 @@ class PrintStuff(task.Task):
     def stop(self):
         return True
 
+    def status(self):
+        return ''
+
     @classmethod
     def config(cls, conf_dict):
         return cls()

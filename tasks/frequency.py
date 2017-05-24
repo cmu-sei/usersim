@@ -38,6 +38,9 @@ class Frequency(task.Task):
         else:
             return True
 
+    def status(self):
+        return 'Triggered %d times.' % self._triggered
+
     @classmethod
     def config(cls, conf_dict):
         """ Configures a Frequency object.

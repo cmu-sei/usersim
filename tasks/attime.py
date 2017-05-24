@@ -23,6 +23,12 @@ class AtTime(task.Task):
     def stop(self):
         return self._triggered
 
+    def status(self):
+        if self._triggered:
+            return 'Nested task has triggered.'
+        else:
+            return 'Nested task will trigger at %s' % str(self._trigger_time)
+
     @classmethod
     def config(cls, conf_dict):
         param_missing = '%s parameter missing from configuration'

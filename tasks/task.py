@@ -32,6 +32,14 @@ class Task(object):
         """
         raise NotImplementedError("Not yet implemented.")
 
+    def status(self):
+        """ Called when status is polled for this task.
+
+        Returns:
+            str: An arbitrary string giving more detailed, task-specific status for the given task.
+        """
+        raise NotImplementedError("Not yet implemented.")
+
     @classmethod
     def config(cls, conf_dict):
         """ Converts a configuration into an actual Task object.
