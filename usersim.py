@@ -177,7 +177,7 @@ class _UserSim(object):
         """ Unpause all tasks that are currently paused. Guaranteed thread-safe.
         """
         with self._operation_lock:
-            for key in self._scheduled:
+            for key in self._paused:
                 self._unpause_single(key)
 
     def unpause_task(self, task_id):
