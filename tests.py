@@ -8,7 +8,7 @@ import usersim
 def test_new_task():
     importlib.reload(usersim)
     sim = usersim.UserSim()
-    task = tasks.printstuff.PrintStuff.config(dict())
+    task = tasks.test.Test.config(dict())
     assert sim.new_task(task) == 1
 
 def test_cycle():
@@ -17,7 +17,7 @@ def test_cycle():
     # First cycle should not have had any scheduled tasks to run yet - they will be scheduled at the end.
     assert not sim.cycle()
     # This cycle SHOULD have a feedback tuple.
-    assert bool(sim.cycle())
+    assert sim.cycle()
 
 def test_scheduling():
     test_new_task()
@@ -33,6 +33,8 @@ def test_scheduling():
     sim.cycle()
     assert not sim.status_all()
     assert sim.status_task(1)['state'] == api.States.STOPPED
+
+    assert sim.status_task(2)['state'] == api.States.UNKNOWN
 
 if __name__ == '__main__':
     print('Running test_new_task')
