@@ -28,10 +28,6 @@ class _UserSim(object):
     def __init__(self):
         self._scheduled = dict()
         self._paused = dict()
-        # TODO: If we keep track of dead tasks, that means that the simulator WILL eventually run out of memory.
-        # It's nice keeping track of the types of dead tasks, but this must be handled in a better way. Maybe clean
-        # this dict out periodically, or just use the current highest ID to determine if a task is stopped.
-        self._stopped = dict()
 
         # Used in order to keep the sanity checks in _resolve_actions.
         self._new = dict()
@@ -43,7 +39,7 @@ class _UserSim(object):
         self._operation_lock = threading.Lock()
 
         # Used to give status about stopped tasks. This variable must not be increased or decreased, only assigned.
-        self._current_id = None
+        self._current_id = 0
         self._id_gen = self._new_id()
 
     def cycle(self):
@@ -132,8 +128,6 @@ class _UserSim(object):
                 status_list.append(self._status_single(key))
             for key in self._paused:
                 status_list.append(self._status_single(key))
-            for key in self._stopped:
-                status_list.append(self._status_single(key))
             for key in self._new:
                 status_list.append(self._status_single(key))
 
@@ -213,7 +207,7 @@ class _UserSim(object):
         """ Return the status of a particular task. NOT guaranteed thread-safe.
 
         Arguments:
-            task_id (int): The value returned by the new_task method when the task to be paused was added.
+            task_id (int > 0): The value returned by the new_task method when the task to be paused was added.
 
         Returns:
             dict: A dictionary with the following key:value pairs:
@@ -222,6 +216,8 @@ class _UserSim(object):
                 'state':str
                 'status':str
         """
+        assert task_id > 0
+
         status_dict = dict()
 
         if task_id in self._to_schedule:
@@ -239,15 +235,14 @@ class _UserSim(object):
         elif task_id in self._paused:
             task = self._paused[task_id]
             state = States.PAUSED
-        elif task_id in self._stopped:
-            # Stopped task references have been dropped.
-            task = None
-            state = States.STOPPED
         elif task_id in self._new:
             # Actually, new tasks will always be in _to_pause or _to_schedule, so we should never get this status.
             # It's fine to leave it for now.
             task = self._new[task_id]
             state = States.NEW
+        elif task_id <= self._current_id:
+            task = None
+            state = States.STOPPED
         else:
             task = None
             state = States.UNKNOWN
@@ -256,7 +251,7 @@ class _UserSim(object):
             task_type = self._get_task_type(task)
             status = task.status()
         elif state == States.STOPPED:
-            task_type = self._stopped[task_id]
+            task_type = 'unknown'
             status = 'dead'
         else:
             task_type = 'unknown'
@@ -346,9 +341,6 @@ class _UserSim(object):
                 # If this raises, how did this happen?
                 assert task_ is task
                 task.cleanup()
-
-                # Still keep tracking the ID and task type so we can report the task's stopped status.
-                self._stopped[task_id] = self._get_task_type(task)
 
             self._to_stop = dict()
 
