@@ -7,9 +7,13 @@ import usersim
 
 def test_new_task():
     importlib.reload(usersim)
-    sim = usersim.UserSim()
-    task = tasks.test.Test.config(dict())
-    assert sim.new_task(task) == 1
+    task = {'type': 'test', 'config': {}}
+    assert api.new_task(task) == 1
+
+def test_new_task_stop():
+    importlib.reload(usersim)
+    task = {'type': 'testnostop', 'config': {}}
+    assert api.new_task(task) == 1
 
 def test_cycle():
     test_new_task()
@@ -19,22 +23,62 @@ def test_cycle():
     # This cycle SHOULD have a feedback tuple.
     assert sim.cycle()
 
-def test_scheduling():
+def test_scheduling_auto_stop():
     test_new_task()
     sim = usersim.UserSim()
 
-    assert sim.status_all()
-    assert sim.status_task(1)['state'] == api.States.TO_SCHEDULE
+    assert api.status_all()
+    assert api.status_task(1)['state'] == api.States.TO_SCHEDULE
 
     sim.cycle()
-    assert sim.status_all()
-    assert sim.status_task(1)['state'] == api.States.SCHEDULED
+    assert api.status_all()
+    assert api.status_task(1)['state'] == api.States.SCHEDULED
 
     sim.cycle()
-    assert not sim.status_all()
-    assert sim.status_task(1)['state'] == api.States.STOPPED
+    assert not api.status_all()
+    assert api.status_task(1)['state'] == api.States.STOPPED
 
-    assert sim.status_task(2)['state'] == api.States.UNKNOWN
+    assert api.status_task(2)['state'] == api.States.UNKNOWN
+
+def test_scheduling():
+    test_new_task_stop()
+    sim = usersim.UserSim()
+
+    assert api.status_task(1)['state'] == api.States.TO_SCHEDULE
+    sim.cycle()
+    assert api.status_task(1)['state'] == api.States.SCHEDULED
+
+    sim.cycle()
+    assert api.status_task(1)['state'] == api.States.SCHEDULED
+
+    api.pause_all()
+    assert api.status_task(1)['state'] == api.States.TO_PAUSE
+
+    # pauses should be idempotent
+    api.pause_task(1)
+    assert api.status_task(1)['state'] == api.States.TO_PAUSE
+
+    sim.cycle()
+    assert api.status_task(1)['state'] == api.States.PAUSED
+
+    api.unpause_all()
+    assert api.status_task(1)['state'] == api.States.TO_SCHEDULE
+
+    # unpauses should be idempotent
+    api.unpause_task(1)
+    assert api.status_task(1)['state'] == api.States.TO_SCHEDULE
+
+    sim.cycle()
+    assert api.status_task(1)['state'] == api.States.SCHEDULED
+
+    api.stop_all()
+    assert api.status_task(1)['state'] == api.States.TO_STOP
+
+    api.stop_task(1)
+    assert api.status_task(1)['state'] == api.States.TO_STOP
+
+    sim.cycle()
+    assert api.status_task(1)['state'] == api.States.STOPPED
 
 if __name__ == '__main__':
     print('Running test_new_task')
@@ -43,5 +87,8 @@ if __name__ == '__main__':
     print('Running test_cycle')
     test_cycle()
 
-    print('Running test_scheduling')
+    print('Running test_scheduling_auto_stop')
+    test_scheduling_auto_stop()
+
+    print('running test_scheduling')
     test_scheduling()
