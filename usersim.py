@@ -296,7 +296,7 @@ class _UserSim(object):
             bool: True if the operation was successful, False otherwise.
         """
         if task_id in self._paused:
-            self._to_stop[task_id] = self._paused[task_id]
+            self._to_schedule[task_id] = self._paused[task_id]
             return True
         return False
 
