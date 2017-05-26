@@ -1,4 +1,4 @@
-import tasks
+import tasks.test
 
 
 class TestNoStop(tasks.test.Test):
