@@ -42,6 +42,8 @@ class _UserSim(object):
 
         self._operation_lock = threading.Lock()
 
+        # Used to give status about stopped tasks. This variable must not be increased or decreased, only assigned.
+        self._current_id = None
         self._id_gen = self._new_id()
 
     def cycle(self):
@@ -84,6 +86,7 @@ class _UserSim(object):
         """
         with self._operation_lock:
             task_id = next(self._id_gen)
+            self._current_id = task_id
             if start_paused:
                 self._to_pause[task_id] = task
             else:
