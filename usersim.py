@@ -73,7 +73,7 @@ class _UserSim(object):
         return feedback
 
     def new_task(self, task, start_paused=False):
-        """ Manage a task.
+        """ Manage a task. Guaranteed thread-safe.
 
         Arguments:
             task (tasks.task.Task): A constructed Task object that is ready to run.
