@@ -44,6 +44,11 @@ class _UserSim(object):
 
     def cycle(self):
         """ Work through one simulation cycle.
+
+        Returns:
+            list of tuples: For each task that ran during this cycle, a tuple of the following is created:
+                int: Task ID of the task that ran
+                str: A traceback message if an exception occurred, empty string otherwise.
         """
         feedback = list()
 
@@ -54,14 +59,11 @@ class _UserSim(object):
                 # if the timer should be a guaranteed global.
                 task()
             except Exception:
-                result = 'Failure'
                 exception = traceback.format_exc()
             else:
-                result = 'Success'
-                exception = None
+                exception = str()
 
-            # TODO: This should probably construct a feedback message object - NYI.
-            feedback.append((task_id, result, exception))
+            feedback.append((task_id, exception))
 
             if task.stop():
                 self.stop_task(task_id)
