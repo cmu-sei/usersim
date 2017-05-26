@@ -74,6 +74,7 @@ def test_scheduling():
     api.stop_all()
     assert api.status_task(1)['state'] == api.States.TO_STOP
 
+    # stops should be idempotent
     api.stop_task(1)
     assert api.status_task(1)['state'] == api.States.TO_STOP
 
