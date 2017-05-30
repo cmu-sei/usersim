@@ -6,7 +6,7 @@ from usersim import States
 import tasks
 
 
-def new_task(task_config, start_paused=False):
+def new_task(config, start_paused=False):
     """ Inserts a new task into the user simulator.
 
     Arguments:
@@ -15,12 +15,18 @@ def new_task(task_config, start_paused=False):
             'config':dict
         start_paused (bool): True if the new task should be paused initially, False otherwise.
 
+    Raises:
+        KeyError: See validate_config docstring.
+        ValueError: See validate_config docstring.
+
     Returns:
         int: The new task's unique ID.
     """
     sim = usersim.UserSim()
-    new_task = tasks.task_dict[task_config['type']].config(task_config['config'])
-    return sim.new_task(new_task, start_paused)
+    validate_config(config)
+    task = tasks.task_dict[config['type']]
+    t = task(config['config'])
+    return sim.new_task(t, start_paused)
 
 def pause_task(task_id):
     """ Pause a single task.
@@ -104,3 +110,18 @@ def stop_all():
     """
     sim = usersim.UserSim()
     sim.stop_all()
+
+def validate_config(config):
+    """ Validate a config dictionary without instantiating a Task subclass.
+
+    Args:
+        config (dict): A dictionary with the following key:value pairs.
+            'type':str
+            'config':dict
+
+    Raises:
+        KeyError: If a required key is missing from config or config['config'] or if the task type does not exist.
+        ValueError: If the given value of an option under config['config'] is invalid.
+    """
+    task = tasks.task_dict[config['type']]
+    task.validate(config['config'])

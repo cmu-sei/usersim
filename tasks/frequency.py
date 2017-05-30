@@ -6,13 +6,18 @@ from tasks import task
 
 
 class Frequency(task.Task):
-    def __init__(self, freq, reps, task):
+    def __init__(self, config):
         """
         Args:
             freq (float > 0): Average number of occurences per hour.
             reps (int >= 0): Maximum number of times to trigger. 0 imposes no limit.
             task (dict): A configuration dictionary for any task.
         """
+        config = self.validate(config)
+        freq = config['frequency']
+        reps = config['repetitions']
+        task = config['task']
+
         self._time_per_trigger = 3600 / freq
         self._reps = reps
         self._triggered = 0
@@ -42,47 +47,72 @@ class Frequency(task.Task):
         return 'Triggered %d times.' % self._triggered
 
     @classmethod
-    def config(cls, conf_dict):
-        """ Configures a Frequency object.
+    def parameters(cls):
+        """ Returns a dictionary with human-readable descriptions of required arguments for the Frequency task.
+
+        Returns:
+            dict of dicts: Configuration dictionary with the keys 'required' and 'optional', where values are dicts
+                containing the required and optional parameters and their descriptions for the Frequency task,
+                respectively.
+        """
+        params = {'required': {'task': 'the configuration of another task',
+                               'frequency': 'positive decimal number - avg number of triggers per hour',
+                               'repetitions': 'non-negative integer - 0 for unlimited'},
+                  'optional': {}}
+
+    @classmethod
+    def validate(cls, config):
+        """ Check if the given configuration is valid.
 
         Args:
-            conf_dict (dict): Configuration dictionary with the following keys:
+            config (dict): Configuration dictionary with the following keys:
                 frequency (float > 0): Average number of occurences per hour.
                 repetitions (int >= 0): Maximum number of times to trigger. 0 indicates no maximum.
                 task (dict): Configuration for a nested task.
 
-        Returns:
-            Frequency: A constructed Frequency object.
-        """
-        param_missing = '%s parameter missing from configuration'
-        not_a_number = 'Given %s value %s cannot be interpreted as a number.'
-        invalid_input = 'Given %s value %s, which is not valid.'
+        Raises:
+            KeyError: If a required key is missing. The error message will be the missing key.
+            ValueError: If an argument to an option is invalid. The error message will be as follows:
+                key: value reason
 
-        if 'frequency' not in conf_dict:
-            raise KeyError(param_missing % 'frequency')
+        Returns:
+            dict: The given configuration dict with arguments converted to their required formats with missing
+                optional arguments added with default arguments.
+        """
+        converted = dict()
+
+        if 'frequency' not in config:
+            raise KeyError('frequency')
         else:
-            freq = conf_dict['frequency']
+            freq = config['frequency']
             try:
                 freq = float(freq)
             except ValueError:
-                raise ValueError(not_a_number % ('frequency', str(freq)))
+                raise ValueError('frequency: {} Not a valid number.'.format(str(freq)))
             if freq <= 0:
-                raise ValueError(invalid_input % ('frequency', '%s <= 0' % str(freq)))
+                raise ValueError('frequency: {} Must be non-negative.'.format(str(freq)))
 
-        if 'repetitions' not in conf_dict:
-            raise KeyError(param_missing % 'repetitions')
+        if 'repetitions' not in config:
+            raise KeyError('repetitions')
         else:
-            reps = conf_dict['repetitions']
+            reps = config['repetitions']
             try:
                 reps = int(reps)
             except ValueError:
-                raise ValueError(not_a_number % ('repetitions', str(reps)))
+                raise ValueError('repetitions: {} Not a valid number'.format(str(reps)))
             if reps < 0:
-                raise ValueError(invalid_input % ('repetitions', '%s <= 0' % str(reps)))
+                raise ValueError('repetitions: {} Must be positive'.format(str(reps)))
 
-        if 'task' not in conf_dict:
+        if 'task' not in config:
             raise KeyError(param_missing % 'task')
         else:
-            task = conf_dict['task']
+            task = config['task']
+            if not isinstance(task, dict):
+                raise ValueError('task: {} Must be a dictionary.'.format(str(task)))
+            api.validate_config(task)
 
-        return cls(freq, reps, task)
+        converted['frequency'] = freq
+        converted['repetitions'] = reps
+        converted['task'] = task
+
+        return converted

@@ -1,7 +1,7 @@
 class Task(object):
     """ All methods must be overridden by subclasses.
     """
-    def __init__(self):
+    def __init__(self, config):
         raise NotImplementedError("Not yet implemented.")
 
     def __call__(self):
@@ -41,17 +41,30 @@ class Task(object):
         raise NotImplementedError("Not yet implemented.")
 
     @classmethod
-    def config(cls, conf_dict):
-        """ Converts a configuration into an actual Task object.
-
-        Args:
-            conf_dict (dict): A dictionary of the configuration options for this class.
-
-        Raises:
-            KeyError: If a configuration option is missing.
-            ValueError: If a configuration's value is not valid.
+    def parameters(cls):
+        """ Returns a dictionary with the required and optional parameters of the class, with human-readable
+        descriptions for each.
 
         Returns:
-            Task: A configured Task object.
+            dict of dicts: A dictionary whose keys are 'required' and 'optional', and whose values are dictionaries
+                containing the required and optional parameters of the class as keys and human-readable (str)
+                descriptions and requirements for each key as values.
+        """
+        raise NotImplementedError("Not yet implemented.")
+
+    @classmethod
+    def validate(cls, conf_dict):
+        """ Validates the given configuration dictionary.
+
+        Args:
+            conf_dict (dict): The dictionary to validate. Its keys and values are subclass-specific.
+
+        Raises:
+            KeyError: If a required configuration option is missing. The error message is the missing key.
+            ValueError: If a configuration option's value is not valid. The error message is in the following format:
+                key: value requirement
+
+        Returns:
+            dict: The dict given as the conf_dict argument with missing optional parameters added with default values.
         """
         raise NotImplementedError("Not yet implemented.")
