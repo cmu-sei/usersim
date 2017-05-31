@@ -3,6 +3,7 @@ import traceback
 import api
 import tasks
 import usersim
+import runtests
 
 
 def main():

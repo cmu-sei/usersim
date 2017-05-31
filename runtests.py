@@ -1,7 +1,8 @@
 import tests
 import traceback
 
-if __name__ == '__main__':
+
+def run_all_tests():
     successes = list()
     failures = list()
 
@@ -31,3 +32,6 @@ if __name__ == '__main__':
             print('    ' + str(test))
     else:
         print('ALL TESTS PASSED.')
+
+if __name__ == '__main__':
+    run_all_tests()
