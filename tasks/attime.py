@@ -1,21 +1,30 @@
 import datetime
 
+import api
 from tasks import task
 
 
 class AtTime(task.Task):
-    def __init__(self, behavior, trigger_time):
+    def __init__(self, config):
+        config = self.validate(config)
+        time = datetime.datetime.strptime(config['time'], '%H%M').time()
+        seconds = datetime.timedelta(seconds=config['seconds'])
+        date = datetime.datetime.strptime(config['date'], '%Y-%m-%d').date()
+        task = config['task']
+
+        trigger_time = datetime.datetime.combine(date, time) + seconds
+
         if datetime.datetime.now() > trigger_time:
             # If the trigger time has passed for today, just trigger it tomorrow at that time.
             trigger_time += datetime.timedelta(days=1)
         self._trigger_time = trigger_time
-        self._behavior = behavior
+        self._task = task
         self._triggered = False
 
     def __call__(self):
         if datetime.datetime.now() >= self._trigger_time:
             self._triggered = True
-            return self._behavior
+            api.new_task(self._task)
 
     def cleanup(self):
         pass
@@ -30,41 +39,73 @@ class AtTime(task.Task):
             return 'Nested task will trigger at %s' % str(self._trigger_time)
 
     @classmethod
-    def config(cls, conf_dict):
+    def parameters(cls):
+        """ Returns a dictionary with the required and optional parameters of the class, with human-readable
+        descriptions for each.
+
+        Returns:
+            dict of dicts: A dictionary whose keys are 'required' and 'optional', and whose values are dictionaries
+                containing the required and optional parameters of the class as keys and human-readable (str)
+                descriptions and requirements for each key as values.
+        """
+        required = {'time': '24-hour time code in HHMM format'}
+        optional = {'seconds': 'positive decimal number less than 60 - default is 0',
+                    'date': 'date stamp in YYYY-MM-DD format - default is today, or tomorrow if time was passed today'}
+
+        return {'required': required, 'optional': optional}
+
+    @classmethod
+    def validate(cls, conf_dict):
+        """ Validates the given configuration dictionary.
+
+        Args:
+            conf_dict (dict): The dictionary to validate. Its keys and values are subclass-specific.
+
+        Raises:
+            KeyError: If a required configuration option is missing. The error message is the missing key.
+            ValueError: If a configuration option's value is not valid. The error message is in the following format:
+                key: value requirement
+
+        Returns:
+            dict: The dict given as the conf_dict argument with missing optional parameters added with default values.
+                'time':str - HHMM formatted timestamp
+                'seconds':float - 0 <= number < 60, default 0
+                'date':str - YYYY-MM-DD formatted date, default today
+        """
         param_missing = '%s parameter missing from configuration'
 
-        if 'time' not in conf_dict:
-            raise KeyError(param_missing % 'time')
-        else:
+        try:
             time = conf_dict['time']
+        except KeyError:
+            raise KeyError('time')
+        else:
             try:
-                time_obj = datetime.datetime.strptime(time, '%H%M').time()
+                datetime.datetime.strptime(time, '%H%M').time()
             except Exception:
-                raise ValueError('Given time value %s is invalid. It should be in 24-hour HHMM format' % str(time))
+                raise ValueError('time: {} Must be in HHMM format'.format(str(time)))
 
         if 'seconds' in conf_dict:
             try:
                 seconds = float(conf_dict['seconds'])
-                # It makes no sense for this value to be 0.
-                assert 0 < seconds and seconds < 60
+                assert 0 <= seconds and seconds < 60
             except Exception:
-                raise ValueError('Given seconds value %s is invalid. It must be between 0 and 60.' % str(seconds))
-            else:
-                seconds_obj = datetime.timedelta(seconds=seconds)
-                time_obj += seconds_obj
+                raise ValueError('seconds: {} Must be a number between 0 and 60 non-inclusive'.format(str(seconds)))
+        else:
+            seconds = 0.0
 
         if 'date' in conf_dict:
             date = conf_dict['date']
             try:
                 date_obj = datetime.datetime.strptime(date, '%Y-%m-%d').date()
             except Exception:
-                raise ValueError('Given date value %s is invalid. It must be in the format YYYY-MM-DD.' % str(date))
+                raise ValueError('date: {} Must be in YYYY-MM-DD format'.format(str(date)))
         else:
-            date_obj = datetime.datetime.today().date()
+            date = str(datetime.datetime.today().date())
 
-        if 'behavior' not in conf_dict:
-            raise KeyError(param_missing % 'behavior')
+        if 'task' not in conf_dict:
+            raise KeyError('task')
         else:
-            behavior = conf_dict['behavior']
+            task = conf_dict['task']
+            api.validate_config(task)
 
-        return cls(behavior, datetime.datetime.combine(date_obj, time_obj))
+        return {'time': time, 'seconds': seconds, 'date': date, 'task': task}
