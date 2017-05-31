@@ -60,12 +60,10 @@ class _UserSim(object):
                 task()
             except Exception:
                 exception = traceback.format_exc()
-            else:
-                exception = str()
-
-            feedback.append((task_id, exception))
+                feedback.append((task_id, exception))
 
             if task.stop():
+                feedback.append((task_id, str()))
                 self.stop_task(task_id)
 
         self._resolve_actions()
