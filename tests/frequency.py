@@ -5,16 +5,17 @@ import usersim
 
 
 def run_test():
+    reps = 10
     config = {'type': 'frequency',
               'config': {'frequency': 2000,
-                         'repetitions': 10,
+                         'repetitions': reps,
                          'task': {'type': 'test',
                                   'config': {}}}}
 
     importlib.reload(usersim)
     sim = usersim.UserSim()
 
-    api.new_task(config)
+    task_id = api.new_task(config)
 
     while True:
         result = sim.cycle()
@@ -22,7 +23,8 @@ def run_test():
         if len(result) > 1:
             print(result)
 
-        if api.status_task(1)['state'] == api.States.STOPPED:
+        # Break once the final task has been stopped.
+        if api.status_task(task_id + reps)['state'] == api.States.STOPPED:
             break
 
 if __name__ == '__main__':
