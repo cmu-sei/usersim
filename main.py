@@ -11,13 +11,12 @@ def main():
                             'repetitions': 10,
                             'task': {'type': 'test',
                                      'config': {}}}}
-
-    sim = usersim.UserSim()
     api.new_task(conf_dict)
 
+    sim = usersim.UserSim()
     while True:
         result = sim.cycle()
-        if len(result) > 1:
+        if result:
             print(result)
 
 if __name__ == '__main__':
