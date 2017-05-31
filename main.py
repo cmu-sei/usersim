@@ -1,5 +1,3 @@
-import traceback
-
 import api
 import tasks
 import usersim
