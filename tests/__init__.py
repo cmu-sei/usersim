@@ -2,6 +2,7 @@ import importlib
 import inspect
 import os
 import sys
+import textwrap
 import traceback
 
 
@@ -65,7 +66,8 @@ def run_all_tests():
     print('********************************************************************************')
     if failures:
         print('The following tests failed:')
-        for test in failures:
+        for test, exception in failures:
             print('    ' + str(test))
+            print(textwrap.indent(exception, ' '*8))
     else:
         print('ALL TESTS PASSED.')
