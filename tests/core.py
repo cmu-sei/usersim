@@ -81,15 +81,14 @@ def test_scheduling():
     sim.cycle()
     assert api.status_task(1)['state'] == api.States.STOPPED
 
-if __name__ == '__main__':
-    print('Running test_new_task')
+def run_test():
     test_new_task()
 
-    print('Running test_cycle')
     test_cycle()
 
-    print('Running test_scheduling_auto_stop')
     test_scheduling_auto_stop()
 
-    print('running test_scheduling')
     test_scheduling()
+
+if __name__ == '__main__':
+    run_test()
