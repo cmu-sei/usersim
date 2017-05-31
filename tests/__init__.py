@@ -35,3 +35,36 @@ load_modules()
 # Avoid having a bunch of junk left over.
 del py_files
 del special_modules
+
+
+# Importable test runner.
+def run_all_tests():
+    successes = list()
+    failures = list()
+
+    for test in loaded:
+        try:
+            test.run_test()
+        except Exception:
+            failures.append((test, traceback.format_exc()))
+        else:
+            successes.append(test)
+
+    print('********************************************************************************')
+    print('********************************************************************************')
+    print('********************************************************************************')
+    if successes:
+        print('The following tests passed:')
+        for test in successes:
+            print('    ' + str(test))
+    else:
+        print('NO TESTS PASSED.')
+    print('********************************************************************************')
+    print('********************************************************************************')
+    print('********************************************************************************')
+    if failures:
+        print('The following tests failed:')
+        for test in failures:
+            print('    ' + str(test))
+    else:
+        print('ALL TESTS PASSED.')
