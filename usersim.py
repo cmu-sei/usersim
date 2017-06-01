@@ -53,10 +53,7 @@ class _UserSim(object):
         feedback = list()
 
         for task_id, task in self._scheduled.items():
-
             try:
-                # TODO: This should have a watchdog timer - unsure if individual tasks should set their own timers or
-                # if the timer should be a guaranteed global.
                 task()
             except Exception:
                 exception = traceback.format_exc()
