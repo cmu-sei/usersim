@@ -61,7 +61,7 @@ def unpause_task(task_id):
     return sim.unpause_task(task_id)
 
 def unpause_all():
-    """ Unpause all currently scheduled tasks.
+    """ Unpause all currently paused tasks.
     """
     sim = usersim.UserSim()
     sim.unpause_all()
