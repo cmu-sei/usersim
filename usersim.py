@@ -17,8 +17,8 @@ class UserSim(object):
     """
     _instance = None
 
-    def __new__(cls):
-        if cls._instance is None:
+    def __new__(cls, reset=False):
+        if cls._instance is None or reset:
             cls._instance = _UserSim()
         return cls._instance
 

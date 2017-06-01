@@ -1,5 +1,4 @@
 import datetime
-import importlib
 
 import api
 import usersim
@@ -19,8 +18,7 @@ def run_test():
                          'task': {'type': 'test',
                                   'config': {}}}}
 
-    importlib.reload(usersim)
-    sim = usersim.UserSim()
+    sim = usersim.UserSim(True)
 
     task_id = api.new_task(config)
     sim.cycle()

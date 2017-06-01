@@ -1,19 +1,15 @@
-import importlib
-
 import api
 import tasks
 import usersim
 
 
 def test_new_task():
-    importlib.reload(usersim)
     task = {'type': 'test', 'config': {}}
-    assert api.new_task(task) == 1
+    assert api.new_task(task, reset=True) == 1
 
 def test_new_task_stop():
-    importlib.reload(usersim)
     task = {'type': 'testnostop', 'config': {}}
-    assert api.new_task(task) == 1
+    assert api.new_task(task, reset=True) == 1
 
 def test_cycle():
     test_new_task()

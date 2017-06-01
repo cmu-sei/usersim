@@ -6,7 +6,7 @@ from usersim import States
 import tasks
 
 
-def new_task(config, start_paused=False):
+def new_task(config, start_paused=False, reset=False):
     """ Inserts a new task into the user simulator.
 
     Arguments:
@@ -14,6 +14,8 @@ def new_task(config, start_paused=False):
             'type':str
             'config':dict
         start_paused (bool): True if the new task should be paused initially, False otherwise.
+        reset (bool): True if the simulator should be reset, False otherwise. This option should only be used
+            for writing tests.
 
     Raises:
         KeyError: See validate_config docstring.
@@ -22,7 +24,7 @@ def new_task(config, start_paused=False):
     Returns:
         int: The new task's unique ID.
     """
-    sim = usersim.UserSim()
+    sim = usersim.UserSim(reset)
     validate_config(config)
     task = tasks.task_dict[config['type']]
     t = task(config['config'])
