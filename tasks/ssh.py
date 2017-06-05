@@ -42,8 +42,8 @@ class SSH(task.Task):
         """
         raise NotImplementedError("Not yet implemented.")
 
-	@classmethod
-	def parameters(cls):
+    @classmethod
+    def parameters(cls):
         """ Returns a dictionary with the required and optional parameters of the class, with human-readable
         descriptions for each.
 
@@ -60,13 +60,13 @@ class SSH(task.Task):
                     },
                 "optional": 
                 {
-                    "port": 'int: of the port on which to connect to the SSH server, ex. 22 or "22".  Default: 22'
-                    "policy": 'str: which policy to adopt in regards to missing host keys, should be one of "AutoAdd", "Reject", or "Warning". Default: Warning'}
+                    "port": 'int: of the port on which to connect to the SSH server, ex. 22 or "22".  Default: 22',
+                    "policy": 'str: which policy to adopt in regards to missing host keys, should be one of AutoAdd, Reject, or Warning. Default: Warning'}
                 }
         return params
 
-	@classmethod
-	def validate(cls, conf_dict):
+    @classmethod
+    def validate(cls, conf_dict):
         """ Validates the given configuration dictionary.
 
         Args:

@@ -93,7 +93,7 @@ class Task(object):
 
         #1. check for KeyErrors (missing required parameters)
         for item in params_reqd.keys:
-            if item not in conf_dict.keys
+            if item not in conf_dict.keys:
                 raise KeyError(item)
 
         #2. check for ValueError (all keys present, but some keys have incorrect values)
@@ -111,7 +111,7 @@ class Task(object):
                     if not item.value:
                         item.value = params_opt[item].value[1]
                     #otherwise if the type is wrong we can raise a ValueError
-                    else if type(item.value).__name__ not in params_opt[item].value:
+                    elif type(item.value).__name__ not in params_opt[item].value:
                         raise ValueError(item + ": " + item.value)
 
         #3. put in default values for any missing optional parameters
