@@ -7,16 +7,16 @@ BLOCKING = True
 
 class SSH(task.Task):
     def __init__(self, config):
+        """ Validates config and stores it as an attribute
+
+        Returns None
+        """
         self._config = self.validate(config)
 
     def __call__(self):
-        """ Periodically called while the object is scheduled. This gives the object its behavior, whatever that may
-        entail.
+        """ Connects to the SSH server specified in config.
 
-        Returns:
-            dict or None: If this task wants another task to be scheduled, this call should return the
-                configuration for that task as a dict. Otherwise, it should not return anything, which is equivalent
-                to returning None.
+        Returns None
         """
         self.ssh_to(self._config['host'],
                     self._config['user'],
@@ -26,21 +26,18 @@ class SSH(task.Task):
                     self._config['port'])
 
     def cleanup(self):
-        """ Called in the event __call__ raises an exception or when the stop method returns True. This method should
-        never raise an exception. Use this method to handle cleaning up any open handles, files, or whatever needs to be
-        closed in order to free up the memory that this object is using. This method must be overridden, but it is fine
-        for it not to actually do anything if that is intended functionality.
+        """ Doesn't do anything
+
+        Returns None
         """
         pass
 
     def stop(self):
-        """ Each time the task runs, the scheduler subsequently calls this method to check if the Task object
-        should be descheduled.
+        """ Task should stop after it is run once
 
-        Returns:
-            bool: True if this object should be descheduled. False if it should stay in the scheduler.
+        Returns True
         """
-        raise NotImplementedError("Not yet implemented.")
+        return True
 
     def status(self):
         """ Called when status is polled for this task.
@@ -64,7 +61,7 @@ class SSH(task.Task):
                                'user': 'str of username to log in with, ex. "user1"',
                                'passwd': 'str of password to log in with, ex. "p@ssw0rd1"',
                                'cmdlist': 'list of strs to send as commands, ex. ["ls -la", "cat README"]',
-                               'policty': 'str of which policy to adopt with regards to missing host keys; should be one of "AutoAdd", "Reject", or "Warning"'},
+                               'policy': 'str of which policy to adopt with regards to missing host keys; should be one of "AutoAdd", "Reject", or "Warning"'},
                   'optional': {'port': 'int or str of the port on which to connect to the SSH server, ex 22 or "22"; defaults to "22"'}}
         return params
 
@@ -89,6 +86,7 @@ class SSH(task.Task):
         """
         Connects to an SSH server at host:port with user as the username and passwd as the password.
         Proceeds to execute all commands in cmdlist.
+        Returns None
         """
         ssh = paramiko.SSHClient()
         if policy == "AutoAdd":
