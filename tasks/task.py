@@ -120,4 +120,3 @@ class Task(object):
                 conf_dict[item] = params_opt[item].value[1]
         
 
-        ##raise NotImplementedError("Not yet implemented.")

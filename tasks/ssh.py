@@ -60,7 +60,7 @@ class SSH(task.Task):
                     },
                 "optional": 
                 {
-                    "port": 'int or str: of the port on which to connect to the SSH server, ex. 22 or "22".  Default: 22'
+                    "port": 'int: of the port on which to connect to the SSH server, ex. 22 or "22".  Default: 22'
                     "policy": 'str: which policy to adopt in regards to missing host keys, should be one of "AutoAdd", "Reject", or "Warning". Default: Warning'}
                 }
         return params
