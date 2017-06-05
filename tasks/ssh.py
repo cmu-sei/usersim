@@ -42,6 +42,48 @@ class SSH(task.Task):
         """
         raise NotImplementedError("Not yet implemented.")
 
+    def ssh_to(self, host, user, passwd, cmdlist, policy, port = 22):
+        """
+        Connects to an SSH server at host:port with user as the username and passwd as the password.
+        Proceeds to execute all commands in cmdlist.
+        Returns None
+        """
+        ssh = paramiko.SSHClient()
+        if policy == "AutoAdd":
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        elif policy == "Reject":
+            ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
+        elif policy == "Warning":
+            ssh.set_missing_host_key_policy(paramiko.WarningPolicy())
+        ssh.connect(host, int(port),user, passwd)
+        channel = ssh.invoke_shell()
+        channel.setblocking(int(BLOCKING))
+        channel.sendall("")
+        incoming = ""
+
+        #Receive the welcome message from the server and print it.  If any of this fails,
+        #something went wrong with the connection.
+        while channel.recv_ready():
+            incoming += channel.recv(MAX_RECV)
+            time.sleep(.1)
+        sys.stdout.write(incoming)
+
+        for command in cmdlist:
+            channel.sendall(command + "\n")
+            time.sleep(.5)
+            incoming = ""
+            while channel.recv_ready():
+                incoming += channel.recv(MAX_RECV)
+                time.sleep(.1)
+            sys.stdout.write(incoming)
+
+        try: # Try to close the connection, but we don't want to raise an exception here if it fails
+            ssh.close()
+        except:
+            pass
+        print("") # So that the next output will be on a new line
+        
+
     @classmethod
     def parameters(cls):
         """ Returns a dictionary with the required and optional parameters of the class, with human-readable
@@ -90,43 +132,4 @@ class SSH(task.Task):
 
         return conf_dict
 
-    def ssh_to(self, host, user, passwd, cmdlist, policy, port = 22):
-        """
-        Connects to an SSH server at host:port with user as the username and passwd as the password.
-        Proceeds to execute all commands in cmdlist.
-        Returns None
-        """
-        ssh = paramiko.SSHClient()
-        if policy == "AutoAdd":
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        elif policy == "Reject":
-            ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
-        elif policy == "Warning":
-            ssh.set_missing_host_key_policy(paramiko.WarningPolicy())
-        ssh.connect(host, int(port),user, passwd)
-        channel = ssh.invoke_shell()
-        channel.setblocking(int(BLOCKING))
-        channel.sendall("")
-        incoming = ""
-
-        #Receive the welcome message from the server and print it.  If any of this fails,
-        #something went wrong with the connection.
-        while channel.recv_ready():
-            incoming += channel.recv(MAX_RECV)
-            time.sleep(.1)
-        sys.stdout.write(incoming)
-
-        for command in cmdlist:
-            channel.sendall(command + "\n")
-            time.sleep(.5)
-            incoming = ""
-            while channel.recv_ready():
-                incoming += channel.recv(MAX_RECV)
-                time.sleep(.1)
-            sys.stdout.write(incoming)
-
-        try: # Try to close the connection, but we don't want to raise an exception here if it fails
-            ssh.close()
-        except:
-            pass
-        print("") # So that the next output will be on a new line
+    
