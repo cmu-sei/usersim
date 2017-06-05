@@ -42,7 +42,7 @@ class SSH(task.Task):
         """
         raise NotImplementedError("Not yet implemented.")
 
-    def ssh_to(self, host, user, passwd, cmdlist, policy, port = 22):
+    def ssh_to(self, host, user, passwd, cmdlist, policy = "Warning", port = 22):
         """
         Connects to an SSH server at host:port with user as the username and passwd as the password.
         Proceeds to execute all commands in cmdlist.
@@ -102,7 +102,7 @@ class SSH(task.Task):
                     },
                 "optional": 
                 {
-                    "port": 'int: of the port on which to connect to the SSH server, ex. 22 or "22".  Default: 22',
+                    "port": 'int: of the port on which to connect to the SSH server, ex. 22.  Default: 22',
                     "policy": 'str: which policy to adopt in regards to missing host keys, should be one of AutoAdd, Reject, or Warning. Default: Warning'}
                 }
         return params
@@ -123,10 +123,39 @@ class SSH(task.Task):
         Returns:
             dict: The dict given as the conf_dict argument with missing optional parameters added with default values.
         """
-        super().validate(conf_dict)
+        params = cls.parameters()
 
-        #more detailed task-specific commands can go here
-        policy_opts = ['AutoAdd', 'Reject', 'Warning']
+        reqd_params = params['required']
+
+        baditem = ""
+        for item in reqd_params:
+            baditem = item
+            assert item in conf_dict
+        except:
+            raise TypeError(baditem)
+
+        strargs = ["host", "user", "passwd"]
+        for item in strargs:
+            if type(conf_dict[item].value) != str:
+                try:
+                    conf_dict[item].value = str(conf_dict[item].value)
+                except:
+                    raise ValueError(item ": " + conf_dict[item].value)
+
+        if type(conf_dict["cmdlist"].value) != list:
+            try:
+                conf_dict[item].value = [conf_dict[item].value]
+            except:
+                raise ValueError("cmdlist: " + conf_dict[item].value)
+
+
+        #optional parameters
+        if "policy" not in conf_dict:
+            conf_dict["policy"] = "Warning"
+        if "port" not in conf_dict:
+            conf_dict["port"] = 22
+
+        policy_opts = ["AutoAdd", "Reject", "Warning"]
         if conf_dict["policy"] not in policy_opts:
             raise ValueError("policy: " + conf_dict["policy"].value)
 
