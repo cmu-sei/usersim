@@ -1,13 +1,19 @@
 import json
+import xml.etree as xmltree
+import yaml
 
-import tasks
 
-
-def construct_task(task_config):
+def json_to_dict(json_string):
+    """ Converts a JSON configuration to a dict.
+    """
     pass
 
-def parse_config_string(config_string):
-    try:
-        config_obj = json.loads(config_string)
-    except Exception:
-        pass
+def xml_to_dict(xml_string):
+    """ Converts an XML configuration to a dict.
+    """
+    pass
+
+def yaml_to_dict(yaml_string):
+    """ Converts a YAML configuration to a dict.
+    """
+    pass
