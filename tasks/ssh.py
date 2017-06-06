@@ -4,14 +4,16 @@ class SSH(task.Task):
     def __init__(self, config):
         """ Validates config and stores it as an attribute
 
-        Returns None
+        Returns:
+            None
         """
         self._config = self.validate(config)
 
     def __call__(self):
         """ Connects to the SSH server specified in config.
 
-        Returns None
+        Returns:
+            None
         """
         self.ssh_to(self._config['host'],
                     self._config['user'],
@@ -21,16 +23,18 @@ class SSH(task.Task):
                     self._config['port'])
 
     def cleanup(self):
-        """ Doesn't do anything
+        """ Doesn't need to do anything
 
-        Returns None
+        Returns:
+            None
         """
         return None
 
     def stop(self):
         """ Task should stop after it is run once
 
-        Returns True
+        Returns:
+            True
         """
         return True
 
@@ -43,10 +47,11 @@ class SSH(task.Task):
         return ""
 
     def ssh_to(self, host, user, passwd, cmdlist, policy = "Warning", port = 22):
-        """ Connects to an SSH server at host:port with user as the username and passwd as the password.
-        Proceeds to execute all commands in cmdlist.
+        """ Connects to an SSH server at host:port with user as the username and passwd as the password. Proceeds to 
+        execute all commands in cmdlist.
 
-        Returns None
+        Returns:
+            None
         """
         ssh = paramiko.SSHClient()
         if policy == "AutoAdd":
@@ -138,7 +143,7 @@ class SSH(task.Task):
             raise ValueError("cmdlist: {} Must be a list of strings".format(str(config["cmdlist"])))
         for command in config["cmdlist"]:
             if type(command) != str:
-                raise ValueError("cmdlist: {} Must be a list of strings".format(str(command)))
+                raise ValueError("cmdlist: {} Must be a list of strings".format(str(config["cmdlist"])))
 
         if "policy" not in config:
             config["policy"] = "Warning"
@@ -146,7 +151,7 @@ class SSH(task.Task):
             config["port"] = 22
         policy_opts = ["AutoAdd", "Reject", "Warning"]
         if config["policy"] not in policy_opts:
-            raise ValueError("policy: {} Must be one of 'AutoAdd', \
-             'Reject', or 'Warning'".format(str(config["policy"])))
+            raise ValueError("policy: {} Must be one of 'AutoAdd', "
+                             "'Reject', or 'Warning'".format(str(config["policy"])))
 
         return config
