@@ -103,7 +103,8 @@ class SSH(task.Task):
                 "optional": 
                 {
                     "port": 'int: of the port on which to connect to the SSH server, ex. 22.  Default: 22',
-                    "policy": 'str: which policy to adopt in regards to missing host keys, should be one of AutoAdd, Reject, or Warning. Default: Warning'}
+                    "policy": 'str: which policy to adopt in regards to missing host keys, should be one of AutoAdd, \
+                    Reject, or Warning. Default: Warning'}
                 }
         return params
 
@@ -146,6 +147,6 @@ class SSH(task.Task):
         policy_opts = ["AutoAdd", "Reject", "Warning"]
         if config["policy"] not in policy_opts:
             raise ValueError("policy: {} Must be one of 'AutoAdd', \
-'Reject', or 'Warning'".format(str(config["policy"])))
+             'Reject', or 'Warning'".format(str(config["policy"])))
 
         return config
