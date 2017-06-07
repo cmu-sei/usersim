@@ -27,7 +27,11 @@ def new_task(config, start_paused=False, reset=False):
     sim = usersim.UserSim(reset)
     validate_config(config)
     task = tasks.task_dict[config['type']]
-    t = task(config['config'])
+    task_config = config['config']
+    if not task_config:
+        # Task interface expects a dict.
+        task_config = dict()
+    t = task(task_config)
     return sim.new_task(t, start_paused)
 
 def pause_task(task_id):
@@ -126,4 +130,8 @@ def validate_config(config):
         ValueError: If the given value of an option under config['config'] is invalid.
     """
     task = tasks.task_dict[config['type']]
-    task.validate(config['config'])
+    task_config = config['config']
+    if not task_config:
+        # Task interface expects a dict.
+        task_config = dict()
+    task.validate(task_config)
