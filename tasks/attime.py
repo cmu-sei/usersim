@@ -80,7 +80,7 @@ class AtTime(task.Task):
             raise KeyError('time')
         else:
             try:
-                datetime.datetime.strptime(time, '%H%M').time()
+                datetime.datetime.strptime(str(time), '%H%M').time()
             except Exception:
                 raise ValueError('time: {} Must be in HHMM format'.format(str(time)))
 
@@ -96,7 +96,7 @@ class AtTime(task.Task):
         if 'date' in conf_dict:
             date = conf_dict['date']
             try:
-                date_obj = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+                date_obj = datetime.datetime.strptime(str(date), '%Y-%m-%d').date()
             except Exception:
                 raise ValueError('date: {} Must be in YYYY-MM-DD format'.format(str(date)))
         else:
