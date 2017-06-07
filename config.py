@@ -48,15 +48,10 @@ def string_to_python(config_string):
                   xml_to_python,
                   yaml_to_python]
 
-    structure = None
-
     for converter in converters:
         try:
-            structure = converter(config_string)
+            return converter(config_string)
         except Exception:
             continue
 
-    if structure:
-        return structure
-    else:
-        raise ValueError('Could not determine a valid structure from the given configuration string:\n' + config_string)
+    raise ValueError('Could not determine a valid structure from the given configuration string:\n' + config_string)
