@@ -1,23 +1,16 @@
 import api
 import usersim
 
-def run_test(sim, input_dict):
-    task_id = api.new_task(config)
-    result = sim.cycle()
-    if len(result) > 1:
-        print(result)
-
-if __name__ == '__main__':
-    control = {
+def testSSH():
+    empty = {}
+    missingUser = {
             "host": "me",
-            "user": "admin",
             "passwd": "badpassword",
             "cmdlist": "la la la la la",
             "port": 68,
             "policy": "AutoAdd"
             }
-
-    wrongreqd = {
+    wrongHost = {
             "host": 28,
             "user": "admin",
             "passwd": "badpassword",
@@ -25,8 +18,7 @@ if __name__ == '__main__':
             "port": 68,
             "policy": "AutoAdd"
             }
-
-    wrongopt = {
+    wrongPort = {
             "host": "me",
             "user": "admin",
             "passwd": "badpassword",
@@ -34,24 +26,7 @@ if __name__ == '__main__':
             "port": "68",
             "policy": "AutoAdd"
             }
-
-    missingreqd = {
-            "host": "me",
-            "passwd": "badpassword",
-            "cmdlist": "la la la la la",
-            "port": 68,
-            "policy": "AutoAdd"
-            }
-
-    missingopt = {
-            "host": "me",
-            "user": "admin",
-            "passwd": "badpassword",
-            "cmdlist": "la la la la la",
-            "policy": "AutoAdd"
-            }
-
-    blankopt = {
+    blankPort = {
             "host": "me",
             "user": "admin",
             "passwd": "badpassword",
@@ -59,8 +34,7 @@ if __name__ == '__main__':
             "port": "",
             "policy": "AutoAdd"
             }
-
-    blankreqd = {
+    blankHost = {
             "host": "",
             "user": "admin",
             "passwd": "badpassword",
@@ -68,8 +42,7 @@ if __name__ == '__main__':
             "port": 68,
             "policy": "AutoAdd"
             }
-
-    wrongpolicy = {
+    wrongPolicy = {
             "host": "me",
             "user": "admin",
             "passwd": "badpassword",
@@ -77,22 +50,52 @@ if __name__ == '__main__':
             "port": 68,
             "policy": "AutoBAD"
             }
-
-    empty = {}
-
-    testcases = {
-                "control": control,
-                "wrongreqd": wrongreqd, 
-                "wrongopt": wrongopt, 
-                "missingreqd": missingreqd, 
-                "missingopt": missingopt, 
-                "blankreqd": blankreqd, 
-                "blankopt": blankopt, 
-                "wrongpolicy": wrongpolicy,
-                "empty": empty
-                }
-
+    missingPort = {
+            "host": "me",
+            "user": "admin",
+            "passwd": "badpassword",
+            "cmdlist": "la la la la la",
+            "policy": "AutoAdd"
+            }
+    goodConfig = {
+            "host": "me",
+            "user": "admin",
+            "passwd": "badpassword",
+            "cmdlist": "la la la la la",
+            "port": 68,
+            "policy": "AutoAdd"
+            }
+    badKeyCases = [("empty", empty), ("missingUser", missingUser)]
+    badValueCases = [("wrongHost", wrongHost), ("wrongPort", wrongPort), ("blankPort", blankPort),
+                     ("blankHost", blankHost), ("wrongPolicy", wrongPolicy)]
+    goodCases = [("missingPort", missingPort), ("goodConfig", goodConfig)]
     sim = usersim.UserSim(True)
-    for configName, config in testcases.items():
-        print("Testing input: " + configName)
-        run_test(sim, config)
+    task = {'type': 'ssh', 'config' = None}
+
+    for configName, config in badKeyCases:
+        task['config'] = config
+        try:
+            api.new_task(task)
+            raise AssertionError("Incorrectly accepted %s" % configName)
+        except KeyError:
+            print("Correctly rejected %s" % configName)
+
+    for configName, config in badValueCases:
+        task['config'] = config
+        try:
+            api.new_task(task)
+            raise AssertionError("Incorrectly accepted %s" % configName)
+        except ValueError:
+            print("Correctly rejected %s" configName)
+
+    for configName, config in goodCases:
+        task['config'] = config
+        api.new_task(task)
+        print('Correctly accepted %s' % configName)
+        result = sim.cycle()
+        if result:
+            print('    Feedback from task:')
+            print('    %s' % str(result))
+
+if __name__ == '__main__':
+    testSSH()
