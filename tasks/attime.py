@@ -72,7 +72,7 @@ class AtTime(task.Task):
                 'seconds':float - 0 <= number < 60, default 0
                 'date':str - YYYY-MM-DD formatted date, default today
         """
-        for key in self.parameters()['required']:
+        for key in cls.parameters()['required']:
             if key not in conf_dict:
                 raise KeyError(key)
 
