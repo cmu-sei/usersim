@@ -72,38 +72,30 @@ class AtTime(task.Task):
                 'seconds':float - 0 <= number < 60, default 0
                 'date':str - YYYY-MM-DD formatted date, default today
         """
+        for key in self.parameters()['required']:
+            if key not in conf_dict:
+                raise KeyError(key)
+
+        time = conf_dict['time']
         try:
-            time = conf_dict['time']
-        except KeyError:
-            raise KeyError('time')
-        else:
-            try:
-                datetime.datetime.strptime(str(time), '%H%M').time()
-            except Exception:
-                raise ValueError('time: {} Must be in HHMM format'.format(str(time)))
+            datetime.datetime.strptime(str(time), '%H%M').time()
+        except Exception:
+            raise ValueError('time: {} Must be in HHMM format'.format(str(time)))
 
-        if 'seconds' in conf_dict:
-            try:
-                seconds = float(conf_dict['seconds'])
-                assert 0 <= seconds and seconds < 60
-            except Exception:
-                raise ValueError('seconds: {} Must be a number between 0 and 60 non-inclusive'.format(str(seconds)))
-        else:
-            seconds = 0.0
+        seconds = conf_dict.get('seconds', 0.0)
+        try:
+            seconds = float(seconds)
+            assert 0 <= seconds and seconds < 60
+        except Exception:
+            raise ValueError('seconds: {} Must be a number between 0 and 60 non-inclusive'.format(str(seconds)))
 
-        if 'date' in conf_dict:
-            date = conf_dict['date']
-            try:
-                date_obj = datetime.datetime.strptime(str(date), '%Y-%m-%d').date()
-            except Exception:
-                raise ValueError('date: {} Must be in YYYY-MM-DD format'.format(str(date)))
-        else:
-            date = str(datetime.datetime.today().date())
+        date = conf_dict.get('date', str(datetime.datetime.today().date()))
+        try:
+            datetime.datetime.strptime(str(date), '%Y-%m-%d').date()
+        except Exception:
+            raise ValueError('date: {} Must be in YYYY-MM-DD format'.format(str(date)))
 
-        if 'task' not in conf_dict:
-            raise KeyError('task')
-        else:
-            task = conf_dict['task']
-            api.validate_config(task)
+        task = conf_dict['task']
+        api.validate_config(task)
 
         return {'time': time, 'seconds': seconds, 'date': date, 'task': task}
