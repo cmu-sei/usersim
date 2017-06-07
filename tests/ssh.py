@@ -1,7 +1,37 @@
 import api
 import usersim
 
+def testBadKeyCases(task, badKeyCases):
+    for configName, config in badKeyCases:
+        task['config'] = config
+        try:
+            api.new_task(task)
+            raise AssertionError('Incorrectly accepted %s' % configName)
+        except KeyError:
+            print("Correctly rejected %s" % configName)
+
+def testBadValueCases(task, badValueCases):
+    for configName, config in badValueCases:
+        task['config'] = config
+        try:
+            api.new_task(task)
+            raise AssertionError('Incorrectly accepted %s' % configName)
+        except ValueError:
+            print("Correctly rejected %s" % configName)
+
+def testGoodCases(task, goodCases):
+    sim = usersim.UserSim(True)
+    for configName, config in goodCases:
+        task['config'] = config
+        api.new_task(task)
+        print('Correctly accepted %s' % configName)
+        result = sim.cycle()
+        if result:
+            print('    Feedback from task:')
+            print('    %s' % str(result))
+
 def testSSH():
+    task = {'type': 'ssh', 'config' = None}
     empty = {}
     missingUser = {
             "host": "me",
@@ -69,33 +99,9 @@ def testSSH():
     badValueCases = [("wrongHost", wrongHost), ("wrongPort", wrongPort), ("blankPort", blankPort),
                      ("blankHost", blankHost), ("wrongPolicy", wrongPolicy)]
     goodCases = [("missingPort", missingPort), ("goodConfig", goodConfig)]
-    sim = usersim.UserSim(True)
-    task = {'type': 'ssh', 'config' = None}
-
-    for configName, config in badKeyCases:
-        task['config'] = config
-        try:
-            api.new_task(task)
-            raise AssertionError("Incorrectly accepted %s" % configName)
-        except KeyError:
-            print("Correctly rejected %s" % configName)
-
-    for configName, config in badValueCases:
-        task['config'] = config
-        try:
-            api.new_task(task)
-            raise AssertionError("Incorrectly accepted %s" % configName)
-        except ValueError:
-            print("Correctly rejected %s" configName)
-
-    for configName, config in goodCases:
-        task['config'] = config
-        api.new_task(task)
-        print('Correctly accepted %s' % configName)
-        result = sim.cycle()
-        if result:
-            print('    Feedback from task:')
-            print('    %s' % str(result))
+    testBadKeyCases(task, badKeyCases)
+    testBadValueCases(task, badValueCases)
+    testGoodCases(task, goodCases)
 
 if __name__ == '__main__':
     testSSH()
