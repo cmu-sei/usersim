@@ -1,17 +1,11 @@
 import api
-
-
+import usersim
 
 def run_test(sim, input_dict):
-    
-
     task_id = api.new_task(config)
     result = sim.cycle()
     if len(result) > 1:
         print(result)
-
-
-
 
 if __name__ == '__main__':
     control = {
@@ -84,19 +78,21 @@ if __name__ == '__main__':
             "policy": "AutoBAD"
             }
 
+    empty = {}
 
     testcases = {
-                "good": good,
+                "control": control,
                 "wrongreqd": wrongreqd, 
                 "wrongopt": wrongopt, 
                 "missingreqd": missingreqd, 
                 "missingopt": missingopt, 
                 "blankreqd": blankreqd, 
                 "blankopt": blankopt, 
-                "wrongpolicy": wrongpolicy
+                "wrongpolicy": wrongpolicy,
+                "empty": empty
                 }
 
     sim = usersim.UserSim(True)
-    for item in testcases:
-        print("Testing input: " + item.key)
-        run_test(sim, item.value)
+    for configName, config in testcases.items():
+        print("Testing input: " + configName)
+        run_test(sim, config)
