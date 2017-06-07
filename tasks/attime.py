@@ -72,8 +72,6 @@ class AtTime(task.Task):
                 'seconds':float - 0 <= number < 60, default 0
                 'date':str - YYYY-MM-DD formatted date, default today
         """
-        param_missing = '%s parameter missing from configuration'
-
         try:
             time = conf_dict['time']
         except KeyError:
