@@ -139,14 +139,13 @@ class SSH(task.Task):
         """
         params = cls.parameters()
         reqd_params = params['required']
-        for item in reqd_params:
-            if item not in config:
-                raise KeyError(item)
+        for key in reqd_params:
+            if key not in config:
+                raise KeyError(key)
 
-        strargs = ["host", "user", "passwd"]
-        for item in strargs:
-            if type(config[item]) != str:
-                raise ValueError(item + ": {} Must be a string".format(str(config[item])))
+        for key in ["host", "user", "passwd"]:
+            if type(config[key]) != str:
+                raise ValueError(key + ": {} Must be a string".format(str(config[key])))
         if not config["host"]:
             raise ValueError("host: {} Must be non-empty".format(str(config["host"])))
         if type(config["cmdlist"]) != list:
@@ -162,9 +161,9 @@ class SSH(task.Task):
         if "port" not in config:
             config["port"] = 22
         if config["policy"] not in ["AutoAdd", "Reject", "Warning"]:
-            raise ValueError("policy: {} Must be one of 'AutoAdd', "
-                             "'Reject', or 'Warning'".format(str(config["policy"])))
+            raise ValueError("policy: {} Must be one of 'AutoAdd', 'Reject', "
+                             "or 'Warning'".format(str(config["policy"])))
         if type(config["port"]) != int:
-            raise ValueError("Port: {} Must be an int".format(str(config["port"])))
+            raise ValueError("port: {} Must be an int".format(str(config["port"])))
 
         return config
