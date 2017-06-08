@@ -21,6 +21,7 @@ def test_yaml():
             - one
             - two
             - three
+        nothing:
     """
     structure = config.string_to_python(yaml_data)
 
@@ -37,6 +38,7 @@ def test_yaml():
     assert data_dict['somefloat'] == '3.14159'
     assert data_dict['somedate'] == '2017-06-08'
     assert data_dict['somelist'] == ['one', 'two', 'three']
+    assert data_dict['nothing'] == dict()
 
     sim = usersim.UserSim(True)
     for task in structure:

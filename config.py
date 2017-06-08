@@ -1,17 +1,8 @@
 import json
+import traceback
 import xml.etree as xmltree
 import yaml
 
-
-def json_to_python(json_string):
-    """ Converts a JSON configuration to a list of dicts.
-    """
-    return json.loads(json_string)
-
-def xml_to_python(xml_string):
-    """ Converts an XML configuration to a list of dicts.
-    """
-    raise NotImplementedError('XML configuration not yet implemented.')
 
 def yaml_to_python(yaml_string):
     """ Converts a YAML configuration to a list of dicts.
@@ -40,6 +31,9 @@ def yaml_to_python(yaml_string):
     def string_constructor(loader, node):
         return node.value
 
+    def dict_constructor(loader, node):
+        return dict()
+
     # For whatever reason, shorthand tags do not work.
     yaml_2002_prefix = 'tag:yaml.org,2002:'
     yaml_tags = ['bool',
@@ -51,7 +45,7 @@ def yaml_to_python(yaml_string):
     for tag in yaml_tags:
         yaml.add_constructor(yaml_2002_prefix + tag, string_constructor)
 
-    yaml.add_constructor(yaml_2002_prefix + 'null', string_constructor)
+    yaml.add_constructor(yaml_2002_prefix + 'null', dict_constructor)
 
     return yaml.load(yaml_string)
 
@@ -70,25 +64,18 @@ def string_to_python(config_string):
     Raises:
         ValueError: If the given config_string does not meet its requirements.
     """
-    converters = [json_to_python,
-                  xml_to_python,
-                  yaml_to_python]
-
-    for converter in converters:
-        try:
-            structure = converter(config_string)
-        except Exception:
-            continue
-        else:
-            if not isinstance(structure, list):
-                raise ValueError('Invalid configuration - a list could not be inferred.')
-            for task in structure:
-                if not isinstance(task, dict):
-                    raise ValueError('Invalid configuration - a list item is empty.')
-                if 'type' not in task:
-                    raise ValueError('Invalid configuration - a task is missing a type.')
-                if 'config' not in task:
-                    raise ValueError('Invalid configuration - a task is missing its configuration.')
-            return structure
-
-    raise ValueError('Could not determine a valid structure from the given configuration string:\n' + config_string)
+    try:
+        structure = yaml_to_python(config_string)
+    except Exception as e:
+        raise ValueError('Input was not valid YAML.\n' + traceback.format_exc())
+    else:
+        if not isinstance(structure, list):
+            raise ValueError('Invalid configuration - a list could not be inferred.')
+        for task in structure:
+            if not isinstance(task, dict):
+                raise ValueError('Invalid configuration - a list item is empty.')
+            if 'type' not in task:
+                raise ValueError('Invalid configuration - a task is missing a type.')
+            if 'config' not in task:
+                raise ValueError('Invalid configuration - a task is missing its configuration.')
+        return structure
