@@ -1,9 +1,14 @@
+# Ali Kidwai
+# June 8, 2017
+# Tests for SSH module for UserSim. Makes sure that SSH rejects incorrect configs and accepts correct configs. Prints
+# output from correct configs.
+
 import api
 import usersim
 
 def testBadKeyCases(task, badKeyCases):
-    """ Used to test configs with missing keys. validate() should raise a KeyError if config is missing a key, and this
-    function will raise an assertion error if validate incorrectly accepts a bad config dictionary.
+    """ Used to test configs with missing keys. This function will raise an assertion error if validate incorrectly 
+    accepts a bad config dictionary.
 
     Args:
         task: A task dictionary mapping "type" to the task name (e.g. "ssh")
@@ -24,8 +29,8 @@ def testBadKeyCases(task, badKeyCases):
             print("Correctly rejected %s" % configName)
 
 def testBadValueCases(task, badValueCases):
-    """ Used to test configs with invalid values. validate() should raise a ValueError if config contains an invalid
-    value, and this function will raise an assertion error if validate incorrectly accepts a bad config dictionary.
+    """ Used to test configs with invalid values. This function will raise an assertion error if validate incorrectly 
+    accepts a bad config dictionary.
 
     Args:
         task: A task dictionary mapping "type" to the task name (e.g. "ssh")
