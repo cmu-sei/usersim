@@ -74,5 +74,6 @@ def string_to_python(config_string):
                     raise ValueError('Invalid configuration - a task is missing a type.')
                 if 'config' not in task:
                     raise ValueError('Invalid configuration - a task is missing its configuration.')
+            return structure
 
     raise ValueError('Could not determine a valid structure from the given configuration string:\n' + config_string)

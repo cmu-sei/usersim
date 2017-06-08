@@ -10,11 +10,13 @@ def test_json():
     pass
 
 def test_yaml():
-    yaml_data = '- type: testconfig\n'\
-    '  config:\n'\
-    '   someint: 42\n'\
-    '   somestr: "blah"\n'\
-    '   somefloat: 3.14159\n'
+    yaml_data = """
+    - type: test
+      config:
+        someint: 42
+        somestr: "blah"
+        somefloat: 3.14159
+    """
     print(yaml_data)
     structure = config.string_to_python(yaml_data)
     sim = usersim.UserSim(True)
