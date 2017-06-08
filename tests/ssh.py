@@ -113,16 +113,16 @@ def testSSH():
             "policy": "AutoBAD"
             }
     missingOpts = {
-            "host": "github.com",
-            "user": "git",
+            "host": "unix.andrew.cmu.edu",
+            "user": "",
             "passwd": "",
-            "cmdlist": ["echo hello"]
+            "cmdlist": ["echo hello", "ls", "exit"]
             }
     goodConfig = {
-            "host": "github.com",
-            "user": "git",
+            "host": "unix.andrew.cmu.edu",
+            "user": "",
             "passwd": "",
-            "cmdlist": ["echo hello"],
+            "cmdlist": ["echo hello", "ls", "exit"],
             "port": 68,
             "policy": "AutoAdd"
             }

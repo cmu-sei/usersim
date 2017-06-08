@@ -9,6 +9,9 @@ import sys
 
 from tasks import task
 
+MAX_RECV = 4096
+BLOCKING = True
+
 class SSH(task.Task):
     def __init__(self, config):
         """ Validates config and stores it as an attribute
@@ -87,7 +90,7 @@ class SSH(task.Task):
             time.sleep(.5)
             incoming = ""
             while channel.recv_ready():
-                incoming += channel.recv(MAX_RECV)
+                incoming += channel.recv(MAX_RECV).decode()
                 time.sleep(.1)
             sys.stdout.write(incoming)
 
@@ -165,5 +168,7 @@ class SSH(task.Task):
                              "or 'Warning'".format(str(config["policy"])))
         if type(config["port"]) != int:
             raise ValueError("port: {} Must be an int".format(str(config["port"])))
+        if config["port"] < 1 or config["port"] > 65536:
+            raise ValueError("port: {} Must be in the range [1, 65536]".format(str(config["port"])))
 
         return config
