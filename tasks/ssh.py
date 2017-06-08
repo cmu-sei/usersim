@@ -81,7 +81,7 @@ class SSH(task.Task):
         #Receive the welcome message from the server and print it.  If any of this fails,
         #something went wrong with the connection.
         while channel.recv_ready():
-            incoming += channel.recv(MAX_RECV)
+            incoming += channel.recv(MAX_RECV).decode()
             time.sleep(.1)
         sys.stdout.write(incoming)
 
