@@ -2,6 +2,19 @@ import api
 import usersim
 
 def testBadKeyCases(task, badKeyCases):
+    """ Used to test configs with missing keys. validate() should raise a KeyError if config is missing a key, and this
+    function will raise an assertion error if validate incorrectly accepts a bad config dictionary.
+
+    Args:
+        task: A task dictionary mapping "type" to the task name (e.g. "ssh")
+        badKeyCases: A list of tuples of the form ("configName", config). config should be missing at least one key.
+
+    Raises:
+        AssertionError: If api.new_task does not raise a KeyError
+
+    Returns:
+        None
+    """
     for configName, config in badKeyCases:
         task['config'] = config
         try:
@@ -11,6 +24,20 @@ def testBadKeyCases(task, badKeyCases):
             print("Correctly rejected %s" % configName)
 
 def testBadValueCases(task, badValueCases):
+    """ Used to test configs with invalid values. validate() should raise a ValueError if config contains an invalid
+    value, and this function will raise an assertion error if validate incorrectly accepts a bad config dictionary.
+
+    Args:
+        task: A task dictionary mapping "type" to the task name (e.g. "ssh")
+        badValueCases: A list of tuples of the form ("configName", config). config should have at least one invalid 
+            value.
+
+    Raises:
+        AssertionError: If api.new_task does not raise a ValueError
+
+    Returns:
+        None
+    """
     for configName, config in badValueCases:
         task['config'] = config
         try:
@@ -20,6 +47,15 @@ def testBadValueCases(task, badValueCases):
             print("Correctly rejected %s" % configName)
 
 def testGoodCases(task, goodCases):
+    """ Used to test properly formatted configs. Prints feedback from the task.
+
+    Args:
+        task: A task dictionary mapping "type" to the task name (e.g. "ssh")
+        goodCases: A list of tuples of the form ("configName, config"). config should be properly formatted.
+
+    Returns:
+        None
+    """
     sim = usersim.UserSim(True)
     for configName, config in goodCases:
         task['config'] = config
