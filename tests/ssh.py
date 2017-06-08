@@ -72,61 +72,52 @@ def testSSH():
     missingUser = {
             "host": "me",
             "passwd": "badpassword",
-            "cmdlist": ["la la la la la"],
-            "port": 68,
-            "policy": "AutoAdd"
+            "cmdlist": ["echo hello"]
             }
     wrongHost = {
             "host": 28,
             "user": "admin",
             "passwd": "badpassword",
-            "cmdlist": ["la la la la la"],
-            "port": 68,
-            "policy": "AutoAdd"
+            "cmdlist": ["echo hello"]
             }
     wrongPort = {
             "host": "me",
             "user": "admin",
             "passwd": "badpassword",
-            "cmdlist": ["la la la la la"],
-            "port": "68",
-            "policy": "AutoAdd"
+            "cmdlist": ["echo hello"],
+            "port": "68"
             }
     blankPort = {
             "host": "me",
             "user": "admin",
             "passwd": "badpassword",
-            "cmdlist": ["la la la la la"],
-            "port": "",
-            "policy": "AutoAdd"
+            "cmdlist": ["echo hello"],
+            "port": ""
             }
     blankHost = {
             "host": "",
             "user": "admin",
             "passwd": "badpassword",
-            "cmdlist": ["la la la la la"],
-            "port": 68,
-            "policy": "AutoAdd"
+            "cmdlist": ["echo hello"]
             }
     wrongPolicy = {
             "host": "me",
             "user": "admin",
             "passwd": "badpassword",
-            "cmdlist": ["la la la la la"],
-            "port": 68,
+            "cmdlist": ["echo hello"],
             "policy": "AutoBAD"
             }
     missingOpts = {
-            "host": "io.smashthestack.org",
-            "user": "level1",
-            "passwd": "level1",
-            "cmdlist": ["la la la la la"]
+            "host": "github.com",
+            "user": "git",
+            "passwd": "",
+            "cmdlist": ["echo hello"]
             }
     goodConfig = {
-            "host": "io.smashthestack.org",
-            "user": "level1",
-            "passwd": "level1",
-            "cmdlist": ["la la la la la"],
+            "host": "github.com",
+            "user": "git",
+            "passwd": "",
+            "cmdlist": ["echo hello"],
             "port": 68,
             "policy": "AutoAdd"
             }

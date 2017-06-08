@@ -50,7 +50,7 @@ class SSH(task.Task):
         """
         return ""
 
-    def ssh_to(self, host, user, passwd, cmdlist, policy = "Warning", port = 22):
+    def ssh_to(self, host, user, passwd, cmdlist, policy="Warning", port=22):
         """ Connects to an SSH server at host:port with user as the username and passwd as the password. Proceeds to 
         execute all commands in cmdlist.
 
