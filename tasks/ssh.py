@@ -112,8 +112,8 @@ class SSH(task.Task):
                 "optional": 
                 {
                     "port": 'int: of the port on which to connect to the SSH server, ex. 22.  Default: 22',
-                    "policy": 'str: which policy to adopt in regards to missing host keys, should be one of AutoAdd, \
-                    Reject, or Warning. Default: Warning'}
+                    "policy": 'str: which policy to adopt in regards to missing host keys, should be one of AutoAdd, '
+                              'Reject, or Warning. Default: Warning'}
                 }
         return params
 
@@ -142,9 +142,12 @@ class SSH(task.Task):
         for item in strargs:
             if type(config[item]) != str:
                 raise ValueError(item + ": {} Must be a string".format(str(config[item])))
-
+        if not config["host"]:
+            raise ValueError("host: {} Must be non-empty".format(str(config["host"])))
         if type(config["cmdlist"]) != list:
             raise ValueError("cmdlist: {} Must be a list of strings".format(str(config["cmdlist"])))
+        if not config["cmdlist"]:
+            raise ValueError("cmdlist: {} Must be non-empty".format(str(config["host"])))
         for command in config["cmdlist"]:
             if type(command) != str:
                 raise ValueError("cmdlist: {} Must be a list of strings".format(str(config["cmdlist"])))
@@ -153,9 +156,10 @@ class SSH(task.Task):
             config["policy"] = "Warning"
         if "port" not in config:
             config["port"] = 22
-        policy_opts = ["AutoAdd", "Reject", "Warning"]
-        if config["policy"] not in policy_opts:
+        if config["policy"] not in ["AutoAdd", "Reject", "Warning"]:
             raise ValueError("policy: {} Must be one of 'AutoAdd', "
                              "'Reject', or 'Warning'".format(str(config["policy"])))
+        if type(config["port"]) != int:
+            raise ValueError("Port: {} Must be an int".format(str(config["port"])))
 
         return config

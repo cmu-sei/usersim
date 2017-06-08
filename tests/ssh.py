@@ -31,12 +31,12 @@ def testGoodCases(task, goodCases):
             print('    %s' % str(result))
 
 def testSSH():
-    task = {'type': 'ssh', 'config' = None}
+    task = {'type': 'ssh', 'config': None}
     empty = {}
     missingUser = {
             "host": "me",
             "passwd": "badpassword",
-            "cmdlist": "la la la la la",
+            "cmdlist": ["la la la la la"],
             "port": 68,
             "policy": "AutoAdd"
             }
@@ -44,7 +44,7 @@ def testSSH():
             "host": 28,
             "user": "admin",
             "passwd": "badpassword",
-            "cmdlist": "la la la la la",
+            "cmdlist": ["la la la la la"],
             "port": 68,
             "policy": "AutoAdd"
             }
@@ -52,7 +52,7 @@ def testSSH():
             "host": "me",
             "user": "admin",
             "passwd": "badpassword",
-            "cmdlist": "la la la la la",
+            "cmdlist": ["la la la la la"],
             "port": "68",
             "policy": "AutoAdd"
             }
@@ -60,7 +60,7 @@ def testSSH():
             "host": "me",
             "user": "admin",
             "passwd": "badpassword",
-            "cmdlist": "la la la la la",
+            "cmdlist": ["la la la la la"],
             "port": "",
             "policy": "AutoAdd"
             }
@@ -68,7 +68,7 @@ def testSSH():
             "host": "",
             "user": "admin",
             "passwd": "badpassword",
-            "cmdlist": "la la la la la",
+            "cmdlist": ["la la la la la"],
             "port": 68,
             "policy": "AutoAdd"
             }
@@ -76,29 +76,28 @@ def testSSH():
             "host": "me",
             "user": "admin",
             "passwd": "badpassword",
-            "cmdlist": "la la la la la",
+            "cmdlist": ["la la la la la"],
             "port": 68,
             "policy": "AutoBAD"
             }
-    missingPort = {
-            "host": "me",
-            "user": "admin",
-            "passwd": "badpassword",
-            "cmdlist": "la la la la la",
-            "policy": "AutoAdd"
+    missingOpts = {
+            "host": "io.smashthestack.org",
+            "user": "level1",
+            "passwd": "level1",
+            "cmdlist": ["la la la la la"]
             }
     goodConfig = {
-            "host": "me",
-            "user": "admin",
-            "passwd": "badpassword",
-            "cmdlist": "la la la la la",
+            "host": "io.smashthestack.org",
+            "user": "level1",
+            "passwd": "level1",
+            "cmdlist": ["la la la la la"],
             "port": 68,
             "policy": "AutoAdd"
             }
     badKeyCases = [("empty", empty), ("missingUser", missingUser)]
     badValueCases = [("wrongHost", wrongHost), ("wrongPort", wrongPort), ("blankPort", blankPort),
                      ("blankHost", blankHost), ("wrongPolicy", wrongPolicy)]
-    goodCases = [("missingPort", missingPort), ("goodConfig", goodConfig)]
+    goodCases = [("missingOpts", missingOpts), ("goodConfig", goodConfig)]
     testBadKeyCases(task, badKeyCases)
     testBadValueCases(task, badValueCases)
     testGoodCases(task, goodCases)
