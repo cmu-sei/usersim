@@ -30,15 +30,29 @@ def yaml_to_python(yaml_string):
                           config:
 
     Returns:
-        list of dicts: The YAML document converted to Python objects, which will be a list of dicts.
+        list of dicts: The YAML document converted to Python objects.
             YAML constructs will be converted to Python objects by this conversion:
-                None from -, null (except when - is used for list notation)
-                bool from true, false, on, and off
-                int from 42
-                float from 3.14159
-                list from [1, 2.0, 'three'] or when - list notation is used
-                dict from {one: 1, two: 2}
+                Blank scalars become empty dicts
+                All other scalars become strs
+                Sequences become lists
+                Mappings become dicts
     """
+    def string_constructor(loader, node):
+        return node.value
+
+    # For whatever reason, shorthand tags do not work.
+    yaml_2002_prefix = 'tag:yaml.org,2002:'
+    yaml_tags = ['bool',
+                 'int',
+                 'float',
+                 'binary',
+                 'timestamp']
+
+    for tag in yaml_tags:
+        yaml.add_constructor(yaml_2002_prefix + tag, string_constructor)
+
+    yaml.add_constructor(yaml_2002_prefix + 'null', string_constructor)
+
     return yaml.load(yaml_string)
 
 def string_to_python(config_string):
@@ -47,6 +61,7 @@ def string_to_python(config_string):
     Arguments:
         config_string (str): A string configuration in one of the supported formats (YAML, JSON, XML).
             This string should represent a list of dictionaries, each with the keys 'type' and 'config'.
+            In YAML, the first document should be a sequence of mapping nodes.
 
     Returns:
         list of dicts: A Python list which includes any number of task configuration dictionaries, each with the keys

@@ -28,9 +28,6 @@ def new_task(config, start_paused=False, reset=False):
     validate_config(config)
     task = tasks.task_dict[config['type']]
     task_config = config['config']
-    if not task_config:
-        # Task interface expects a dict.
-        task_config = dict()
     t = task(task_config)
     return sim.new_task(t, start_paused)
 
@@ -131,7 +128,4 @@ def validate_config(config):
     """
     task = tasks.task_dict[config['type']]
     task_config = config['config']
-    if not task_config:
-        # Task interface expects a dict.
-        task_config = dict()
     task.validate(task_config)
