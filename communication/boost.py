@@ -4,7 +4,6 @@ May not successfully import if boostmq could not be imported.
 """
 import base64
 from io import BytesIO
-import queue
 import time
 import traceback
 import xml.etree.ElementTree as ET
