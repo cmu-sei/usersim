@@ -37,7 +37,7 @@ def pause_task(task_id):
     """ Pause a single task.
 
     Arguments:
-        task_id (int): The task ID returned by an earlier call to new_task.
+        task_id (int > 0): The task ID returned by an earlier call to new_task.
 
     Returns:
         bool: True if the operation succeeded, False otherwise.
@@ -55,7 +55,7 @@ def unpause_task(task_id):
     """ Unpause a single task.
 
     Arguments:
-        task_id (int): The task ID returned by an earlier call to new_task.
+        task_id (int > 0): The task ID returned by an earlier call to new_task.
 
     Returns:
         bool: True if the operation succeeded, False otherwise.
@@ -73,7 +73,7 @@ def status_task(task_id):
     """ Get the status of a single task.
 
     Arguments:
-        task_id (int): The task ID returned by an earlier call to new_task.
+        task_id (int > 0): The task ID returned by an earlier call to new_task.
 
     Returns:
         dict: A dictionary with the following key:value pairs:
@@ -102,7 +102,7 @@ def stop_task(task_id):
     """ Stop a single task.
 
     Arguments:
-        task_id (int): The task ID returned by an earlier call to new_task.
+        task_id (int > 0): The task ID returned by an earlier call to new_task.
 
     Returns:
         bool: True if the operation succeeded, False otherwise.
