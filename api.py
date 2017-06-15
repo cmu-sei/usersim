@@ -1,6 +1,8 @@
 """ Module which contains all public user simulator operations. All functions contained in this module are thread-safe
 unless otherwise noted.
 """
+import re
+
 import usersim
 from usersim import States
 import tasks
@@ -129,3 +131,26 @@ def validate_config(config):
     task = tasks.task_dict[config['type']]
     task_config = config['config']
     task.validate(task_config)
+
+def get_tasks():
+    """ Get the tasks and their (human-readable) parameters currently available to this simulation. Certain special
+    tasks will be filtered.
+
+    Returns:
+        dict of dicts of dicts: A dictionary whose keys are task names, and whose values are dictionaries whose keys are
+            'required' and 'optional', and whose values are dictionaries whose keys are the parameter name, and whose
+            values are human-readable strings indicating what is expected for the parameter.
+    """
+    special_tasks = [re.compile('task$'), re.compile('test')]
+
+    available_tasks = dict()
+
+    for key in tasks.task_dict:
+        for filtered in special_tasks:
+            if filtered.match(key):
+                break
+        else:
+            # Else statements of a for-loop are triggered if a break was not triggered within the for-loop.
+            available_tasks[key] = tasks.task_dict[key].parameters()
+
+    return available_tasks
