@@ -1,5 +1,5 @@
 # Ali Kidwai
-# June 8, 2017
+# June 15, 2017
 # SSH module for UserSim. Connects to and authenticates with a host, then sends a sequence of shell commands from the
 # configuration dictionary.
 
