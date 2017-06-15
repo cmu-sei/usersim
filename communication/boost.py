@@ -4,6 +4,7 @@ May not successfully import if boostmq could not be imported.
 """
 import base64
 from io import BytesIO
+import threading
 import time
 import traceback
 import xml.etree.ElementTree as ET
@@ -18,6 +19,10 @@ class BoostCommunication(object):
         self._feedback_queue = feedback_queue
         self._config_mq = boostmq.MQ('config', 10, 50000)
         self._feedback_mq = boostmq.MQ('feedback', 10000, 10000)
+
+        thread = threading.Thread(target=self._handle_communication)
+        thread.daemon = True
+        thread.start()
 
     def _receive(self):
         """ Check if there are any messages available. If an invalid message is received, sends a feedback message
