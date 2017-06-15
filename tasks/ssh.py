@@ -58,7 +58,7 @@ class SSH(task.Task):
         """
         return ""
 
-    def ssh_to(self, host, user, passwd, cmdlist, policy="Warning", port=22):
+    def ssh_to(self, host, user, passwd, cmdlist, policy, port):
         """ Connects to an SSH server at host:port with user as the username and passwd as the password. Proceeds to 
         execute all commands in cmdlist.
 
@@ -72,7 +72,7 @@ class SSH(task.Task):
             ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
         elif policy == "Warning":
             ssh.set_missing_host_key_policy(paramiko.WarningPolicy())
-        ssh.connect(host, int(port),user, passwd)
+        ssh.connect(host, port, user, passwd)
         channel = ssh.invoke_shell()
         channel.setblocking(int(BLOCKING))
         channel.sendall("")

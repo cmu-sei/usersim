@@ -66,6 +66,7 @@ def testGoodCases(task, goodCases):
         task['config'] = config
         api.new_task(task)
         print('Correctly accepted %s' % configName)
+        sim.cycle()
         result = sim.cycle()
         if result:
             print('    Feedback from task:')
@@ -123,7 +124,7 @@ def testSSH():
             "user": "",
             "passwd": "",
             "cmdlist": ["echo hello", "ls", "exit"],
-            "port": 68,
+            "port": 22,
             "policy": "AutoAdd"
             }
     badKeyCases = [("empty", empty), ("missingUser", missingUser)]
