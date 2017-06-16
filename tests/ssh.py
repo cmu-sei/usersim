@@ -1,5 +1,5 @@
 # Ali Kidwai
-# June 15, 2017
+# June 16, 2017
 # Tests for SSH module for UserSim. Makes sure that SSH rejects incorrect configs and accepts correct configs. Prints
 # output from correct configs.
 
@@ -16,9 +16,6 @@ def testBadKeyCases(task, badKeyCases):
 
     Raises:
         AssertionError: If api.new_task does not raise a KeyError
-
-    Returns:
-        None
     """
     for configName, config in badKeyCases:
         task['config'] = config
@@ -39,9 +36,6 @@ def testBadValueCases(task, badValueCases):
 
     Raises:
         AssertionError: If api.new_task does not raise a ValueError
-
-    Returns:
-        None
     """
     for configName, config in badValueCases:
         task['config'] = config
@@ -57,9 +51,6 @@ def testGoodCases(task, goodCases):
     Args:
         task: A task dictionary mapping "type" to the task name (e.g. "ssh")
         goodCases: A list of tuples of the form ("configName, config"). config should be properly formatted.
-
-    Returns:
-        None
     """
     sim = usersim.UserSim(True)
     for configName, config in goodCases:

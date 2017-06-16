@@ -1,5 +1,5 @@
 # Ali Kidwai
-# June 15, 2017
+# June 16, 2017
 # SSH module for UserSim. Connects to and authenticates with a host, then sends a sequence of shell commands from the
 # configuration dictionary.
 
@@ -15,17 +15,11 @@ BLOCKING = True
 class SSH(task.Task):
     def __init__(self, config):
         """ Validates config and stores it as an attribute
-
-        Returns:
-            None
         """
         self._config = self.validate(config)
 
     def __call__(self):
         """ Connects to the SSH server specified in config.
-
-        Returns:
-            None
         """
         self.ssh_to(self._config['host'],
                     self._config['user'],
@@ -36,9 +30,6 @@ class SSH(task.Task):
 
     def cleanup(self):
         """ Doesn't need to do anything
-
-        Returns:
-            None
         """
         return None
 
@@ -61,9 +52,6 @@ class SSH(task.Task):
     def ssh_to(self, host, user, passwd, cmdlist, policy, port):
         """ Connects to an SSH server at host:port with user as the username and passwd as the password. Proceeds to 
         execute all commands in cmdlist.
-
-        Returns:
-            None
         """
         ssh = paramiko.SSHClient()
         if policy == "AutoAdd":
@@ -78,8 +66,8 @@ class SSH(task.Task):
         channel.sendall("")
         incoming = ""
 
-        #Receive the welcome message from the server and print it.  If any of this fails,
-        #something went wrong with the connection.
+        # Receive the welcome message from the server and print it.  If any of this fails, something went wrong with
+        # the connection.
         while channel.recv_ready():
             incoming += channel.recv(MAX_RECV).decode()
             time.sleep(.1)
@@ -99,7 +87,6 @@ class SSH(task.Task):
         except:
             pass
         print("") # So that the next output will be on a new line
-        
 
     @classmethod
     def parameters(cls):
