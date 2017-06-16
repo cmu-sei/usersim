@@ -1,3 +1,4 @@
+import textwrap
 import threading
 import time
 
@@ -17,11 +18,13 @@ class LocalCommunication(object):
             try:
                 api.new_task(task)
             except KeyError as e:
-                self._feedback_queue.put((0, 'task ' + task['type'] + 'missing required key %s '
+                task_status = {'id': 0, 'type': 'core', 'state': api.States.UNKNOWN, 'status': str()}
+                self._feedback_queue.put((task_status, 'task ' + task['type'] + 'missing required key %s '
                     'from its configuration' % e.message))
             except ValueError as e:
-                self._feedback_queue.put((0, 'task ' + task['type'] + 'has at least one bad value for a config '
-                    'option:\n%s' % e.message))
+                task_status = {'id': 0, 'type': 'core', 'state': api.States.UNKNOWN, 'status': str()}
+                self._feedback_queue.put((task_status, 'task ' + task['type'] + 'has at least one bad value for a '
+                    'config option:\n%s' % e.message))
 
         thread = threading.Thread(target=self._handle_communication)
         thread.daemon = True
@@ -30,32 +33,24 @@ class LocalCommunication(object):
     def _send(self):
         """ Write available feedback messages to the console.
         """
-        print('\n' * 3)
         while not self._feedback_queue.empty():
-            task_id, exception = self._feedback_queue.get()
-
-            if task_id > 0:
-                task_status = api.status_task(task_id)
-            else:
-                task_status = {'type': 'core', 'state': api.States.UNKNOWN, 'status': str()}
+            print('=' * 40)
+            task_status, exception = self._feedback_queue.get()
 
             if exception:
                 print('The following task FAILED an iteration:')
             else:
                 print('The following task WAS SCHEDULED TO STOP:')
             print('Type: ' + task_status['type'])
-            print('ID: ' + task_id)
+            print('ID: ' + str(task_status['id']))
             print('State: ' + task_status['state'])
             print('Status: ' + task_status['status'])
             if exception:
-                print('Exception: \n' + exception)
-            print('=' * 40)
-
-        print('\n' * 3)
-        print('=' * 40)
+                print('Exception: \n' + textwrap.indent(exception, '    '))
 
     def _handle_communication(self):
         """ Periodically write feedback messages to the console.
         """
-        self._send()
-        time.sleep(60)
+        while True:
+            self._send()
+            time.sleep(6)

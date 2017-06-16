@@ -85,11 +85,13 @@ class BoostCommunication(object):
                 try:
                     api.new_task(task)
                 except KeyError as e:
-                    self._feedback_queue.put((0, 'task ' + task['type'] + 'missing required key %s '
+                    task_status = {'id': 0, 'type': 'core', 'state': api.States.UNKNOWN, 'status': str()}
+                    self._feedback_queue.put((task_status, 'task ' + task['type'] + 'missing required key %s '
                         'from its configuration' % e.message))
                 except ValueError as e:
-                    self._feedback_queue.put((0, 'task ' + task['type'] + 'has at least one bad value for a config '
-                        'option:\n%s' % e.message))
+                    task_status = {'id': 0, 'type': 'core', 'state': api.States.UNKNOWN, 'status': str()}
+                    self._feedback_queue.put((task_status, 'task ' + task['type'] + 'has at least one bad value for a '
+                        'config option:\n%s' % e.message))
 
         self._send()
 
