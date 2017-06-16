@@ -1,11 +1,9 @@
 # Ali Kidwai
 # June 16, 2017
-# SSH module for UserSim. Connects to and authenticates with a host, then sends a sequence of shell commands from the
-# configuration dictionary.
 
 import paramiko
-import time
 import sys
+import time
 
 from tasks import task
 
@@ -13,6 +11,8 @@ MAX_RECV = 4096
 BLOCKING = True
 
 class SSH(task.Task):
+    """ SSH module for UserSim. Connects to and authenticates with a host, then sends a sequence of shell commands.
+    """
     def __init__(self, config):
         """ Validates config and stores it as an attribute
         """
