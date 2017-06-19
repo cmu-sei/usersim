@@ -8,12 +8,13 @@ from smb.smb_structs import OperationFailure
 
 from tasks import task
 
-class Task(object):
-    def __init__(self, config):
+class Samba(task.Task):
+    def __init__(self, config, debug=False):
         """ Validates config and stores it as an attribute. Also initializes self._smb_con to None.
         """
         self._config = self.validate(config)
         self._smb_con = None
+        self._debug = debug
 
     def __call__(self):
         """ Establish a connection with the Samba server. If files have been specified, download them from the Samba.
@@ -21,8 +22,8 @@ class Task(object):
         """
         self._smb_connect(self._config['address'], self._config['port'],
                           self._config['user'], self._config['passwd'])
-        if config['files']:
-            self.retrieve_files(config['files'])
+        if self._config['files']:
+            self.retrieve_files(self._config['files'])
         else: # No files specified; upload/download a random file
             if random.getrandbits(1): # Flip a coin
                 self.retrieve_random_file()
@@ -65,7 +66,7 @@ class Task(object):
                                'user': 'str: a username to authenticate with the server if necessary',
                                'passwd': 'str: password for user',
                                'files': 'list: a list of filenames to download from the Samba share. If not specified, '
-                                        'the UserSim will download a random file.'}}
+                                        'the UserSim will either upload or download a random file.'}}
         return params
 
     @classmethod
@@ -121,8 +122,8 @@ class Task(object):
         an exception at the end.
 
         Args:
-            file_paths (list): A list of files to retrieve from the server.  Files will be retrieved in the order given.
-            The file paths may use forward slashes or backslashes as separators.
+            file_paths (list): A list of files to retrieve from the server. Files will be retrieved in the order given.
+                The file paths may use forward slashes or backslashes as separators.
 
         Raises:
             Exception: If any file retrieval fails, an exception will be raised whose message includes a list of all
@@ -177,8 +178,8 @@ class Task(object):
         Returns:
             str: The name of the chosen share.
         """
-        # There are a bunch of special "shares" returned by this call which are not valid. Hopefully this can trim
-        # down the occurence of trying to use those.
+        # There are a bunch of special "shares" returned by this call which are not valid. Hopefully this can trim down 
+        # the occurence of trying to use those.
         shares = []
         for share in self._smb_con.listShares():
             if share.name[-1] != '$':
@@ -190,7 +191,6 @@ class Task(object):
 
         while shares:
             chosen_share = shares.pop()
-
             try:
                 # Make sure the share is accessible
                 if self._debug:
@@ -209,7 +209,14 @@ class Task(object):
     def _retrieve_file(self, share, path):
         """ Retrieve the file at path from share.
         """
+        if self._debug:
+            out_file = 'smbdebug'
+        else:
+            out_file = os.devnull
+
         with open(out_file, 'w') as f:
+            if self._debug:
+                print('Attempting to retrieve file %s' % os.path.join(share, path))
             self._smb_con.retrieveFile(share, path, f)
 
     def _write_file(self, share, path, content):
