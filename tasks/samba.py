@@ -10,13 +10,24 @@ from tasks import task
 
 class Task(object):
     def __init__(self, config):
+        """ Validates config and stores it as an attribute. Also initializes self._smb_con to None.
+        """
         self._config = self.validate(config)
+        self._smb_con = None
 
     def __call__(self):
-        """ Periodically called while the object is scheduled. This gives the object its behavior, whatever that may
-        entail.
+        """ Establish a connection with the Samba server. If files have been specified, download them from the Samba.
+        Otherwise, upload or download a random a file.
         """
-        raise NotImplementedError("Not yet implemented.")
+        self._smb_connect(self._config['address'], self._config['port'],
+                          self._config['user'], self._config['passwd'])
+        if config['files']:
+            self.retrieve_files(config['files'])
+        else: # No files specified; upload/download a random file
+            if random.getrandbits(1): # Flip a coin
+                self.retrieve_random_file()
+            else:
+                self.upload_random_file()
 
     def cleanup(self):
         """ Doesn't need to do anything
@@ -83,7 +94,7 @@ class Task(object):
         if not isinstance(config['port'], int):
             raise ValueError('port: {} Must be an int'.format(str(config['port'])))
         if config['port'] < 0 or config['port'] > 65535:
-            raise ValueError('port: {} Must be in the range [0, 65536]'.format(str(config['port'])))
+            raise ValueError('port: {} Must be in the range [0, 65535]'.format(str(config['port'])))
 
         if 'user' not in config:
             config['user'] = ''
@@ -103,93 +114,40 @@ class Task(object):
             if not isinstance(file, str):
                 raise ValueError('files: {} Must be a list of strings'.format(str(config['files'])))
 
-
-class SambaAutomation(object):
-    def __init__(self, debug=False):
-        self._smb_con = None
-        self._debug = debug
-
-    def startaction(self, args):
-        """ Start running the task.
-
-        Args:
-            args (dict): A dictionary with the following keys:
-                'TID': (str or int): Task ID.
-                'EMSBlob' (str): Data to be returned to the EMS when feedback is reported.
-                'address' (str): Samba server address.
-                'port' (int): (Optional) Samba server port. Defaults to 445 if unspecified.
-                'username' (str): (Optional) Defaults to empty string if unspecified.
-                'password' (str): (Optional) Defaults to empty string if unspecified.
-                'filepaths' (iterable): (Optional) An iterable of files to retrieve from the server.  Files will be
-                    retrieved in the order given. The file paths may use forward slashes or backslashes as separators.
-                    If unspecified, module will default to choose some files to retrieve at random.
-        """
-        tid = args['TID']
-        ems = args['EMSBlob']
-        address = args['address']
-        port = args.setdefault('port', 445)
-        username = args.setdefault('username', '')
-        password = args.setdefault('password', '')
-        file_paths = args.setdefault('filepaths', None)
-
-        feedback = list()
-
-        try:
-            self._smb_connect(address, port, username, password)
-
-            if file_paths is None:
-                if random.randrange(100) < 50:
-                    self.retrieve_files_random()
-                else:
-                    self.upload_files_random()
-            else:
-                self.retrieve_files(file_paths)
-        except Exception:
-            fm = FM(tid, task_type='smb', status='Failure', emsblob=ems, exception=traceback.format_exc())
-        else:
-            fm = FM(tid, task_type='smb', status='Success', emsblob=ems)
-        finally:
-            feedback.append(fm)
-
-        return feedback
+        return config
 
     def retrieve_files(self, file_paths):
-        """ Retrieves an iterable of files. Will make an attempt to retrieve all files. If any files fail to retrieve,
-        raises an exception at the end.
+        """ Retrieves a list of files. Will make an attempt to retrieve all files. If any files fail to retrieve, raises
+        an exception at the end.
 
         Args:
-            file_paths (iterable): (Optional) An iterable of files to retrieve from the server.  Files will be
-                retrieved in the order given. The file paths may use forward slashes or backslashes as separators.
+            file_paths (list): A list of files to retrieve from the server.  Files will be retrieved in the order given.
+            The file paths may use forward slashes or backslashes as separators.
 
         Raises:
             Exception: If any file retrieval fails, an exception will be raised whose message includes a list of all
                 failures.
         """
-        failures = list()
-
+        failures = []
         for file_path in file_paths:
             file_path.replace('\\', '/')
             share, path = file_path.split('/', 1)
-
             try:
                 self._retrieve_file(share, path)
             except OperationFailure as e:
                 failures.append(file_path + ' ' + e.message)
-
         if failures:
             raise Exception('Failed to retrieve the following files:\n%s' % '\n'.join(failures))
 
-    def retrieve_files_random(self):
+    def retrieve_random_file(self):
         """ Attempts to download a random file from the remote Samba server. A best-effort attempt is made.
         """
         chosen_share = self._choose_new_share()
-
         chosen_path = ''
         path_is_dir = True
 
         while path_is_dir:
             files = self._smb_con.listPath(chosen_share, chosen_path)
-
             try:
                 # Don't include the special files . and ..
                 chosen_file = random.choice(files[2:])
@@ -203,12 +161,11 @@ class SambaAutomation(object):
 
         self._retrieve_file(chosen_share, chosen_path)
 
-    def upload_files_random(self):
+    def upload_random_file(self):
         """ Attempts to create a file on a random share on the Samba server. This is a best-effort attempt.
         """
         chosen_share = self._choose_new_share()
         file_name = str(random.randint(0, 999)) + '.txt'
-
         self._write_file(chosen_share, file_name, get_paragraph())
 
     def _choose_new_share(self):
@@ -222,7 +179,7 @@ class SambaAutomation(object):
         """
         # There are a bunch of special "shares" returned by this call which are not valid. Hopefully this can trim
         # down the occurence of trying to use those.
-        shares = list()
+        shares = []
         for share in self._smb_con.listShares():
             if share.name[-1] != '$':
                 shares.append(share.name)
@@ -250,19 +207,18 @@ class SambaAutomation(object):
         raise Exception('Could not find a valid share to use.')
 
     def _retrieve_file(self, share, path):
-        if self._debug:
-            out_file = 'smbdebug'
-        else:
-            out_file = os.devnull
-
+        """ Retrieve the file at path from share.
+        """
         with open(out_file, 'w') as f:
-            if self._debug:
-                print('Attempting to retrieve file %s' % os.path.join(share, path))
             self._smb_con.retrieveFile(share, path, f)
 
     def _write_file(self, share, path, content):
-        # This is needed because the Samba library only supports uploading using file-like objects with a read method.
+        """ Write a file containing content at path in share.
+        """
         class FileLike(object):
+            """ This is needed because the Samba library only supports uploading using file-like objects with a read 
+            method.
+            """
             def __init__(self, content):
                 self.text = content
                 self._read = False
@@ -278,11 +234,13 @@ class SambaAutomation(object):
         self._smb_con.storeFile(share, path, f)
 
     def _smb_connect(self, address, port, username, password):
+        """ Attempts to connect to the Samba server at address. Will try direct TCP if initial attempt fails.
+        """
         try:
-            self._smb_con = SMBConnection(username, password, '', 'usersim')
+            self._smb_con = SMBConnection(username, password, '', 'usersim') # TODO: Ask Joe if this should be hardcoded
             self._smb_con.connect(address, port)
         except Exception:
-            # If the remote server is using direct TCP this flag must be set to True or we get an exception when we
-            # try to connect.
+            # If the remote server is using direct TCP this flag must be set to True or we get an exception when we try
+            # to connect.
             self._smb_con = SMBConnection(username, password, '', 'usersim', is_direct_tcp=True)
             self._smb_con.connect(address, port)
