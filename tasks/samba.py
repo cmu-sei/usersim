@@ -1,7 +1,5 @@
 import os
 import random
-import time
-import traceback
 from loremipsum import get_paragraph
 from smb.SMBConnection import SMBConnection
 from smb.smb_structs import OperationFailure

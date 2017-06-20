@@ -64,7 +64,7 @@ def testSamba():
     noneAddress = {'address': None}
     emptyAddress = {'address': ''}
     nonePort = {'address': 'localhost', 'port': None}
-    badPort = {'address': 'localhost', 'port': 10000000000}
+    badPort = {'address': 'localhost', 'port': 1000000000}
     badFiles = {'address': 'localhost', 'files': [None, 1, "README"]}
     random1 = {'address': 'localhost'}
     random2 = {'address': 'localhost', 'files': []}
