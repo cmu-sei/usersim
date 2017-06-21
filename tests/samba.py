@@ -45,7 +45,7 @@ def testGoodCases(task, goodCases):
 
     Args:
         task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        goodCases: A list of tuples of the form ("configName, config"). config should be properly formatted.
+        goodCases: A list of tuples of the form ("configName", config). config should be properly formatted.
     """
     sim = usersim.UserSim(True)
     for configName, config in goodCases:
