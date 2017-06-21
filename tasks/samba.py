@@ -16,7 +16,7 @@ class Samba(task.Task):
 
     def __call__(self):
         """ Establish a connection with the Samba server. If files have been specified, download them from the Samba.
-        Otherwise, upload or download a random a file.
+        Otherwise, upload or download a random file.
         """
         self._smb_connect(self._config['address'], self._config['port'],
                           self._config['user'], self._config['passwd'])
