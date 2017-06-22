@@ -170,7 +170,7 @@ class Samba(task.Task):
         """ Pick one of the shared devices on the server at random.
 
         Raises:
-            OperationFailure: If a valid share is unable to be found.
+            Exception: If a valid share is unable to be found.
 
         Returns:
             str: The name of the chosen share.
@@ -205,6 +205,10 @@ class Samba(task.Task):
 
     def _retrieve_file(self, share, path):
         """ Retrieve the file at path from share.
+
+        Args:
+            share: The Samba share that the file is stored on
+            path: Path to the file
         """
         if self._debug:
             out_file = 'smbdebug'
@@ -218,6 +222,11 @@ class Samba(task.Task):
 
     def _write_file(self, share, path, content):
         """ Write a file containing content at path in share.
+
+        Args:
+            share: The Samba share that the file is stored on
+            path: Path to the file
+            content: A string containing the text that will be written to the file
         """
         class FileLike(object):
             """ This is needed because the Samba library only supports uploading using file-like objects with a read 
@@ -239,6 +248,12 @@ class Samba(task.Task):
 
     def _smb_connect(self, address, port, username, password):
         """ Attempts to connect to the Samba server at address. Will try direct TCP if initial attempt fails.
+
+        Args:
+            address: The address of the Samba server
+            port: Port for the Samba server
+            username: The username to log in with
+            password: The password for username
         """
         try:
             self._smb_con = SMBConnection(username, password, '', 'usersim') # TODO: Ask Joe if this should be hardcoded
