@@ -1,3 +1,6 @@
+# Ali Kidwai
+# June 22, 2017
+
 import os
 import random
 from loremipsum import get_paragraph
@@ -63,8 +66,8 @@ class Samba(task.Task):
                   'optional': {'port': 'int: the port for the Samba server. Defaults to 445',
                                'user': 'str: a username to authenticate with the server if necessary',
                                'passwd': 'str: password for user',
-                               'files': 'list: a list of filenames to download from the Samba share. If not specified, '
-                                        'the UserSim will either upload or download a random file.'}}
+                               'files': 'list: a list of filenames (strings) to download from the Samba share. If not '
+                               'specified, the UserSim will either upload or download a random file.'}}
         return params
 
     @classmethod
@@ -207,8 +210,8 @@ class Samba(task.Task):
         """ Retrieve the file at path from share.
 
         Args:
-            share: The Samba share that the file is stored on
-            path: Path to the file
+            share (str): The Samba share that the file is stored on
+            path (str): Path to the file
         """
         if self._debug:
             out_file = 'smbdebug'
@@ -224,9 +227,9 @@ class Samba(task.Task):
         """ Write a file containing content at path in share.
 
         Args:
-            share: The Samba share that the file is stored on
-            path: Path to the file
-            content: A string containing the text that will be written to the file
+            share (str): The Samba share that the file is stored on
+            path (str): Path to the file
+            content (str): A string containing the text that will be written to the file
         """
         class FileLike(object):
             """ This is needed because the Samba library only supports uploading using file-like objects with a read 
@@ -250,10 +253,10 @@ class Samba(task.Task):
         """ Attempts to connect to the Samba server at address. Will try direct TCP if initial attempt fails.
 
         Args:
-            address: The address of the Samba server
-            port: Port for the Samba server
-            username: The username to log in with
-            password: The password for username
+            address (str): The address of the Samba server
+            port (int): Port for the Samba server
+            username (str): The username to log in with
+            password (str): The password for username
         """
         try:
             self._smb_con = SMBConnection(username, password, '', 'usersim') # TODO: Ask Joe if this should be hardcoded
