@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 import api
 import boostmq
 import config
+from communication import common
 
 
 class BoostCommunication(object):
@@ -40,8 +41,7 @@ class BoostCommunication(object):
             more = self._config_mq.receivequeue_noblock()
 
             if message and not more:
-                # TODO: Make sure 0 is an appropriate task ID for non-task feedback.
-                self._feedback_queue.put((0, last_error + '\n\n' + message))
+                self._feedback_queue.put((common.api_exception_status, last_error + '\n\n' + message))
             if not more:
                 # If there's nothing else, go to sleep for a while.
                 break
@@ -81,17 +81,22 @@ class BoostCommunication(object):
         """
         new_config = self._receive()
         if new_config:
+            available_tasks = api.get_tasks()
+
             for task in new_config:
+                if task['type'] not in available_tasks:
+                    self._feedback_queue.put((common.api_exception_status, 'task ' + task['type'] + ' does not exist '
+                        'in the current build'))
+                    continue
+
                 try:
                     api.new_task(task)
                 except KeyError as e:
-                    task_status = {'id': 0, 'type': 'core', 'state': api.States.UNKNOWN, 'status': str()}
-                    self._feedback_queue.put((task_status, 'task ' + task['type'] + 'missing required key %s '
-                        'from its configuration' % e.message))
+                    self._feedback_queue.put((common.api_exception_status, 'task ' + task['type'] + ' missing required '
+                        'key %s from its configuration' % e.message))
                 except ValueError as e:
-                    task_status = {'id': 0, 'type': 'core', 'state': api.States.UNKNOWN, 'status': str()}
-                    self._feedback_queue.put((task_status, 'task ' + task['type'] + 'has at least one bad value for a '
-                        'config option:\n%s' % e.message))
+                    self._feedback_queue.put((common.api_exception_status, 'task ' + task['type'] + ' has at least one '
+                        'bad value for a config option:\n%s' % e.message))
 
         self._send()
 

@@ -4,6 +4,8 @@ import time
 
 import api
 import config
+from communication import common
+import tasks
 
 
 class LocalCommunication(object):
@@ -14,17 +16,22 @@ class LocalCommunication(object):
             config_string = f.read()
 
         new_config = config.string_to_python(config_string)
+        available_tasks = api.get_tasks(False)
+
         for task in new_config:
+            if task['type'] not in available_tasks:
+                self._feedback_queue.put((common.api_exception_status, 'task ' + task['type'] + ' does not exist in '
+                    'this build'))
+                continue
+
             try:
                 api.new_task(task)
             except KeyError as e:
-                task_status = {'id': 0, 'type': 'core', 'state': api.States.UNKNOWN, 'status': str()}
-                self._feedback_queue.put((task_status, 'task ' + task['type'] + 'missing required key %s '
-                    'from its configuration' % e.message))
+                self._feedback_queue.put((common.api_exception_status, 'task ' + task['type'] + ' missing required key '
+                    '%s from its configuration' % e.message))
             except ValueError as e:
-                task_status = {'id': 0, 'type': 'core', 'state': api.States.UNKNOWN, 'status': str()}
-                self._feedback_queue.put((task_status, 'task ' + task['type'] + 'has at least one bad value for a '
-                    'config option:\n%s' % e.message))
+                self._feedback_queue.put((common.api_exception_status, 'task ' + task['type'] + ' has at least one '
+                    'bad value for a config option:\n%s' % e.message))
 
         thread = threading.Thread(target=self._handle_communication)
         thread.daemon = True
