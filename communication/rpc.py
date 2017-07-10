@@ -20,9 +20,11 @@ class UserSimService(rpyc.Service):
             setattr(self.__class__, 'exposed_' + function_name, staticmethod(function))
 
 class RPCCommunication(object):
-    def __init__(self, feedback_queue, server_addr, server_port):
+    def __init__(self, feedback_queue, server_addr, server_port, name):
         self._feedback_queue = feedback_queue
         self._connection = rpyc.connect(server_addr, server_port, service=UserSimService)
+        if name:
+            self._connection.root.register_name(name)
 
         serve_thread = threading.Thread(target=self._connection.serve_all)
         serve_thread.daemon = True
