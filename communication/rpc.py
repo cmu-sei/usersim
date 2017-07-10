@@ -40,6 +40,7 @@ class RPCCommunication(object):
                 status_dict, exception = self._feedback_queue.get()
                 # Try to minimize spikes.
                 time.sleep(1)
-                self._connection.root.new_feedback(status_dict, exception)
+                self._connection.root.push_feedback(status_dict, exception)
+
             # Don't waste CPU cycles.
-            time.sleep(30)
+            time.sleep(10)
