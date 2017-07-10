@@ -1,7 +1,7 @@
 import queue
 
 import api
-from communication import local
+import cli
 import tasks
 import tests
 import usersim
@@ -9,7 +9,9 @@ import usersim
 
 def main():
     feedback_queue = queue.Queue()
-    comm = local.LocalCommunication(feedback_queue, 'test.yaml')
+
+    cli.parse_and_initialize(feedback_queue)
+
     sim = usersim.UserSim()
 
     while True:
