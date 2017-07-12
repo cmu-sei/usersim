@@ -1,6 +1,8 @@
 """ Module which contains all public user simulator operations. All functions contained in this module are thread-safe
 unless otherwise noted.
 """
+import re
+
 import usersim
 from usersim import States
 import tasks
@@ -27,14 +29,15 @@ def new_task(config, start_paused=False, reset=False):
     sim = usersim.UserSim(reset)
     validate_config(config)
     task = tasks.task_dict[config['type']]
-    t = task(config['config'])
+    task_config = config['config']
+    t = task(task_config)
     return sim.new_task(t, start_paused)
 
 def pause_task(task_id):
     """ Pause a single task.
 
     Arguments:
-        task_id (int): The task ID returned by an earlier call to new_task.
+        task_id (int > 0): The task ID returned by an earlier call to new_task.
 
     Returns:
         bool: True if the operation succeeded, False otherwise.
@@ -52,7 +55,7 @@ def unpause_task(task_id):
     """ Unpause a single task.
 
     Arguments:
-        task_id (int): The task ID returned by an earlier call to new_task.
+        task_id (int > 0): The task ID returned by an earlier call to new_task.
 
     Returns:
         bool: True if the operation succeeded, False otherwise.
@@ -70,7 +73,7 @@ def status_task(task_id):
     """ Get the status of a single task.
 
     Arguments:
-        task_id (int): The task ID returned by an earlier call to new_task.
+        task_id (int > 0): The task ID returned by an earlier call to new_task.
 
     Returns:
         dict: A dictionary with the following key:value pairs:
@@ -99,7 +102,7 @@ def stop_task(task_id):
     """ Stop a single task.
 
     Arguments:
-        task_id (int): The task ID returned by an earlier call to new_task.
+        task_id (int > 0): The task ID returned by an earlier call to new_task.
 
     Returns:
         bool: True if the operation succeeded, False otherwise.
@@ -126,4 +129,31 @@ def validate_config(config):
         ValueError: If the given value of an option under config['config'] is invalid.
     """
     task = tasks.task_dict[config['type']]
-    task.validate(config['config'])
+    task_config = config['config']
+    task.validate(task_config)
+
+def get_tasks(filter_result=True):
+    """ Get the tasks and their (human-readable) parameters currently available to this simulation. Certain special
+    tasks will be filtered by default.
+
+    Args:
+        filter_result (bool): True - filters special tasks, False - no filter is applied.
+
+    Returns:
+        dict of dicts of dicts: A dictionary whose keys are task names, and whose values are dictionaries whose keys are
+            'required' and 'optional', and whose values are dictionaries whose keys are the parameter name, and whose
+            values are human-readable strings indicating what is expected for the parameter.
+    """
+    special_tasks = [re.compile('task$'), re.compile('test')]
+
+    available_tasks = dict()
+
+    for key in tasks.task_dict:
+        for filtered in special_tasks:
+            if filter_result and filtered.match(key):
+                break
+        else:
+            # Else statements of a for-loop are triggered if a break was not triggered within the for-loop.
+            available_tasks[key] = tasks.task_dict[key].parameters()
+
+    return available_tasks

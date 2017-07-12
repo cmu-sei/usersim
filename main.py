@@ -1,22 +1,23 @@
+import queue
+
 import api
+import cli
 import tasks
-import usersim
 import tests
+import usersim
 
 
 def main():
-    conf_dict = {'type': 'frequency',
-                 'config': {'frequency': 720,
-                            'repetitions': 10,
-                            'task': {'type': 'test',
-                                     'config': {}}}}
-    api.new_task(conf_dict)
+    feedback_queue = queue.Queue()
+
+    cli.parse_and_initialize(feedback_queue)
 
     sim = usersim.UserSim()
+
     while True:
         result = sim.cycle()
-        if result:
-            print(result)
+        for feedback in result:
+            feedback_queue.put(feedback)
 
 if __name__ == '__main__':
     main()

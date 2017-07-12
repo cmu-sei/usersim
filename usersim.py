@@ -57,10 +57,15 @@ class _UserSim(object):
                 task()
             except Exception:
                 exception = traceback.format_exc()
-                feedback.append((task_id, exception))
+                feedback.append((self.status_task(task_id), exception))
 
             if task.stop():
-                feedback.append((task_id, str()))
+                # Get its status before it's actually stopped because stopping removes the task from memory.
+                # Manually set the state to stopped because the final status will still say the task is scheduled.
+                final_status = self.status_task(task_id)
+                final_status['state'] = States.STOPPED
+                feedback.append((final_status, str()))
+
                 self.stop_task(task_id)
 
         self._resolve_actions()

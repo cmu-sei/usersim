@@ -57,7 +57,8 @@ class Task(object):
         """ Validates the given configuration dictionary.
 
         Args:
-            conf_dict (dict): The dictionary to validate. Its keys and values are subclass-specific.
+            conf_dict (dict): The dictionary to validate. Its keys and values are subclass-specific. Its values should
+                be assumed to be str type and converted appropriately.
 
         Raises:
             KeyError: If a required configuration option is missing. The error message is the missing key.

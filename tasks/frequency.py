@@ -60,6 +60,8 @@ class Frequency(task.Task):
                                'repetitions': 'non-negative integer - 0 for unlimited'},
                   'optional': {}}
 
+        return params
+
     @classmethod
     def validate(cls, config):
         """ Check if the given configuration is valid.
