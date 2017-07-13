@@ -2,11 +2,13 @@
 # June 16, 2017
 # Adapted from code written by Rotem Guttman and Joe Vessella
 
-import paramiko
 import sys
 import time
 
+import paramiko
+
 from tasks import task
+
 
 MAX_RECV = 4096
 BLOCKING = True
@@ -51,7 +53,7 @@ class SSH(task.Task):
         return ""
 
     def ssh_to(self, host, user, passwd, cmdlist, policy, port):
-        """ Connects to an SSH server at host:port with user as the username and passwd as the password. Proceeds to 
+        """ Connects to an SSH server at host:port with user as the username and passwd as the password. Proceeds to
         execute all commands in cmdlist.
         """
         ssh = paramiko.SSHClient()
@@ -99,18 +101,14 @@ class SSH(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {"required": 
-                    {"host": 'str: the hostname to connect to, ex. "io.smashthestack.org"', 
-                    "user": 'str: username to login with, ex. "level1"', 
-                    "passwd": 'str: password to login with, ex. "level1"', 
-                    "cmdlist": 'list: strs to send as commands, ex. ["ls -la", "cat README"]', 
-                    },
-                "optional": 
-                {
-                    "port": 'int: of the port on which to connect to the SSH server, ex. 22.  Default: 22',
-                    "policy": 'str: which policy to adopt in regards to missing host keys, should be one of AutoAdd, '
-                              'Reject, or Warning. Default: Warning'}
-                }
+        params = {"required": {"host": 'the hostname to connect to, ex. "io.smashthestack.org"',
+                               "user": 'username to login with, ex. "level1"',
+                               "password": 'password to login with, ex. "level1"',
+                               "cmdlist": 'list of strings to send as commands, ex. ["ls -la", "cat README"]'},
+                  "optional": {"port": 'the port on which to connect to the SSH server, ex. 22.  Default: 22',
+                               "policy": 'which policy to adopt in regards to missing host keys, should be one of '
+                                         'AutoAdd, Reject, or Warning. Default: Warning'}
+                  }
         return params
 
     @classmethod
