@@ -6,111 +6,105 @@
 import api
 import usersim
 
-def testBadKeyCases(task, badKeyCases):
-    """ Used to test configs with missing keys. This function will raise an assertion error if validate incorrectly 
+def test_bad_key_cases(task, bad_key_cases):
+    """ Used to test configs with missing keys. This function will raise an assertion error if validate incorrectly
     accepts a bad config dictionary.
 
     Args:
         task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        badKeyCases: A list of tuples of the form ("configName", config). config should be missing at least one key.
+        bad_key_cases: A list of tuples of the form ("config_name", config). config should be missing at least one key.
 
     Raises:
         AssertionError: If api.new_task does not raise a KeyError
     """
-    for configName, config in badKeyCases:
+    for config_name, config in bad_key_cases:
         task['config'] = config
         try:
             api.new_task(task)
-            raise AssertionError('Incorrectly accepted %s' % configName)
+            raise AssertionError('Incorrectly accepted %s' % config_name)
         except KeyError:
-            print("Correctly rejected %s" % configName)
+            print("Correctly rejected %s" % config_name)
 
-def testBadValueCases(task, badValueCases):
-    """ Used to test configs with invalid values. This function will raise an assertion error if validate incorrectly 
+def test_bad_value_cases(task, bad_value_cases):
+    """ Used to test configs with invalid values. This function will raise an assertion error if validate incorrectly
     accepts a bad config dictionary.
 
     Args:
         task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        badValueCases: A list of tuples of the form ("configName", config). config should have at least one invalid 
+        bad_value_cases: A list of tuples of the form ("config_name", config). config should have at least one invalid
             value.
 
     Raises:
         AssertionError: If api.new_task does not raise a ValueError
     """
-    for configName, config in badValueCases:
+    for config_name, config in bad_value_cases:
         task['config'] = config
         try:
             api.new_task(task)
-            raise AssertionError('Incorrectly accepted %s' % configName)
+            raise AssertionError('Incorrectly accepted %s' % config_name)
         except ValueError:
-            print("Correctly rejected %s" % configName)
+            print("Correctly rejected %s" % config_name)
 
-def testGoodCases(task, goodCases):
-    """ Used to test properly formatted configs. Prints feedback from the task.
+def test_good_cases(task, good_cases):
+    """ Used to test properly formatted configs.
 
     Args:
         task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        goodCases: A list of tuples of the form ("configName, config"). config should be properly formatted.
+        good_cases: A list of tuples of the form ("config_name, config"). config should be properly formatted.
     """
-    sim = usersim.UserSim(True)
-    for configName, config in goodCases:
+    for config_name, config in good_cases:
         task['config'] = config
         api.new_task(task)
-        print('Correctly accepted %s' % configName)
-        sim.cycle()
-        result = sim.cycle()
-        if result:
-            print('    Feedback from task:')
-            print('    %s' % str(result))
+        print('Correctly accepted %s' % config_name)
 
-def testSSH():
+def test_ssh():
     task = {'type': 'ssh', 'config': None}
     empty = {}
-    missingUser = {
+    missing_user = {
             "host": "me",
             "passwd": "badpassword",
             "cmdlist": ["echo hello"]
             }
-    wrongHost = {
+    wrong_host = {
             "host": 28,
             "user": "admin",
             "passwd": "badpassword",
             "cmdlist": ["echo hello"]
             }
-    wrongPort = {
+    wrong_port = {
             "host": "me",
             "user": "admin",
             "passwd": "badpassword",
             "cmdlist": ["echo hello"],
             "port": "68"
             }
-    blankPort = {
+    blank_port = {
             "host": "me",
             "user": "admin",
             "passwd": "badpassword",
             "cmdlist": ["echo hello"],
             "port": ""
             }
-    blankHost = {
+    blank_host = {
             "host": "",
             "user": "admin",
             "passwd": "badpassword",
             "cmdlist": ["echo hello"]
             }
-    wrongPolicy = {
+    wrong_policy = {
             "host": "me",
             "user": "admin",
             "passwd": "badpassword",
             "cmdlist": ["echo hello"],
             "policy": "AutoBAD"
             }
-    missingOpts = {
+    missing_opts = {
             "host": "unix.andrew.cmu.edu",
             "user": "",
             "passwd": "",
             "cmdlist": ["echo hello", "ls", "exit"]
             }
-    goodConfig = {
+    good_config = {
             "host": "unix.andrew.cmu.edu",
             "user": "",
             "passwd": "",
@@ -118,13 +112,13 @@ def testSSH():
             "port": 22,
             "policy": "AutoAdd"
             }
-    badKeyCases = [("empty", empty), ("missingUser", missingUser)]
-    badValueCases = [("wrongHost", wrongHost), ("wrongPort", wrongPort), ("blankPort", blankPort),
-                     ("blankHost", blankHost), ("wrongPolicy", wrongPolicy)]
-    goodCases = [("missingOpts", missingOpts), ("goodConfig", goodConfig)]
-    testBadKeyCases(task, badKeyCases)
-    testBadValueCases(task, badValueCases)
-    testGoodCases(task, goodCases)
+    bad_key_cases = [("empty", empty), ("missing_user", missing_user)]
+    bad_value_cases = [("wrong_host", wrong_host), ("wrong_port", wrong_port), ("blank_port", blank_port),
+                     ("blank_host", blank_host), ("wrong_policy", wrong_policy)]
+    good_cases = [("missing_opts", missing_opts), ("good_config", good_config)]
+    test_bad_key_cases(task, bad_key_cases)
+    test_bad_value_cases(task, bad_value_cases)
+    test_good_cases(task, good_cases)
 
 if __name__ == '__main__':
-    testSSH()
+    test_ssh()
