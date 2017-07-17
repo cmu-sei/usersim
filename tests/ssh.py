@@ -55,6 +55,7 @@ def test_good_cases(task, good_cases):
     for config_name, config in good_cases:
         task['config'] = config
         if config['host']:
+            print('Trying to connect to %s in test configuration...' % config['host'])
             sim = usersim.UserSim(True)
             api.new_task(task)
             result = sim.cycle()
