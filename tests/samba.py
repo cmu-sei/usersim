@@ -61,7 +61,7 @@ def test_good_cases(task, good_cases):
             print('    Feedback from task:')
             print('    %s' % str(result))
 
-def test_samba():
+def run_test():
     task = {'type': 'samba', 'config': None}
     empty = {}
     none_address = {'address': None}
@@ -82,4 +82,4 @@ def test_samba():
     test_good_cases(task, good_cases)
 
 if __name__ == '__main__':
-    test_samba()
+    run_test()
