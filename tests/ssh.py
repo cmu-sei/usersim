@@ -65,7 +65,7 @@ def test_good_cases(task, good_cases):
             print('No host specified for test. Cannot test connectivity.')
         print('Correctly accepted %s' % config_name)
 
-def test_ssh():
+def run_test():
     task = {'type': 'ssh', 'config': None}
     empty = {}
     missing_user = {
@@ -129,4 +129,4 @@ def test_ssh():
     test_good_cases(task, good_cases)
 
 if __name__ == '__main__':
-    test_ssh()
+    run_test()

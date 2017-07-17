@@ -58,7 +58,6 @@ def test_good_cases(task, good_cases):
         task['config'] = config
         api.new_task(task)
         print('Correctly accepted %s' % config_name)
-        sim.cycle()
         result = sim.cycle()
         if result:
             print('    Feedback from task:')
