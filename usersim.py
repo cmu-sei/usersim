@@ -50,6 +50,8 @@ class _UserSim(object):
                 int: Task ID of the task that ran
                 str: A traceback message if an exception occurred, empty string otherwise.
         """
+        self._resolve_actions()
+
         feedback = list()
 
         for task_id, task in self._scheduled.items():
@@ -67,8 +69,6 @@ class _UserSim(object):
                 feedback.append((final_status, str()))
 
                 self.stop_task(task_id)
-
-        self._resolve_actions()
 
         return feedback
 
