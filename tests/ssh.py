@@ -23,7 +23,7 @@ def test_bad_key_cases(task, bad_key_cases):
             api.new_task(task)
             raise AssertionError('Incorrectly accepted %s' % config_name)
         except KeyError:
-            print("Correctly rejected %s" % config_name)
+            print('Correctly rejected %s' % config_name)
 
 def test_bad_value_cases(task, bad_value_cases):
     """ Used to test configs with invalid values. This function will raise an assertion error if validate incorrectly
@@ -43,7 +43,7 @@ def test_bad_value_cases(task, bad_value_cases):
             api.new_task(task)
             raise AssertionError('Incorrectly accepted %s' % config_name)
         except ValueError:
-            print("Correctly rejected %s" % config_name)
+            print('Correctly rejected %s' % config_name)
 
 def test_good_cases(task, good_cases):
     """ Used to test properly formatted configs.
@@ -68,61 +68,61 @@ def test_ssh():
     task = {'type': 'ssh', 'config': None}
     empty = {}
     missing_user = {
-            "host": "me",
-            "password": "badpassword",
-            "cmdlist": ["echo hello"]
+            'host': 'me',
+            'password': 'badpassword',
+            'cmdlist': ['echo hello']
             }
     wrong_host = {
-            "host": 28,
-            "user": "admin",
-            "password": "badpassword",
-            "cmdlist": ["echo hello"]
+            'host': 28,
+            'user': 'admin',
+            'password': 'badpassword',
+            'cmdlist': ['echo hello']
             }
     wrong_port = {
-            "host": "me",
-            "user": "admin",
-            "password": "badpassword",
-            "cmdlist": ["echo hello"],
-            "port": "68"
+            'host': 'me',
+            'user': 'admin',
+            'password': 'badpassword',
+            'cmdlist': ['echo hello'],
+            'port': '68'
             }
     blank_port = {
-            "host": "me",
-            "user": "admin",
-            "password": "badpassword",
-            "cmdlist": ["echo hello"],
-            "port": ""
+            'host': 'me',
+            'user': 'admin',
+            'password': 'badpassword',
+            'cmdlist': ['echo hello'],
+            'port': str()
             }
     blank_host = {
-            "host": "",
-            "user": "admin",
-            "password": "badpassword",
-            "cmdlist": ["echo hello"]
+            'host': str(),
+            'user': 'admin',
+            'password': 'badpassword',
+            'cmdlist': ['echo hello']
             }
     wrong_policy = {
-            "host": "me",
-            "user": "admin",
-            "password": "badpassword",
-            "cmdlist": ["echo hello"],
-            "policy": "AutoBAD"
+            'host': 'me',
+            'user': 'admin',
+            'password': 'badpassword',
+            'cmdlist': ['echo hello'],
+            'policy': 'AutoBAD'
             }
     missing_opts = {
-            "host": "",
-            "user": "",
-            "password": "",
-            "cmdlist": ["echo hello", "ls", "exit"]
+            'host': '',
+            'user': '',
+            'password': '',
+            'cmdlist': ['echo hello', 'ls', 'exit']
             }
     good_config = {
-            "host": "",
-            "user": "",
-            "password": "",
-            "cmdlist": ["echo hello", "ls", "exit"],
-            "port": 22,
-            "policy": "AutoAdd"
+            'host': '',
+            'user': '',
+            'password': '',
+            'cmdlist': ['echo hello', 'ls', 'exit'],
+            'port': 22,
+            'policy': 'AutoAdd'
             }
-    bad_key_cases = [("empty", empty), ("missing_user", missing_user)]
-    bad_value_cases = [("wrong_host", wrong_host), ("wrong_port", wrong_port), ("blank_port", blank_port),
-                     ("blank_host", blank_host), ("wrong_policy", wrong_policy)]
-    good_cases = [("missing_opts", missing_opts), ("good_config", good_config)]
+    bad_key_cases = [('empty', empty), ('missing_user', missing_user)]
+    bad_value_cases = [('wrong_host', wrong_host), ('wrong_port', wrong_port), ('blank_port', blank_port),
+                     ('blank_host', blank_host), ('wrong_policy', wrong_policy)]
+    good_cases = [('missing_opts', missing_opts), ('good_config', good_config)]
     test_bad_key_cases(task, bad_key_cases)
     test_bad_value_cases(task, bad_value_cases)
     test_good_cases(task, good_cases)
