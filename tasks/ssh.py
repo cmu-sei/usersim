@@ -27,14 +27,14 @@ class SSH(task.Task):
         self.ssh_to(self._config['host'],
                     self._config['user'],
                     self._config['password'],
-                    self._config['cmdlist'],
+                    self._config['command_list'],
                     self._config['policy'],
                     self._config['port'])
 
     def cleanup(self):
         """ Doesn't need to do anything
         """
-        return None
+        pass
 
     def stop(self):
         """ Task should stop after it is run once
@@ -52,9 +52,9 @@ class SSH(task.Task):
         """
         return str()
 
-    def ssh_to(self, host, user, password, cmdlist, policy, port):
+    def ssh_to(self, host, user, password, command_list, policy, port):
         """ Connects to an SSH server at host:port with user as the username and password as the password. Proceeds to
-        execute all commands in cmdlist.
+        execute all commands in command_list.
         """
         ssh = paramiko.SSHClient()
         if policy == 'AutoAdd':
@@ -75,9 +75,8 @@ class SSH(task.Task):
             incoming += channel.recv(MAX_RECV).decode()
             time.sleep(.1)
         sys.stdout.write(incoming)
-        sys.stdout.flush()
 
-        for command in cmdlist:
+        for command in command_list:
             channel.sendall(command + '\n')
             time.sleep(.5)
             incoming = str()
@@ -85,13 +84,13 @@ class SSH(task.Task):
                 incoming += channel.recv(MAX_RECV).decode()
                 time.sleep(.1)
             sys.stdout.write(incoming)
-            sys.stdout.flush()
 
-        try: # Try to close the connection, but we don't want to raise an exception here if it fails
+        try:
             ssh.close()
         except:
             pass
-        print() # So that the next output will be on a new line
+        # So that the next output will be on a new line
+        print()
 
     @classmethod
     def parameters(cls):
@@ -106,7 +105,7 @@ class SSH(task.Task):
         params = {'required': {'host': 'the hostname to connect to, ex. "io.smashthestack.org"',
                                'user': 'username to login with, ex. "level1"',
                                'password': 'password to login with, ex. "level1"',
-                               'cmdlist': 'list of strings to send as commands, ex. ["ls -la", "cat README"]'},
+                               'command_list': 'list of strings to send as commands, ex. ["ls -la", "cat README"]'},
                   'optional': {'port': 'the port on which to connect to the SSH server, ex. 22.  Default: 22',
                                'policy': 'which policy to adopt in regards to missing host keys, should be one of '
                                          'AutoAdd, Reject, or Warning. Default: Warning'}}
@@ -138,13 +137,13 @@ class SSH(task.Task):
                 raise ValueError(key + ': {} Must be a string'.format(str(config[key])))
         if not config['host']:
             raise ValueError('host: {} Must be non-empty'.format(str(config['host'])))
-        if type(config['cmdlist']) != list:
-            raise ValueError('cmdlist: {} Must be a list of strings'.format(str(config['cmdlist'])))
-        if not config['cmdlist']:
-            raise ValueError('cmdlist: {} Must be non-empty'.format(str(config['host'])))
-        for command in config['cmdlist']:
+        if type(config['command_list']) != list:
+            raise ValueError('command_list: {} Must be a list of strings'.format(str(config['command_list'])))
+        if not config['command_list']:
+            raise ValueError('command_list: {} Must be non-empty'.format(str(config['host'])))
+        for command in config['command_list']:
             if type(command) != str:
-                raise ValueError('cmdlist: {} Must be a list of strings'.format(str(config['cmdlist'])))
+                raise ValueError('command_list: {} Must be a list of strings'.format(str(config['command_list'])))
 
         if 'policy' not in config:
             config['policy'] = 'Warning'

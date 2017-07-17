@@ -71,52 +71,52 @@ def test_ssh():
     missing_user = {
             'host': 'me',
             'password': 'badpassword',
-            'cmdlist': ['echo hello']
+            'command_list': ['echo hello']
             }
     wrong_host = {
             'host': 28,
             'user': 'admin',
             'password': 'badpassword',
-            'cmdlist': ['echo hello']
+            'command_list': ['echo hello']
             }
     wrong_port = {
             'host': 'me',
             'user': 'admin',
             'password': 'badpassword',
-            'cmdlist': ['echo hello'],
+            'command_list': ['echo hello'],
             'port': '68'
             }
     blank_port = {
             'host': 'me',
             'user': 'admin',
             'password': 'badpassword',
-            'cmdlist': ['echo hello'],
+            'command_list': ['echo hello'],
             'port': str()
             }
     blank_host = {
             'host': str(),
             'user': 'admin',
             'password': 'badpassword',
-            'cmdlist': ['echo hello']
+            'command_list': ['echo hello']
             }
     wrong_policy = {
             'host': 'me',
             'user': 'admin',
             'password': 'badpassword',
-            'cmdlist': ['echo hello'],
+            'command_list': ['echo hello'],
             'policy': 'AutoBAD'
             }
     missing_opts = {
             'host': '',
             'user': '',
             'password': '',
-            'cmdlist': ['echo hello', 'ls', 'exit']
+            'command_list': ['echo hello', 'ls', 'exit']
             }
     good_config = {
             'host': '',
             'user': '',
             'password': '',
-            'cmdlist': ['echo hello', 'ls', 'exit'],
+            'command_list': ['echo hello', 'ls', 'exit'],
             'port': 22,
             'policy': 'AutoAdd'
             }
