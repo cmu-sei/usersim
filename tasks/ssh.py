@@ -151,8 +151,8 @@ class SSH(task.Task):
         if 'port' not in config:
             config['port'] = 22
         if config['policy'] not in ['AutoAdd', 'Reject', 'Warning']:
-            raise ValueError('policy: {} Must be one of 'AutoAdd', 'Reject', '
-                             'or 'Warning''.format(str(config['policy'])))
+            raise ValueError('policy: {} Must be one of "AutoAdd", "Reject", '
+                             'or "Warning"'.format(str(config['policy'])))
         if type(config['port']) != int:
             raise ValueError('port: {} Must be an int'.format(str(config['port'])))
         if config['port'] < 1 or config['port'] > 65536:
