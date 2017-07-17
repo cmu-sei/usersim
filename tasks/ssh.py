@@ -26,7 +26,7 @@ class SSH(task.Task):
         """
         self.ssh_to(self._config['host'],
                     self._config['user'],
-                    self._config['passwd'],
+                    self._config['password'],
                     self._config['cmdlist'],
                     self._config['policy'],
                     self._config['port'])
@@ -52,8 +52,8 @@ class SSH(task.Task):
         """
         return ""
 
-    def ssh_to(self, host, user, passwd, cmdlist, policy, port):
-        """ Connects to an SSH server at host:port with user as the username and passwd as the password. Proceeds to
+    def ssh_to(self, host, user, password, cmdlist, policy, port):
+        """ Connects to an SSH server at host:port with user as the username and password as the password. Proceeds to
         execute all commands in cmdlist.
         """
         ssh = paramiko.SSHClient()
@@ -63,7 +63,7 @@ class SSH(task.Task):
             ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
         elif policy == "Warning":
             ssh.set_missing_host_key_policy(paramiko.WarningPolicy())
-        ssh.connect(host, port, user, passwd)
+        ssh.connect(host, port, user, password)
         channel = ssh.invoke_shell()
         channel.setblocking(int(BLOCKING))
         channel.sendall("")
@@ -75,6 +75,7 @@ class SSH(task.Task):
             incoming += channel.recv(MAX_RECV).decode()
             time.sleep(.1)
         sys.stdout.write(incoming)
+        sys.stdout.flush()
 
         for command in cmdlist:
             channel.sendall(command + "\n")
@@ -84,6 +85,7 @@ class SSH(task.Task):
                 incoming += channel.recv(MAX_RECV).decode()
                 time.sleep(.1)
             sys.stdout.write(incoming)
+            sys.stdout.flush()
 
         try: # Try to close the connection, but we don't want to raise an exception here if it fails
             ssh.close()
@@ -107,8 +109,7 @@ class SSH(task.Task):
                                "cmdlist": 'list of strings to send as commands, ex. ["ls -la", "cat README"]'},
                   "optional": {"port": 'the port on which to connect to the SSH server, ex. 22.  Default: 22',
                                "policy": 'which policy to adopt in regards to missing host keys, should be one of '
-                                         'AutoAdd, Reject, or Warning. Default: Warning'}
-                  }
+                                         'AutoAdd, Reject, or Warning. Default: Warning'}}
         return params
 
     @classmethod
@@ -132,7 +133,7 @@ class SSH(task.Task):
             if key not in config:
                 raise KeyError(key)
 
-        for key in ["host", "user", "passwd"]:
+        for key in ["host", "user", "password"]:
             if type(config[key]) != str:
                 raise ValueError(key + ": {} Must be a string".format(str(config[key])))
         if not config["host"]:

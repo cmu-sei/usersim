@@ -54,7 +54,14 @@ def test_good_cases(task, good_cases):
     """
     for config_name, config in good_cases:
         task['config'] = config
-        api.new_task(task)
+        if config['host']:
+            sim = usersim.UserSim(True)
+            api.new_task(task)
+            result = sim.cycle()
+            for item in result:
+                print(item)
+        else:
+            print('No host specified for test. Cannot test connectivity.')
         print('Correctly accepted %s' % config_name)
 
 def test_ssh():
@@ -62,52 +69,52 @@ def test_ssh():
     empty = {}
     missing_user = {
             "host": "me",
-            "passwd": "badpassword",
+            "password": "badpassword",
             "cmdlist": ["echo hello"]
             }
     wrong_host = {
             "host": 28,
             "user": "admin",
-            "passwd": "badpassword",
+            "password": "badpassword",
             "cmdlist": ["echo hello"]
             }
     wrong_port = {
             "host": "me",
             "user": "admin",
-            "passwd": "badpassword",
+            "password": "badpassword",
             "cmdlist": ["echo hello"],
             "port": "68"
             }
     blank_port = {
             "host": "me",
             "user": "admin",
-            "passwd": "badpassword",
+            "password": "badpassword",
             "cmdlist": ["echo hello"],
             "port": ""
             }
     blank_host = {
             "host": "",
             "user": "admin",
-            "passwd": "badpassword",
+            "password": "badpassword",
             "cmdlist": ["echo hello"]
             }
     wrong_policy = {
             "host": "me",
             "user": "admin",
-            "passwd": "badpassword",
+            "password": "badpassword",
             "cmdlist": ["echo hello"],
             "policy": "AutoBAD"
             }
     missing_opts = {
-            "host": "unix.andrew.cmu.edu",
+            "host": "",
             "user": "",
-            "passwd": "",
+            "password": "",
             "cmdlist": ["echo hello", "ls", "exit"]
             }
     good_config = {
-            "host": "unix.andrew.cmu.edu",
+            "host": "",
             "user": "",
-            "passwd": "",
+            "password": "",
             "cmdlist": ["echo hello", "ls", "exit"],
             "port": 22,
             "policy": "AutoAdd"
