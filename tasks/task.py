@@ -68,4 +68,4 @@ class Task(object):
         Returns:
             dict: The dict given as the conf_dict argument with missing optional parameters added with default values.
         """
-        raise NotImplementedError("Not yet implemented")
+        raise NotImplementedError("Not yet implemented.")
