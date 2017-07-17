@@ -50,24 +50,24 @@ class SSH(task.Task):
         Returns:
             str: An arbitrary string giving more detailed, task-specific status for the given task.
         """
-        return ""
+        return str()
 
     def ssh_to(self, host, user, password, cmdlist, policy, port):
         """ Connects to an SSH server at host:port with user as the username and password as the password. Proceeds to
         execute all commands in cmdlist.
         """
         ssh = paramiko.SSHClient()
-        if policy == "AutoAdd":
+        if policy == 'AutoAdd':
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        elif policy == "Reject":
+        elif policy == 'Reject':
             ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
-        elif policy == "Warning":
+        elif policy == 'Warning':
             ssh.set_missing_host_key_policy(paramiko.WarningPolicy())
         ssh.connect(host, port, user, password)
         channel = ssh.invoke_shell()
         channel.setblocking(int(BLOCKING))
-        channel.sendall("")
-        incoming = ""
+        channel.sendall(str())
+        incoming = str()
 
         # Receive the welcome message from the server and print it.  If any of this fails, something went wrong with
         # the connection.
@@ -78,9 +78,9 @@ class SSH(task.Task):
         sys.stdout.flush()
 
         for command in cmdlist:
-            channel.sendall(command + "\n")
+            channel.sendall(command + '\n')
             time.sleep(.5)
-            incoming = ""
+            incoming = str()
             while channel.recv_ready():
                 incoming += channel.recv(MAX_RECV).decode()
                 time.sleep(.1)
@@ -91,7 +91,7 @@ class SSH(task.Task):
             ssh.close()
         except:
             pass
-        print("") # So that the next output will be on a new line
+        print() # So that the next output will be on a new line
 
     @classmethod
     def parameters(cls):
@@ -103,12 +103,12 @@ class SSH(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {"required": {"host": 'the hostname to connect to, ex. "io.smashthestack.org"',
-                               "user": 'username to login with, ex. "level1"',
-                               "password": 'password to login with, ex. "level1"',
-                               "cmdlist": 'list of strings to send as commands, ex. ["ls -la", "cat README"]'},
-                  "optional": {"port": 'the port on which to connect to the SSH server, ex. 22.  Default: 22',
-                               "policy": 'which policy to adopt in regards to missing host keys, should be one of '
+        params = {'required': {'host': 'the hostname to connect to, ex. "io.smashthestack.org"',
+                               'user': 'username to login with, ex. "level1"',
+                               'password': 'password to login with, ex. "level1"',
+                               'cmdlist': 'list of strings to send as commands, ex. ["ls -la", "cat README"]'},
+                  'optional': {'port': 'the port on which to connect to the SSH server, ex. 22.  Default: 22',
+                               'policy': 'which policy to adopt in regards to missing host keys, should be one of '
                                          'AutoAdd, Reject, or Warning. Default: Warning'}}
         return params
 
@@ -133,29 +133,29 @@ class SSH(task.Task):
             if key not in config:
                 raise KeyError(key)
 
-        for key in ["host", "user", "password"]:
+        for key in ['host', 'user', 'password']:
             if type(config[key]) != str:
-                raise ValueError(key + ": {} Must be a string".format(str(config[key])))
-        if not config["host"]:
-            raise ValueError("host: {} Must be non-empty".format(str(config["host"])))
-        if type(config["cmdlist"]) != list:
-            raise ValueError("cmdlist: {} Must be a list of strings".format(str(config["cmdlist"])))
-        if not config["cmdlist"]:
-            raise ValueError("cmdlist: {} Must be non-empty".format(str(config["host"])))
-        for command in config["cmdlist"]:
+                raise ValueError(key + ': {} Must be a string'.format(str(config[key])))
+        if not config['host']:
+            raise ValueError('host: {} Must be non-empty'.format(str(config['host'])))
+        if type(config['cmdlist']) != list:
+            raise ValueError('cmdlist: {} Must be a list of strings'.format(str(config['cmdlist'])))
+        if not config['cmdlist']:
+            raise ValueError('cmdlist: {} Must be non-empty'.format(str(config['host'])))
+        for command in config['cmdlist']:
             if type(command) != str:
-                raise ValueError("cmdlist: {} Must be a list of strings".format(str(config["cmdlist"])))
+                raise ValueError('cmdlist: {} Must be a list of strings'.format(str(config['cmdlist'])))
 
-        if "policy" not in config:
-            config["policy"] = "Warning"
-        if "port" not in config:
-            config["port"] = 22
-        if config["policy"] not in ["AutoAdd", "Reject", "Warning"]:
-            raise ValueError("policy: {} Must be one of 'AutoAdd', 'Reject', "
-                             "or 'Warning'".format(str(config["policy"])))
-        if type(config["port"]) != int:
-            raise ValueError("port: {} Must be an int".format(str(config["port"])))
-        if config["port"] < 1 or config["port"] > 65536:
-            raise ValueError("port: {} Must be in the range [1, 65536]".format(str(config["port"])))
+        if 'policy' not in config:
+            config['policy'] = 'Warning'
+        if 'port' not in config:
+            config['port'] = 22
+        if config['policy'] not in ['AutoAdd', 'Reject', 'Warning']:
+            raise ValueError('policy: {} Must be one of 'AutoAdd', 'Reject', '
+                             'or 'Warning''.format(str(config['policy'])))
+        if type(config['port']) != int:
+            raise ValueError('port: {} Must be an int'.format(str(config['port'])))
+        if config['port'] < 1 or config['port'] > 65536:
+            raise ValueError('port: {} Must be in the range [1, 65536]'.format(str(config['port'])))
 
         return config
