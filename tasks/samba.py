@@ -34,7 +34,7 @@ class Samba(task.Task):
     def cleanup(self):
         """ Doesn't need to do anything
         """
-        return None
+        pass
 
     def stop(self):
         """ This task should be stopped after running once.
@@ -50,7 +50,7 @@ class Samba(task.Task):
         Returns:
             str: An arbitrary string giving more detailed, task-specific status for the given task.
         """
-        return ""
+        return str()
 
     @classmethod
     def parameters(cls):
