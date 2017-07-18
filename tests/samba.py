@@ -75,8 +75,8 @@ def run_test():
     complete = {'address': '\\\\UBUNTU', 'user': 'akidwai', 'passwd': 'password',
                 'files': ['sample1.txt', 'sample2.txt']}
     bad_key_cases = [('empty', empty)]
-    bad_value_cases = [('noneAddress', noneAddress), ('nonePort', nonePort), ('badPort', badPort),
-                       ('badFiles', badFiles)]
+    bad_value_cases = [('none_address', none_address), ('none_port', none_port), ('bad_port', bad_port),
+                       ('bad_files', bad_files)]
     good_cases = [('random1', random1), ('random2', random2), ('authenticated', authenticated), ('complete', complete)]
     test_bad_key_cases(task, bad_key_cases)
     test_bad_value_cases(task, bad_value_cases)
