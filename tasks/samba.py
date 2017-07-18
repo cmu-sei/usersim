@@ -11,7 +11,7 @@ from smb.smb_structs import OperationFailure
 from tasks import task
 
 class Samba(task.Task):
-    def __init__(self, config, debug=False):
+    def __init__(self, config, debug=True):
         """ Validates config and stores it as an attribute. Also initializes self._smb_con to None.
         """
         self._config = self.validate(config)
@@ -68,7 +68,7 @@ class Samba(task.Task):
                                'user': 'str: a username to authenticate with the server if necessary',
                                'passwd': 'str: password for user',
                                'files': 'list: a list of filenames (strings) to download from the Samba share. If not '
-                               'specified, the UserSim will either upload or download a random file.'}}
+                                        'specified, the UserSim will either upload or download a random file.'}}
         return params
 
     @classmethod
