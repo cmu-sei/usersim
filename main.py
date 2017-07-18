@@ -10,7 +10,11 @@ import usersim
 def main():
     feedback_queue = queue.Queue()
 
-    cli.parse_and_initialize(feedback_queue)
+    test_mode = cli.parse_and_initialize(feedback_queue)
+
+    if test_mode:
+        tests.run_all_tests()
+        return
 
     sim = usersim.UserSim()
 

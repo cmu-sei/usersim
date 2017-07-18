@@ -24,6 +24,9 @@ def init_local(args, feedback_queue):
 def init_rpc(args, feedback_queue):
     rpc.RPCCommunication(feedback_queue, args.ip_address, args.port, args.name)
 
+def test_mode(*args):
+    return True
+
 def parse_and_initialize(feedback_queue):
     parser = argparse.ArgumentParser(description = 'User Simulator which can generate various types of traffic.')
 
@@ -58,5 +61,8 @@ def parse_and_initialize(feedback_queue):
             default=None,
             help='An arbitrary identifier string for the RPC server to use.')
 
+    test_parser = subparsers.add_parser('test')
+    test_parser.set_defaults(function=test_mode)
+
     args = parser.parse_args()
-    args.function(args, feedback_queue)
+    return args.function(args, feedback_queue)
