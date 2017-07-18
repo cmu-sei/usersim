@@ -10,18 +10,18 @@ def test_bad_key_cases(task, bad_key_cases):
 
     Args:
         task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        bad_key_cases: A list of tuples of the form ("configName", config). config should be missing at least one key.
+        bad_key_cases: A list of tuples of the form ("config_name", config). config should be missing at least one key.
 
     Raises:
         AssertionError: If api.new_task does not raise a KeyError
     """
-    for configName, config in bad_key_cases:
+    for config_name, config in bad_key_cases:
         task['config'] = config
         try:
             api.new_task(task)
-            raise AssertionError('Incorrectly accepted %s' % configName)
+            raise AssertionError('Incorrectly accepted %s' % config_name)
         except KeyError:
-            print("Correctly rejected %s" % configName)
+            print("Correctly rejected %s" % config_name)
 
 def test_bad_value_cases(task, bad_value_cases):
     """ Used to test configs with invalid values. This function will raise an assertion error if validate incorrectly 
@@ -29,32 +29,32 @@ def test_bad_value_cases(task, bad_value_cases):
 
     Args:
         task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        bad_value_cases: A list of tuples of the form ("configName", config). config should have at least one invalid 
+        bad_value_cases: A list of tuples of the form ("config_name", config). config should have at least one invalid 
             value.
 
     Raises:
         AssertionError: If api.new_task does not raise a ValueError
     """
-    for configName, config in bad_value_cases:
+    for config_name, config in bad_value_cases:
         task['config'] = config
         try:
             api.new_task(task)
-            raise AssertionError('Incorrectly accepted %s' % configName)
+            raise AssertionError('Incorrectly accepted %s' % config_name)
         except ValueError:
-            print("Correctly rejected %s" % configName)
+            print("Correctly rejected %s" % config_name)
 
 def test_good_cases(task, good_cases):
     """ Used to test properly formatted configs. Prints feedback from the task.
 
     Args:
         task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        good_cases: A list of tuples of the form ("configName", config). config should be properly formatted.
+        good_cases: A list of tuples of the form ("config_name", config). config should be properly formatted.
     """
     sim = usersim.UserSim(True)
-    for configName, config in good_cases:
+    for config_name, config in good_cases:
         task['config'] = config
         api.new_task(task)
-        print('Correctly accepted %s' % configName)
+        print('Correctly accepted %s' % config_name)
         sim.cycle()
         result = sim.cycle()
         if result:
