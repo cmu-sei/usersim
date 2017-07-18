@@ -1,6 +1,5 @@
 # Ali Kidwai
 # June 22, 2017
-
 import api
 import usersim
 
@@ -66,13 +65,13 @@ def run_test():
     empty = {}
     none_address = {'address': None}
     empty_address = {'address': ''}
-    none_port = {'address': '128.237.28.16', 'port': None}
-    bad_port = {'address': '128.237.28.16', 'port': 1000000000}
-    bad_files = {'address': '128.237.28.16', 'files': [None, 1, "README"]}
-    random1 = {'address': '128.237.28.16'}
-    random2 = {'address': '128.237.28.16', 'files': []}
-    authenticated = {'address': '128.237.28.16', 'user': 'akidwai', 'passwd': 'password'}
-    complete = {'address': '128.237.28.16', 'user': 'akidwai', 'passwd': 'password',
+    none_port = {'address': '', 'port': None}
+    bad_port = {'address': '192.168.116.136', 'port': 1000000000}
+    bad_files = {'address': '192.168.116.136', 'files': [None, 1, "README"]}
+    random1 = {'address': '192.168.116.136'}
+    random2 = {'address': '192.168.116.136', 'files': []}
+    authenticated = {'address': '192.168.116.136', 'user': 'akidwai', 'passwd': 'password'}
+    complete = {'address': '192.168.116.136', 'user': 'akidwai', 'passwd': 'password',
                 'files': ['smbtest/sample1.txt', 'smbtest/sample2.txt']}
     bad_key_cases = [('empty', empty)]
     bad_value_cases = [('none_address', none_address), ('none_port', none_port), ('bad_port', bad_port),
