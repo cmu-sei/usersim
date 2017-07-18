@@ -1,5 +1,7 @@
 # Ali Kidwai
 # July 18, 2017
+# Tests for Samba module for UserSim. Makes sure that SSH rejects incorrect configs and accepts correct configs. Prints
+# output from correct configs. Be sure to update test cases with the relevant info for your Samba test server.
 
 import api
 import usersim

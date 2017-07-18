@@ -10,7 +10,11 @@ from smb.smb_structs import OperationFailure
 
 from tasks import task
 
+
 class Samba(task.Task):
+    """ Samba module for UserSim. Connects to and authenticates with a Samba share and downloads specified files. If no 
+    files are specified, flips a coin and either uploads/downloads a file to/from the share.
+    """
     def __init__(self, config, debug=False):
         """ Validates config and stores it as an attribute. Also initializes self._smb_con to None.
         """
@@ -33,7 +37,7 @@ class Samba(task.Task):
                 self.upload_random_file()
 
     def cleanup(self):
-        """ Doesn't need to do anything
+        """ Doesn't need to do anything.
         """
         pass
 
