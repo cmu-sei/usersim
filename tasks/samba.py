@@ -11,7 +11,7 @@ from smb.smb_structs import OperationFailure
 from tasks import task
 
 class Samba(task.Task):
-    def __init__(self, config, debug=True):
+    def __init__(self, config, debug=False):
         """ Validates config and stores it as an attribute. Also initializes self._smb_con to None.
         """
         self._config = self.validate(config)
