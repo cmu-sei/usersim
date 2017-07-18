@@ -1,5 +1,6 @@
 # Ali Kidwai
 # June 22, 2017
+# Adapted from code written by Rotem Guttman and Joe Vessella
 
 import os
 import random
