@@ -1,6 +1,5 @@
 # Ali Kidwai
 # June 22, 2017
-# Adapted from code written by Rotem Guttman and Joe Vessella
 
 import api
 import usersim
@@ -67,13 +66,14 @@ def run_test():
     empty = {}
     none_address = {'address': None}
     empty_address = {'address': ''}
-    none_port = {'address': 'localhost', 'port': None}
-    bad_port = {'address': 'localhost', 'port': 1000000000}
-    bad_files = {'address': 'localhost', 'files': [None, 1, "README"]}
-    random1 = {'address': 'localhost'}
-    random2 = {'address': 'localhost', 'files': []}
-    authenticated = {'address': 'localhost', 'user': '', 'passwd': ''}
-    complete = {'address': 'localhost', 'user': '', 'passwd': '', 'files': []}
+    none_port = {'address': '\\\\UBUNTU', 'port': None}
+    bad_port = {'address': '\\\\UBUNTU', 'port': 1000000000}
+    bad_files = {'address': '\\\\UBUNTU', 'files': [None, 1, "README"]}
+    random1 = {'address': '\\\\UBUNTU'}
+    random2 = {'address': '\\\\UBUNTU', 'files': []}
+    authenticated = {'address': '\\\\UBUNTU', 'user': 'akidwai', 'passwd': 'password'}
+    complete = {'address': '\\\\UBUNTU', 'user': 'akidwai', 'passwd': 'password',
+                'files': ['sample1.txt', 'sample2.txt']}
     bad_key_cases = [('empty', empty)]
     bad_value_cases = [('noneAddress', noneAddress), ('nonePort', nonePort), ('badPort', badPort),
                        ('badFiles', badFiles)]
