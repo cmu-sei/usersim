@@ -219,7 +219,7 @@ class Samba(task.Task):
         else:
             out_file = os.devnull
 
-        with open(out_file, 'a') as f:
+        with open(out_file, 'w') as f:
             if self._debug:
                 print('Attempting to retrieve file %s' % os.path.join(share, path))
             self._smb_con.retrieveFile(share, path, f)
