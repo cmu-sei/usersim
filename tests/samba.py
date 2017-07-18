@@ -66,14 +66,14 @@ def run_test():
     empty = {}
     none_address = {'address': None}
     empty_address = {'address': ''}
-    none_port = {'address': '\\\\UBUNTU', 'port': None}
-    bad_port = {'address': '\\\\UBUNTU', 'port': 1000000000}
-    bad_files = {'address': '\\\\UBUNTU', 'files': [None, 1, "README"]}
-    random1 = {'address': '\\\\UBUNTU'}
-    random2 = {'address': '\\\\UBUNTU', 'files': []}
-    authenticated = {'address': '\\\\UBUNTU', 'user': 'akidwai', 'passwd': 'password'}
-    complete = {'address': '\\\\UBUNTU', 'user': 'akidwai', 'passwd': 'password',
-                'files': ['sample1.txt', 'sample2.txt']}
+    none_port = {'address': '128.237.28.16', 'port': None}
+    bad_port = {'address': '128.237.28.16', 'port': 1000000000}
+    bad_files = {'address': '128.237.28.16', 'files': [None, 1, "README"]}
+    random1 = {'address': '128.237.28.16'}
+    random2 = {'address': '128.237.28.16', 'files': []}
+    authenticated = {'address': '128.237.28.16', 'user': 'akidwai', 'passwd': 'password'}
+    complete = {'address': '128.237.28.16', 'user': 'akidwai', 'passwd': 'password',
+                'files': ['smbtest/sample1.txt', 'smbtest/sample2.txt']}
     bad_key_cases = [('empty', empty)]
     bad_value_cases = [('none_address', none_address), ('none_port', none_port), ('bad_port', bad_port),
                        ('bad_files', bad_files)]
