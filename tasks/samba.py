@@ -260,10 +260,10 @@ class Samba(task.Task):
             password (str): The password for username
         """
         try:
-            self._smb_con = SMBConnection(username, password, '', 'usersim') # TODO: Ask Joe if this should be hardcoded
+            self._smb_con = SMBConnection(username, password, 'usersim', 'UBUNTU') # TODO: Ask Joe if this should be hardcoded
             self._smb_con.connect(address, port)
         except Exception:
             # If the remote server is using direct TCP this flag must be set to True or we get an exception when we try
             # to connect.
-            self._smb_con = SMBConnection(username, password, '', 'usersim', is_direct_tcp=True)
+            self._smb_con = SMBConnection(username, password, 'usersim', 'UBUNTU', is_direct_tcp=True)
             self._smb_con.connect(address, port)
