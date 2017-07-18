@@ -2,6 +2,7 @@
 control over the usersim than any of the other communication options.
 """
 import inspect
+import platform
 import threading
 import time
 
@@ -24,7 +25,7 @@ class RPCCommunication(object):
         self._feedback_queue = feedback_queue
         self._connection = rpyc.connect(server_addr, server_port, service=UserSimService)
         if name:
-            self._connection.root.register_name(name)
+            self._connection.root.register(name, platform.system())
 
         serve_thread = threading.Thread(target=self._connection.serve_all)
         serve_thread.daemon = True
