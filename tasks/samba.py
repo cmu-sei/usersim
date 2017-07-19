@@ -14,6 +14,8 @@ from tasks import task
 class Samba(task.Task):
     """ Samba module for UserSim. Connects to and authenticates with a Samba share and downloads specified files. If no 
     files are specified, flips a coin and either uploads/downloads a file to/from the share.
+        * WARNING: If your share does not require authentication, you MUST set the appropriate permission bits on the *
+        *   shared folder so that guests can upload files to it!                                                      *
     """
     def __init__(self, config, debug=False):
         """ Validates config and stores it as an attribute. Also initializes self._smb_con to None.
