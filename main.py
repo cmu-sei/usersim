@@ -1,3 +1,4 @@
+import time
 import queue
 
 import api
@@ -22,6 +23,8 @@ def main():
         result = sim.cycle()
         for feedback in result:
             feedback_queue.put(feedback)
+        print('Sleeping between a cycle.')
+        time.sleep(1)
 
 if __name__ == '__main__':
     main()
