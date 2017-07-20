@@ -31,7 +31,7 @@ def parse_and_initialize(feedback_queue):
     parser = argparse.ArgumentParser(description = 'User Simulator which can generate various types of traffic.')
 
     subparsers = parser.add_subparsers()
-    boost_parser = subparsers.add_parser('boost')
+    boost_parser = subparsers.add_parser('xga')
     boost_parser.set_defaults(function=init_boost)
 
     local_parser = subparsers.add_parser('local')
