@@ -1,3 +1,5 @@
+import itertools
+import sys
 import time
 import queue
 
@@ -19,12 +21,18 @@ def main():
 
     sim = usersim.UserSim()
 
+    spinner = itertools.cycle('-/|\\')
     while True:
         result = sim.cycle()
         for feedback in result:
             feedback_queue.put(feedback)
-        print('Sleeping between a cycle.')
-        time.sleep(1)
+
+        # Spinner to demonstrate that the simulator is still running without scrolling the terminal.
+        for i in range(4):
+            sys.stdout.write(next(spinner))
+            sys.stdout.flush()
+            time.sleep(.25)
+            sys.stdout.write('\b')
 
 if __name__ == '__main__':
     main()
