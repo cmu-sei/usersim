@@ -309,7 +309,7 @@ class Outlook(task.Task):
             if not isinstance(folder, str):
                 raise ValueError('nuke_folders: {} Got a non-str item.'.format(str(folder)))
         if not isinstance(conf_dict['regexes'], dict):
-            raise ValueError('regexes: {} Must be dict mapping str to task dict')
+            raise ValueError('regexes: {} Must be dict mapping str to task dict'.format(str(conf_dict['regexes'])))
         ### End temporary.
 
         open_links = conf_dict['open_links']
