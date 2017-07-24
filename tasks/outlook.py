@@ -197,7 +197,7 @@ class Outlook(task.Task):
         """
         for regex in self._regexes:
             if regex.search(body):
-                api.new_task(self._regexes(regex))
+                api.new_task(self._regexes[regex])
 
     def _check_links(self, body):
         """ Check if a link exists in an email, and if so checks if we should open it.
