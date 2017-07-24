@@ -211,9 +211,9 @@ class Outlook(task.Task):
         match = re.search(url_regex, body)
 
         if match and random.randint(1, 100) <= self._config['open_links']:
-            # There was a link and we decided to click it.
-            # TODO: Add a browser task config here.
-            pass
+            # There was a link in the email and we chose to click it.
+            link_config = {'type': 'firefox', 'config': {'sites': [match.group()]}}
+            api.new_task(link_config)
 
     def _check_attachments(self, attachments):
         """ Check if we should open attachments, and if so, save and open all attachments.
