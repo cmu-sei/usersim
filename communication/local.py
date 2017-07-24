@@ -28,10 +28,10 @@ class LocalCommunication(object):
                 api.new_task(task)
             except KeyError as e:
                 self._feedback_queue.put((common.api_exception_status, 'task ' + task['type'] + ' missing required key '
-                    '%s from its configuration' % e.message))
+                    '%s from its configuration' % str(e)))
             except ValueError as e:
                 self._feedback_queue.put((common.api_exception_status, 'task ' + task['type'] + ' has at least one '
-                    'bad value for a config option:\n%s' % e.message))
+                    'bad value for a config option:\n%s' % str(e)))
 
         thread = threading.Thread(target=self._handle_communication)
         thread.daemon = True
@@ -51,7 +51,8 @@ class LocalCommunication(object):
             print('Type: ' + task_status['type'])
             print('ID: ' + str(task_status['id']))
             print('State: ' + task_status['state'])
-            print('Status: ' + task_status['status'])
+            if task_status['status']:
+                print('Status: ' + task_status['status'])
             if exception:
                 print('Exception: \n' + textwrap.indent(exception, '    '))
 
