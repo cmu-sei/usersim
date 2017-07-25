@@ -27,11 +27,10 @@ def new_task(config, start_paused=False, reset=False):
         int: The new task's unique ID.
     """
     sim = usersim.UserSim(reset)
-    validate_config(config)
+    validated_config = validate_config(config)
     task = tasks.task_dict[config['type']]
-    task_config = config['config']
-    t = task(task_config)
-    return sim.new_task(t, start_paused)
+
+    return sim.new_task(task, validated_config, start_paused)
 
 def pause_task(task_id):
     """ Pause a single task.
@@ -127,10 +126,16 @@ def validate_config(config):
     Raises:
         KeyError: If a required key is missing from config or config['config'] or if the task type does not exist.
         ValueError: If the given value of an option under config['config'] is invalid.
+
+    Returns:
+        dict: The dictionary associated with config's 'config' key, after processing it with the given task's validate
+            method. This does NOT include the 'type' and 'config' keys as above - only the actual configuration for the
+            given task.
     """
     task = tasks.task_dict[config['type']]
     task_config = config['config']
-    task.validate(task_config)
+
+    return task.validate(task_config)
 
 def get_tasks(filter_result=True):
     """ Get the tasks and their (human-readable) parameters currently available to this simulation. Certain special
