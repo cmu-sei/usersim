@@ -27,13 +27,18 @@ class RPCCommunication(object):
         if name:
             self._connection.root.register(name, platform.system())
 
-        serve_thread = threading.Thread(target=self._connection.serve_all)
+        serve_thread = threading.Thread(target=self.serve_all)
         serve_thread.daemon = True
         serve_thread.start()
 
         feedback_thread = threading.Thread(target=self._handle_communication)
         feedback_thread.daemon = True
         feedback_thread.start()
+
+    def serve_all(self):
+        while True:
+            self._connection.serve(.1)
+            time.sleep(1)
 
     def _handle_communication(self):
         """ Forward feedback messages to the server.
