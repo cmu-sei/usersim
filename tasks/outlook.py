@@ -334,6 +334,8 @@ class Outlook(task.Task):
             except Exception:
                 raise ValueError('regexes: {} Bad config value.'.format(str(regexes[regex])))
 
+        return conf_dict
+
     @staticmethod
     def _get_email_host(address):
         """ Attempts to fetch just the hostname part of the email address.
