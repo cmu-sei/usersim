@@ -1,3 +1,4 @@
+import queue
 import threading
 import traceback
 
@@ -36,6 +37,10 @@ class _UserSim(object):
         self._to_pause = dict()
         self._to_stop = dict()
 
+        # Works around the problems with initializing some tasks from threads that are not the main thread, such as
+        # Outlook.
+        self._new_tasks_queue = queue.Queue()
+
         self._operation_lock = threading.Lock()
 
         # Used to give status about stopped tasks. This variable must not be increased or decreased, only assigned.
@@ -72,11 +77,12 @@ class _UserSim(object):
 
         return feedback
 
-    def new_task(self, task, start_paused=False):
+    def new_task(self, task_class, task_config, start_paused=False):
         """ Manage a task. Guaranteed thread-safe.
 
         Arguments:
-            task (tasks.task.Task): A constructed Task object that is ready to run.
+            task (class): The CLASS of the task to construct.
+            config (dict): A pre-validated task config.
             start_paused (bool): Whether the given task will start scheduled (True) or paused (False).
 
         Returns:
@@ -85,12 +91,8 @@ class _UserSim(object):
         with self._operation_lock:
             task_id = next(self._id_gen)
             self._current_id = task_id
-            if start_paused:
-                self._to_pause[task_id] = task
-            else:
-                self._to_schedule[task_id] = task
 
-            self._new[task_id] = task
+            self._new_tasks_queue.put((task_id, task_class, task_config, start_paused))
 
         return task_id
 
@@ -190,6 +192,29 @@ class _UserSim(object):
         """
         with self._operation_lock:
             return self._unpause_single(task_id)
+
+    def _new_task(self, task_id, task_class, task_config, start_paused):
+        """ Do task construction and add the constructed task to internal structures. NOT thread-safe, and should only
+        be called from the main thread due to the fragility of some of the interactions with external programs in some
+        tasks.
+
+        Arguments:
+            task_id (int): The new task's internal ID.
+            task_class (class): The CLASS of the new task to be constructed.
+            task_config (dict): A pre-validated task config.
+            start_paused (bool): Whether the given task will start scheduled (True) or paused (False).
+
+        Returns:
+            bool: True if the operation was successful, False otherwise.
+        """
+        task = task_class(task_config)
+
+        if start_paused:
+            self._to_pause[task_id] = task
+        else:
+            self._to_schedule[task_id] = task
+
+        self._new[task_id] = task
 
     def _pause_single(self, task_id):
         """ Pause an individual task. NOT guaranteed thread-safe.
@@ -307,6 +332,11 @@ class _UserSim(object):
         """
         # Definitely want to lock to prevent any changes to these structures while resolving.
         with self._operation_lock:
+            while not self._new_tasks_queue.empty():
+                # Here we do new task construction within the main thread.
+                task_id, task_class, task_config, start_paused = self._new_tasks_queue.get()
+                self._new_task(task_id, task_class, task_config, start_paused)
+
             for task_id, task in self._to_pause.items():
                 # If these three lines raise, something has gone wrong and we should know about it.
                 try:
