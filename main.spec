@@ -4,9 +4,9 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['/home/dev/Documents/Work/usersim'],
-             binaries=None,
-             datas=None,
+             pathex=[],
+             binaries=[],
+             datas=[],
              hiddenimports=[],
              hookspath=['hooks/'],
              runtime_hooks=[],
@@ -18,11 +18,16 @@ pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
           a.scripts,
-          a.binaries,
-          a.zipfiles,
-          a.datas,
+          exclude_binaries=True,
           name='UserSimulator',
           debug=False,
           strip=False,
           upx=True,
           console=True )
+coll = COLLECT(exe,
+               a.binaries,
+               a.zipfiles,
+               a.datas,
+               strip=False,
+               upx=True,
+               name='UserSimulator')
