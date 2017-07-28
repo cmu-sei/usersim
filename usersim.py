@@ -55,9 +55,10 @@ class _UserSim(object):
                 int: Task ID of the task that ran
                 str: A traceback message if an exception occurred, empty string otherwise.
         """
-        self._resolve_actions()
-
         feedback = list()
+
+        feedback.extend(self._construct_tasks())
+        self._resolve_actions()
 
         for task_id, task in self._scheduled.items():
             try:
@@ -327,16 +328,33 @@ class _UserSim(object):
             return True
         return False
 
+    def _construct_tasks(self):
+        """ Handle task initialization while catching exceptions.
+
+        Returns:
+            list: A list of feedback from any tasks which failed to construct.
+        """
+        feedback = list()
+
+        with self._operation_lock:
+            while not self._new_tasks_queue.empty():
+                # Here we do new task construction within the main thread.
+                task_id, task_class, task_config, start_paused = self._new_tasks_queue.get()
+                try:
+                    self._new_task(task_id, task_class, task_config, start_paused)
+                except Exception as e:
+                    status_dict = {'id': task_id,
+                                   'state': States.STOPPED,
+                                   'type': self._get_task_type(task_class),
+                                   'status': 'Failed to initialize task.'}
+                    feedback.append((status_dict, str(e)))
+            return feedback
+
     def _resolve_actions(self):
         """ Handle all changes in scheduling. Guaranteed thread-safe.
         """
         # Definitely want to lock to prevent any changes to these structures while resolving.
         with self._operation_lock:
-            while not self._new_tasks_queue.empty():
-                # Here we do new task construction within the main thread.
-                task_id, task_class, task_config, start_paused = self._new_tasks_queue.get()
-                self._new_task(task_id, task_class, task_config, start_paused)
-
             for task_id, task in self._to_pause.items():
                 # If these three lines raise, something has gone wrong and we should know about it.
                 try:
