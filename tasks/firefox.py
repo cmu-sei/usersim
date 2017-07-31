@@ -1,12 +1,12 @@
 import functools
 import os
 import platform
-import psutil
 import queue
 import random
 import re
 import threading
 
+import psutil
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
