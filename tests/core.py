@@ -20,9 +20,6 @@ def test_scheduling_auto_stop():
     test_new_task()
     sim = usersim.UserSim()
 
-    assert api.status_all()
-    assert api.status_task(1)['state'] == api.States.TO_SCHEDULE
-
     sim.cycle()
     assert api.status_all()
     assert api.status_task(1)['state'] == api.States.TO_STOP
@@ -37,7 +34,6 @@ def test_scheduling():
     test_new_task_stop()
     sim = usersim.UserSim()
 
-    assert api.status_task(1)['state'] == api.States.TO_SCHEDULE
     sim.cycle()
     assert api.status_task(1)['state'] == api.States.SCHEDULED
 
