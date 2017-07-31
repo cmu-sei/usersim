@@ -58,7 +58,7 @@ class _UserSim(object):
         feedback = list()
 
         feedback.extend(self._construct_tasks())
-        self._resolve_actions()
+        feedback.extend(self._resolve_actions())
 
         for task_id, task in self._scheduled.items():
             try:
@@ -67,7 +67,13 @@ class _UserSim(object):
                 exception = traceback.format_exc()
                 feedback.append((self.status_task(task_id), exception))
 
-            if task.stop():
+            try:
+                stop = task.stop()
+            except Exception as e:
+                stop = True
+                feedback.append((self.status_task(task_id), 'Exception on calling stop method:\n\n' + str(e)))
+
+            if stop:
                 # Get its status before it's actually stopped because stopping removes the task from memory.
                 # Manually set the state to stopped because the final status will still say the task is scheduled.
                 final_status = self.status_task(task_id)
@@ -277,7 +283,10 @@ class _UserSim(object):
 
         if task:
             task_type = self._get_task_type(task)
-            status = task.status()
+            try:
+                status = task.status()
+            except Exception as e:
+                status = 'Exception while checking status:\n\n' + str(e)
         elif state == States.STOPPED:
             task_type = 'unknown'
             status = 'dead'
@@ -352,7 +361,11 @@ class _UserSim(object):
 
     def _resolve_actions(self):
         """ Handle all changes in scheduling. Guaranteed thread-safe.
+
+        Returns:
+            list: A list of feedback tuples (status, exception) for any task whose cleanup method fails.
         """
+        feedback = list()
         # Definitely want to lock to prevent any changes to these structures while resolving.
         with self._operation_lock:
             for task_id, task in self._to_pause.items():
@@ -390,9 +403,15 @@ class _UserSim(object):
 
                 # If this raises, how did this happen?
                 assert task_ is task
-                task.cleanup()
+                try:
+                    task.cleanup()
+                except Exception as e:
+                    status = self._status_single(task_id)
+                    feedback.append((status, 'Exception while calling task cleanup:\n\n' + str(e)))
 
             self._to_stop = dict()
+
+        return feedback
 
     @staticmethod
     def _new_id():
