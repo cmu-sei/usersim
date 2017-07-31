@@ -27,6 +27,8 @@ class _UserSim(object):
     """ Manages Task objects internally. No Task should ever reference an object of this class, nor need to.
     """
     def __init__(self):
+        self._feedback_queue = queue.Queue()
+
         self._scheduled = dict()
         self._paused = dict()
 
@@ -55,33 +57,33 @@ class _UserSim(object):
                 int: Task ID of the task that ran
                 str: A traceback message if an exception occurred, empty string otherwise.
         """
-        feedback = list()
-
-        feedback.extend(self._construct_tasks())
-        feedback.extend(self._resolve_actions())
+        self._construct_tasks()
+        self._resolve_actions()
 
         for task_id, task in self._scheduled.items():
             try:
                 task()
             except Exception:
-                exception = traceback.format_exc()
-                feedback.append((self.status_task(task_id), exception))
+                self.add_feedback(task_id, traceback.format_exc())
 
             try:
                 stop = task.stop()
-            except Exception as e:
+            except Exception:
                 stop = True
-                feedback.append((self.status_task(task_id), 'Exception on calling stop method:\n\n' + str(e)))
+                self.add_feedback(task_id, 'Exception on calling stop method:\n\n' + traceback.format_exc())
 
             if stop:
                 # Get its status before it's actually stopped because stopping removes the task from memory.
                 # Manually set the state to stopped because the final status will still say the task is scheduled.
                 final_status = self.status_task(task_id)
                 final_status['state'] = States.STOPPED
-                feedback.append((final_status, str()))
+                self._add_feedback(final_status, str())
 
                 self.stop_task(task_id)
 
+        feedback = list()
+        while not self._feedback_queue.empty():
+            feedback.append(self._feedback_queue.get())
         return feedback
 
     def new_task(self, task_class, task_config, start_paused=False):
@@ -200,6 +202,28 @@ class _UserSim(object):
         with self._operation_lock:
             return self._unpause_single(task_id)
 
+    def add_feedback(self, task_id, error):
+        """ Add a feedback message for the next cycle. Guaranteed thread-safe.
+
+        Args:
+            task_id (int): A task ID to associate the feedback with.
+            error (str): An error string giving either a traceback (traceback.format_exc() is preferred) or a
+                human-readable explanation of the error condition.
+        """
+        try:
+            status = self.status_task(task_id)
+        except AssertionError:
+            # Someone likely called this with a bad task ID.
+            return
+
+        if not isinstance(error, str):
+            # Pretty much guaranteed to convert to a string, but what it actually creates may not be intended.
+            error = str(error)
+        self._add_feedback(status, error)
+
+    def _add_feedback(self, status_dict, error):
+        self._feedback_queue.put((status_dict, error))
+
     def _new_task(self, task_id, task_class, task_config, start_paused):
         """ Do task construction and add the constructed task to internal structures. NOT thread-safe, and should only
         be called from the main thread due to the fragility of some of the interactions with external programs in some
@@ -215,6 +239,7 @@ class _UserSim(object):
             bool: True if the operation was successful, False otherwise.
         """
         task = task_class(task_config)
+        task._task_id = task_id
 
         if start_paused:
             self._to_pause[task_id] = task
@@ -339,33 +364,23 @@ class _UserSim(object):
 
     def _construct_tasks(self):
         """ Handle task initialization while catching exceptions.
-
-        Returns:
-            list: A list of feedback from any tasks which failed to construct.
         """
-        feedback = list()
-
         with self._operation_lock:
             while not self._new_tasks_queue.empty():
                 # Here we do new task construction within the main thread.
                 task_id, task_class, task_config, start_paused = self._new_tasks_queue.get()
                 try:
                     self._new_task(task_id, task_class, task_config, start_paused)
-                except Exception as e:
+                except Exception:
                     status_dict = {'id': task_id,
                                    'state': States.STOPPED,
                                    'type': self._get_task_type(task_class),
                                    'status': 'Failed to initialize task.'}
-                    feedback.append((status_dict, str(e)))
-            return feedback
+                    self._feedback_queue.put((status_dict, traceback.format_exc()))
 
     def _resolve_actions(self):
         """ Handle all changes in scheduling. Guaranteed thread-safe.
-
-        Returns:
-            list: A list of feedback tuples (status, exception) for any task whose cleanup method fails.
         """
-        feedback = list()
         # Definitely want to lock to prevent any changes to these structures while resolving.
         with self._operation_lock:
             for task_id, task in self._to_pause.items():
@@ -405,13 +420,11 @@ class _UserSim(object):
                 assert task_ is task
                 try:
                     task.cleanup()
-                except Exception as e:
+                except Exception:
                     status = self._status_single(task_id)
-                    feedback.append((status, 'Exception while calling task cleanup:\n\n' + str(e)))
+                    self._add_feedback(status, 'Exception while calling task cleanup:\n\n' + traceback.format_exc())
 
             self._to_stop = dict()
-
-        return feedback
 
     @staticmethod
     def _new_id():
