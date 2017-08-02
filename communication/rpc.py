@@ -48,8 +48,9 @@ class RPCCommunication(object):
 
             try:
                 while True:
-                    self._connection.serve(0)
-                    time.sleep(0.1)
+                    served = self._connection.serve(0)
+                    if not served:
+                        time.sleep(0.1)
             except Exception:
                 print('Exception raised while polling the RPC socket. Trying to reconnect.\n', traceback.format_exc())
             finally:
