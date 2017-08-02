@@ -21,9 +21,8 @@ def run_test():
     sim = usersim.UserSim(True)
 
     task_id = api.new_task(config)
-    sim.cycle()
 
-    print(sim._scheduled[task_id]._trigger_time)
+    print(sim._to_schedule[task_id]._trigger_time)
 
     while True:
         result = sim.cycle()

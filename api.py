@@ -27,11 +27,10 @@ def new_task(config, start_paused=False, reset=False):
         int: The new task's unique ID.
     """
     sim = usersim.UserSim(reset)
-    validate_config(config)
+    validated_config = validate_config(config)
     task = tasks.task_dict[config['type']]
-    task_config = config['config']
-    t = task(task_config)
-    return sim.new_task(t, start_paused)
+
+    return sim.new_task(task, validated_config, start_paused)
 
 def pause_task(task_id):
     """ Pause a single task.
@@ -127,14 +126,23 @@ def validate_config(config):
     Raises:
         KeyError: If a required key is missing from config or config['config'] or if the task type does not exist.
         ValueError: If the given value of an option under config['config'] is invalid.
+
+    Returns:
+        dict: The dictionary associated with config's 'config' key, after processing it with the given task's validate
+            method. This does NOT include the 'type' and 'config' keys as above - only the actual configuration for the
+            given task.
     """
     task = tasks.task_dict[config['type']]
     task_config = config['config']
-    task.validate(task_config)
 
-def get_tasks():
+    return task.validate(task_config)
+
+def get_tasks(filter_result=True):
     """ Get the tasks and their (human-readable) parameters currently available to this simulation. Certain special
-    tasks will be filtered.
+    tasks will be filtered by default.
+
+    Args:
+        filter_result (bool): True - filters special tasks, False - no filter is applied.
 
     Returns:
         dict of dicts of dicts: A dictionary whose keys are task names, and whose values are dictionaries whose keys are
@@ -147,10 +155,22 @@ def get_tasks():
 
     for key in tasks.task_dict:
         for filtered in special_tasks:
-            if filtered.match(key):
+            if filter_result and filtered.match(key):
                 break
         else:
             # Else statements of a for-loop are triggered if a break was not triggered within the for-loop.
             available_tasks[key] = tasks.task_dict[key].parameters()
 
     return available_tasks
+
+def add_feedback(task_id, error):
+    """ Create an additional feedback message. This will mostly be used from within threads supporting a main task, for
+    example, managing interaction with an external program.
+
+    Args:
+        task_id (int): The task ID of the calling task. This can be accessed from within a task object by using
+            self._task_id. If task_id < 1, no feedback will be generated.
+        error (str): A description of the error, or a traceback.format_exc().
+    """
+    sim = usersim.UserSim()
+    sim.add_feedback(task_id, error)

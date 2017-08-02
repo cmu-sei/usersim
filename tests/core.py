@@ -14,21 +14,15 @@ def test_new_task_stop():
 def test_cycle():
     test_new_task()
     sim = usersim.UserSim()
-    # First cycle should not have had any scheduled tasks to run yet - they will be scheduled at the end.
-    assert not sim.cycle()
-    # This cycle SHOULD have a feedback tuple.
     assert sim.cycle()
 
 def test_scheduling_auto_stop():
     test_new_task()
     sim = usersim.UserSim()
 
-    assert api.status_all()
-    assert api.status_task(1)['state'] == api.States.TO_SCHEDULE
-
     sim.cycle()
     assert api.status_all()
-    assert api.status_task(1)['state'] == api.States.SCHEDULED
+    assert api.status_task(1)['state'] == api.States.TO_STOP
 
     sim.cycle()
     assert not api.status_all()
@@ -40,7 +34,6 @@ def test_scheduling():
     test_new_task_stop()
     sim = usersim.UserSim()
 
-    assert api.status_task(1)['state'] == api.States.TO_SCHEDULE
     sim.cycle()
     assert api.status_task(1)['state'] == api.States.SCHEDULED
 

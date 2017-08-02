@@ -1,8 +1,11 @@
+import textwrap
 import threading
 import time
 
 import api
 import config
+from communication import common
+import tasks
 
 
 class LocalCommunication(object):
@@ -13,15 +16,22 @@ class LocalCommunication(object):
             config_string = f.read()
 
         new_config = config.string_to_python(config_string)
+        available_tasks = api.get_tasks(False)
+
         for task in new_config:
+            if task['type'] not in available_tasks:
+                self._feedback_queue.put((common.api_exception_status, 'task ' + task['type'] + ' does not exist in '
+                    'this build'))
+                continue
+
             try:
                 api.new_task(task)
             except KeyError as e:
-                self._feedback_queue.put((0, 'task ' + task['type'] + 'missing required key %s '
-                    'from its configuration' % e.message))
+                self._feedback_queue.put((common.api_exception_status, 'task ' + task['type'] + ' missing required key '
+                    '%s from its configuration' % str(e)))
             except ValueError as e:
-                self._feedback_queue.put((0, 'task ' + task['type'] + 'has at least one bad value for a config '
-                    'option:\n%s' % e.message))
+                self._feedback_queue.put((common.api_exception_status, 'task ' + task['type'] + ' has at least one '
+                    'bad value for a config option:\n%s' % str(e)))
 
         thread = threading.Thread(target=self._handle_communication)
         thread.daemon = True
@@ -30,32 +40,25 @@ class LocalCommunication(object):
     def _send(self):
         """ Write available feedback messages to the console.
         """
-        print('\n' * 3)
         while not self._feedback_queue.empty():
-            task_id, exception = self._feedback_queue.get()
-
-            if task_id > 0:
-                task_status = api.status_task(task_id)
-            else:
-                task_status = {'type': 'core', 'state': api.States.UNKNOWN, 'status': str()}
+            print('=' * 40)
+            task_status, exception = self._feedback_queue.get()
 
             if exception:
                 print('The following task FAILED an iteration:')
             else:
                 print('The following task WAS SCHEDULED TO STOP:')
             print('Type: ' + task_status['type'])
-            print('ID: ' + task_id)
+            print('ID: ' + str(task_status['id']))
             print('State: ' + task_status['state'])
-            print('Status: ' + task_status['status'])
+            if task_status['status']:
+                print('Status: ' + task_status['status'])
             if exception:
-                print('Exception: \n' + exception)
-            print('=' * 40)
-
-        print('\n' * 3)
-        print('=' * 40)
+                print('Exception: \n' + textwrap.indent(exception, '    '))
 
     def _handle_communication(self):
         """ Periodically write feedback messages to the console.
         """
-        self._send()
-        time.sleep(60)
+        while True:
+            self._send()
+            time.sleep(6)
