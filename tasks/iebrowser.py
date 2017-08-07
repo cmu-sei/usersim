@@ -7,6 +7,7 @@ import queue
 import random
 import threading
 import time
+import traceback
 
 import psutil
 import pythoncom
@@ -15,6 +16,7 @@ import win32com.client
 import win32con
 import win32process
 
+import api
 from tasks import task
 
 
@@ -55,8 +57,7 @@ class IEManager(object):
                 try:
                     action()
                 except Exception:
-                    # NOTE: There's not really a good way to propagate this feedback to the main thread right now.
-                    pass
+                    api.add_feedback(self._task_id, traceback.format_exc())
 
         cls._action_queue = None
         cls._persist = True
