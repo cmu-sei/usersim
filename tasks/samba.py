@@ -1,10 +1,10 @@
 # Ali Kidwai
 # July 18, 2017
 # Adapted from code written by Rotem Guttman and Joe Vessella
-
 import os
 import random
-from loremipsum import get_paragraph
+import time
+
 from smb.SMBConnection import SMBConnection
 from smb.smb_structs import OperationFailure
 
@@ -12,7 +12,7 @@ from tasks import task
 
 
 class Samba(task.Task):
-    """ Samba module for UserSim. Connects to and authenticates with a Samba share and downloads specified files. If no 
+    """ Samba module for UserSim. Connects to and authenticates with a Samba share and downloads specified files. If no
     files are specified, flips a coin and either uploads/downloads a file to/from the share.
         * WARNING: If your share does not require authentication, you MUST set the appropriate permission bits on the *
         *   shared folder so that guests can upload files to it!                                                      *
@@ -29,14 +29,14 @@ class Samba(task.Task):
         Otherwise, upload or download a random file.
         """
         self._smb_connect(self._config['address'], self._config['port'],
-                          self._config['user'], self._config['passwd'])
-        if self._config['files']:
-            self.retrieve_files(self._config['files'])
-        else: # No files specified; upload/download a random file
-            if random.getrandbits(1): # Flip a coin
-                self.retrieve_random_file()
-            else:
-                self.upload_random_file()
+                          self._config['user'], self._config['password'])
+
+        if not self._config['files']:
+            self._echo()
+        elif self._config['upload']:
+            self._upload()
+        else:
+            self._download()
 
     def cleanup(self):
         """ Doesn't need to do anything.
@@ -72,9 +72,20 @@ class Samba(task.Task):
         params = {'required': {'address': 'str: the Samba server address'},
                   'optional': {'port': 'int: the port for the Samba server. Defaults to 445',
                                'user': 'str: a username to authenticate with the server if necessary',
-                               'passwd': 'str: password for user',
-                               'files': 'list: a list of filenames (strings) to download from the Samba share. If not '
-                                        'specified, the UserSim will either upload or download a random file.'}}
+                               'password': 'str: password for user',
+                               'upload': 'bool: True to use the files parameter as a list of local files to upload, '
+                                         'False to use the files parameter as a list of remote files to download. '
+                                         'Default False',
+                               'files': 'list: a list of file paths (strings) to download from the Samba share if '
+                                        'upload is False, otherwise a list of local paths to upload. If not '
+                                        'specified, the task will send SMB Echo requests with random strings instead. '
+                                        'It is best to use forward slashes (/) to specify paths, even on Windows',
+                               'write_dir': 'str: A writeable path. If upload is False, then this is a local path in '
+                                            'which files will be downloaded. If upload is True, then this is a remote '
+                                            'path (including the share name) on the remote Samba server. If not '
+                                            'specified, then downloads will not save downloaded files to the disk, and'
+                                            'uploads will not be attempted. It is best to use forward slashes (/) even '
+                                            'for Windows paths.'}}
         return params
 
     @classmethod
@@ -109,10 +120,13 @@ class Samba(task.Task):
         if not isinstance(config['user'], str):
             raise ValueError('user: {} Must be a string'.format(str(config['user'])))
 
-        if 'passwd' not in config:
-            config['passwd'] = ''
-        if not isinstance(config['passwd'], str):
-            raise ValueError('passwd: {} Must be a string'.format(str(config['passwd'])))
+        if 'password' not in config:
+            config['password'] = ''
+        if not isinstance(config['password'], str):
+            raise ValueError('password: {} Must be a string'.format(str(config['password'])))
+
+        if 'upload' not in config:
+            config['upload'] = False
 
         if 'files' not in config:
             config['files'] = []
@@ -122,142 +136,116 @@ class Samba(task.Task):
             if not isinstance(file, str):
                 raise ValueError('files: {} Must be a list of strings'.format(str(config['files'])))
 
+        if 'write_dir' not in config:
+            config['write_dir'] = str()
+        if not isinstance(config['write_dir'], str):
+            raise ValueError('write_dir: {} Must be a string'.format(str(config['write_dir'])))
+
         return config
 
-    def retrieve_files(self, file_paths):
+    def _echo(self):
+        """ Send an echo request to the server with a randomly-generated string.
+        """
+        length = random.randint(1, 100)
+        data = str()
+
+        for _ in range(length):
+            data += random.choice('abcdefghijklmnopqrstuvwxyz')
+
+        self._smb_con.echo(data)
+
+    def _download(self):
         """ Retrieves a list of files. Will make an attempt to retrieve all files. If any files fail to retrieve, raises
         an exception at the end.
-
-        Args:
-            file_paths (list): A list of files to retrieve from the server. Files will be retrieved in the order given.
-                The file paths may use forward slashes or backslashes as separators.
 
         Raises:
             Exception: If any file retrieval fails, an exception will be raised whose message includes a list of all
                 failures.
         """
-        failures = []
+        file_paths = self._config['files']
+        failures = list()
+
         for file_path in file_paths:
-            file_path.replace('\\', '/')
-            share, path = file_path.split('/', 1)
             try:
-                self._retrieve_file(share, path)
-            except OperationFailure as e:
-                failures.append(file_path + ' ' + e.message)
+                self._retrieve_file(file_path)
+            except Exception as e:
+                failures.append(file_path + ': ' + str(e))
         if failures:
             raise Exception('Failed to retrieve the following files:\n%s' % '\n'.join(failures))
 
-    def retrieve_random_file(self):
-        """ Attempts to download a random file from the remote Samba server. A best-effort attempt is made.
-        """
-        chosen_share = self._choose_new_share()
-        chosen_path = ''
-        path_is_dir = True
-
-        while path_is_dir:
-            files = self._smb_con.listPath(chosen_share, chosen_path)
-            try:
-                # Don't include the special files . and ..
-                chosen_file = random.choice(files[2:])
-            except IndexError as e:
-                # TODO: This is the super lazy way. Otherwise we'd need to keep track of each directory we visit.
-                # Maybe when I have some time available.
-                raise Exception('Share %s appears to be completely empty or has an empty directory.' % chosen_share)
-
-            path_is_dir = chosen_file.isDirectory
-            chosen_path = os.path.join(chosen_path, chosen_file.filename)
-
-        self._retrieve_file(chosen_share, chosen_path)
-
-    def upload_random_file(self):
-        """ Attempts to create a file on a random share on the Samba server. This is a best-effort attempt.
-        """
-        chosen_share = self._choose_new_share()
-        file_name = str(random.randint(0, 999)) + '.txt'
-        self._write_file(chosen_share, file_name, get_paragraph())
-
-    def _choose_new_share(self):
-        """ Pick one of the shared devices on the server at random.
-
-        Raises:
-            Exception: If a valid share is unable to be found.
-
-        Returns:
-            str: The name of the chosen share.
-        """
-        # There are a bunch of special "shares" returned by this call which are not valid. Hopefully this can trim down 
-        # the occurence of trying to use those.
-        shares = []
-        for share in self._smb_con.listShares():
-            if share.name[-1] != '$':
-                shares.append(share.name)
-        random.shuffle(shares)
-
-        if self._debug:
-            print('Found the following shares: %s' % shares)
-
-        while shares:
-            chosen_share = shares.pop()
-            try:
-                # Make sure the share is accessible
-                if self._debug:
-                    print('Trying share %s' % chosen_share)
-                self._smb_con.listPath(chosen_share, '')
-            except OperationFailure as e:
-                if self._debug:
-                    print('Failed to access %s' % chosen_share)
-            else:
-                if self._debug:
-                    print('Chose share %s' % chosen_share)
-                return chosen_share
-
-        raise Exception('Could not find a valid share to use.')
-
-    def _retrieve_file(self, share, path):
-        """ Retrieve the file at path from share.
+    def _upload(self):
+        """ Tries to upload a list of files to the server. Will make an attempt to upload all files in the list, using
+        the local path as the remote path. If any file fails to upload, raises an exception at the end.
 
         Args:
-            share (str): The Samba share that the file is stored on
-            path (str): Path to the file
+            file_paths (list): A list of local files to upload to the server. Files will be uploaded in the order given.
+                Files should use forward slashes (/) even for Windows paths.
+
+        Raises:
+            Exception: If any file upload fails, an exception will be raised whose message includes a list of all
+                failures.
         """
-        if self._debug:
-            out_file = 'smbdebug'
+        file_paths = self._config['files']
+        failures = list()
+
+        for file_path in file_paths:
+            try:
+                self._write_file(file_path)
+            except Exception as e:
+                failures.append(file_path + ': ' + str(e))
+        if failures:
+            raise Exception('Failed to retrieve the following files:\n%s' % '\n'.join(failures))
+
+    def _retrieve_file(self, remote_path):
+        """ Retrieve remote_path and save it at the configured 'write_dir' folder if it is specified, otherwise black
+        hole the downloaded file data.
+
+        Args:
+            remote_path (str): The path to the file to retrieve.
+        """
+        write_dir = self._config['write_dir']
+        if os.path.isdir(write_dir):
+            out_file = os.path.join(write_dir, os.path.basename(remote_path))
         else:
             out_file = os.devnull
 
-        with open(out_file, 'w') as f:
+        try:
+            share, path = remote_path.split('/', 1)
+        except ValueError:
+            raise ValueError('A path to a file must be specified along with the share name.')
+
+        with open(out_file, 'wb') as f:
             if self._debug:
                 print('Attempting to retrieve file %s' % os.path.join(share, path))
             self._smb_con.retrieveFile(share, path, f)
 
-    def _write_file(self, share, path, content):
-        """ Write a file containing content at path in share.
+    def _write_file(self, local_path):
+        """ Write the file at local_path to the directory in the 'write_path' config dict.
 
         Args:
-            share (str): The Samba share that the file is stored on
-            path (str): Path to the file
-            content (str): A string containing the text that will be written to the file
+            local_path (str): A path to a local file to upload to the server.
         """
-        class FileLike(object):
-            """ This is needed because the Samba library only supports uploading using file-like objects with a read 
-            method.
-            """
-            def __init__(self, content):
-                self.text = content
-                self._read = False
+        write_dir = self._config['write_dir']
+        if not write_dir:
+            # As noted in parameters, if this isn't specified then we're not uploading. Finding a writeable shared
+            # folder seems pretty tough to make reliable.
+            return
 
-            def read(self, _):
-                if not self._read:
-                    self._read = True
-                    return self.text
-                else:
-                    return ''
+        try:
+            share, path = write_dir.split('/', 1)
+        except ValueError:
+            share, path = write_dir, str()
 
-        f = FileLike(str(content))
-        self._smb_con.storeFile(share, path, f)
+        path = os.path.join(path, os.path.basename(local_path))
+
+        with open(local_path, 'rb') as f:
+            if self._debug:
+                print('Attempting to upload file %s' % local_path)
+            self._smb_con.storeFile(share, path, f)
 
     def _smb_connect(self, address, port, username, password):
-        """ Attempts to connect to the Samba server at address. Will try direct TCP if initial attempt fails.
+        """ Attempts to connect to the Samba server at address. Will try direct TCP first. If that fails, tries not
+        using direct TCP.
 
         Args:
             address (str): The address of the Samba server
@@ -266,10 +254,11 @@ class Samba(task.Task):
             password (str): The password for username
         """
         try:
-            self._smb_con = SMBConnection(username, password, 'usersim', '') # TODO: Ask Joe if this should be hardcoded
-            self._smb_con.connect(address, port)
-        except Exception:
+            # Need to provide *A* remote name it seems, but the share doesn't seem too particular about what it is.
             # If the remote server is using direct TCP this flag must be set to True or we get an exception when we try
             # to connect.
-            self._smb_con = SMBConnection(username, password, 'usersim', '', is_direct_tcp=True)
+            self._smb_con = SMBConnection(username, password, '', 'usersim', is_direct_tcp=True)
+            self._smb_con.connect(address, port)
+        except Exception:
+            self._smb_con = SMBConnection(username, password, '', 'usersim')
             self._smb_con.connect(address, port)
