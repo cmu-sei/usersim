@@ -162,3 +162,15 @@ def get_tasks(filter_result=True):
             available_tasks[key] = tasks.task_dict[key].parameters()
 
     return available_tasks
+
+def add_feedback(task_id, error):
+    """ Create an additional feedback message. This will mostly be used from within threads supporting a main task, for
+    example, managing interaction with an external program.
+
+    Args:
+        task_id (int): The task ID of the calling task. This can be accessed from within a task object by using
+            self._task_id. If task_id < 1, no feedback will be generated.
+        error (str): A description of the error, or a traceback.format_exc().
+    """
+    sim = usersim.UserSim()
+    sim.add_feedback(task_id, error)
