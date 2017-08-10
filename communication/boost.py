@@ -41,9 +41,11 @@ class BoostCommunication(object):
                 print('Got data from Boost MQ.')
 
             if message and not more:
+                feedback_message = last_error + '\n\n' + message
+                print(feedback_message)
                 # Even though we're not sending feedback, this is pretty harmless and means we don't need to figure out
                 # where to add a feedback message to the queue if that changes.
-                self._feedback_queue.put((common.api_exception_status, last_error + '\n\n' + message))
+                self._feedback_queue.put((common.api_exception_status, feedback_message))
             if not more:
                 # If there's nothing else, go to sleep for a while.
                 break
