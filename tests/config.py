@@ -1,3 +1,5 @@
+import datetime
+
 import api
 import config
 import usersim
@@ -33,9 +35,9 @@ def test_yaml():
     data_dict = task_dict['config']
     assert isinstance(data_dict, dict)
 
-    assert data_dict['someint'] == '42'
+    assert data_dict['someint'] == 42
     assert data_dict['somestr'] == 'blah'
-    assert data_dict['somefloat'] == '3.14159'
+    assert data_dict['somefloat'] == 3.14159
     assert data_dict['somedate'] == '2017-06-08'
     assert data_dict['somelist'] == ['one', 'two', 'three']
     assert data_dict['nothing'] == dict()
