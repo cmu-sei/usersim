@@ -2,6 +2,7 @@
 # July 26, 2017
 # Tests for InternetExplorer module in UserSim. Makes sure that InternetExplorer rejects incorrect configs and accepts
 # correct configs. Prints output from correct configs.
+import platform
 
 import api
 import usersim
@@ -65,6 +66,9 @@ def test_good_cases(task, good_cases):
             print('    %s' % str(result))
 
 def run_test():
+    if not platform.system() == 'Windows':
+        return
+
     task = {'type': 'iebrowser', 'config': None}
     empty = {}
     none_sites = {'sites': None}
