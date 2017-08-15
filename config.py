@@ -46,6 +46,7 @@ def yaml_to_python(yaml_string):
     # Leaving commented for now, but may make a return if it's useful.
     #for tag in yaml_tags:
     #    yaml.add_constructor(yaml_2002_prefix + tag, string_constructor)
+    yaml.add_constructor(yaml_2002_prefix + 'timestamp', string_constructor)
 
     yaml.add_constructor(yaml_2002_prefix + 'null', dict_constructor)
 

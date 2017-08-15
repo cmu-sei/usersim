@@ -1,3 +1,5 @@
+import platform
+
 import api
 import usersim
 
@@ -38,6 +40,8 @@ def test_good_cases(task, good_cases):
         print('Correctly accepted %s' % config_name)
 
 def run_test():
+    if not platform.system() == 'Windows':
+        return
     task = {'type': 'outlook', 'config': None}
 
     bad_value_cases = list()

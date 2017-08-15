@@ -5,13 +5,13 @@ import api
 import usersim
 
 
-TCP_IP = 'localhost'
-TCP_PORT = 5005
+#TCP_IP = 'localhost'
+#TCP_PORT = 5005
 
 def run_test():
-    t = threading.Thread(target=start_server)
-    t.daemon = True
-    t.start()
+    #t = threading.Thread(target=start_server)
+    #t.daemon = True
+    #t.start()
 
     telnet_config = {'type': 'telnet',
                      'config': {'host': TCP_IP,
@@ -24,10 +24,10 @@ def run_test():
 
     task_id = api.new_task(telnet_config)
 
-    result = sim.cycle()
+    #result = sim.cycle()
 
-    for item in result:
-        print(result)
+    #for item in result:
+    #    print(result)
 
 def start_server():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -2,6 +2,7 @@
 # July 20, 2017
 # Tests for Word module for UserSim. Makes sure that Word rejects incorrect configs and accepts correct configs. Prints
 # output from correct configs.
+import platform
 
 import api
 import usersim
@@ -45,6 +46,9 @@ def test_good_cases(task, good_cases):
             print('    %s' % str(result))
 
 def run_test():
+    if not platform.system() == 'Windows':
+        return
+
     task = {'type': 'word', 'config': None}
     bad_filetype = {'file_types': ['docx', 'exe']}
     empty = {}

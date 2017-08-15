@@ -5,12 +5,14 @@ import queue
 import random
 import re
 import threading
+import traceback
 
 import psutil
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+import api
 from tasks import task
 
 
@@ -53,10 +55,8 @@ class SharedDriver(object):
             action = cls._action_queue.get()
             try:
                 action()
-            except Exception as e:
-                # NOTE: Using a feedback queue here is problematic because the last call to this task is very likely not
-                # to provide feedback before the call returns.
-                pass
+            except Exception:
+                api.add_feedback(self._task_id, traceback.format_exc())
 
     @classmethod
     def _add_action(cls, partial_function):
