@@ -3,6 +3,7 @@ unless otherwise noted.
 """
 import re
 
+import externalvars
 import usersim
 from usersim import States
 import tasks
@@ -174,3 +175,15 @@ def add_feedback(task_id, error):
     """
     sim = usersim.UserSim()
     sim.add_feedback(task_id, error)
+
+def external_lookup(var_name):
+    """ Look up a variable external to the usersim. First looks at environment variables, then looks at VMWare guestinfo
+    variables. Only returns a value for an exact match.
+
+    Args:
+        var_name (str): The name of the variable to lookup.
+
+    Returns:
+        str: Returns the value of the variable. If the variable is not found, returns an empty string.
+    """
+    return externalvars.lookup(var_name)
