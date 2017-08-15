@@ -58,51 +58,51 @@ def test_good_cases(task, good_cases):
         task['config'] = config
         api.new_task(task)
         print('Correctly accepted %s' % config_name)
-        result = sim.cycle()
-        if result:
-            print('    Feedback from task:')
-            print('    %s' % str(result))
+        #result = sim.cycle()
+        #if result:
+        #    print('    Feedback from task:')
+        #    print('    %s' % str(result))
 
 def run_test():
     task = {'type': 'smtp', 'config': None}
     empty = {}
     no_user = {'destinations': ['testuser1@localhost'],
-               'site': 'ubuntu'}
-    no_dest = {'username': 'akidwai@localhost',
-               'site': 'ubuntu'}
-    no_site = {'username': 'akidwai@localhost',
+               'mail_server': 'ubuntu'}
+    no_dest = {'email_addr': 'akidwai@localhost',
+               'mail_server': 'ubuntu'}
+    no_site = {'email_addr': 'akidwai@localhost',
                'destinations': ['testuser1@localhost']}
-    bad_user = {'username': None,
+    bad_user = {'email_addr': None,
                 'destinations': ['testuser1@localhost'],
-                'site': 'ubuntu'}
-    bad_dest1 = {'username': 'akidwai@localhost',
+                'mail_server': 'ubuntu'}
+    bad_dest1 = {'email_addr': 'akidwai@localhost',
                  'destinations': None,
-                 'site': 'ubuntu'}
-    bad_dest2 = {'username': 'akidwai@localhost',
+                 'mail_server': 'ubuntu'}
+    bad_dest2 = {'email_addr': 'akidwai@localhost',
                  'destinations': ['testuser1@localhost', None, 3],
-                 'site': 'ubuntu'}
-    bad_site = {'username': 'akidwai@localhost',
+                 'mail_server': 'ubuntu'}
+    bad_site = {'email_addr': 'akidwai@localhost',
                 'destinations': ['testuser1@localhost'],
-                'site': None}
-    random_msg_and_subject = {'username': 'akidwai@localhost',
+                'mail_server': None}
+    random_msg_and_subject = {'email_addr': 'akidwai@localhost',
                               'destinations': ['testuser1@localhost'],
-                              'site': 'ubuntu'}
-    random_msg = {'username': 'akidwai@localhost',
+                              'mail_server': 'ubuntu'}
+    random_msg = {'email_addr': 'akidwai@localhost',
                   'destinations': ['testuser1@localhost'],
-                  'site': 'ubuntu',
+                  'mail_server': 'ubuntu',
                   'subjects': ['Test message subject']}
-    random_subject = {'username': 'akidwai@localhost',
+    random_subject = {'email_addr': 'akidwai@localhost',
                       'destinations': ['testuser1@localhost'],
-                      'site': 'ubuntu',
+                      'mail_server': 'ubuntu',
                       'messages': ['Test message body']}
-    complete = {'username': 'akidwai@localhost',
+    complete = {'email_addr': 'akidwai@localhost',
                 'destinations': ['testuser1@localhost', 'testuser2@localhost'],
-                'site': 'ubuntu',
+                'mail_server': 'ubuntu',
                 'messages': ['Test message body 1', 'Test message body 2'],
                 'subjects': ['Test message subject 1', 'Test message subject 2']}
-    encrypted = {'username': 'akidwai@localhost',
+    encrypted = {'email_addr': 'akidwai@localhost',
                  'destinations': ['testuser1@localhost', 'testuser2@localhost'],
-                 'site': 'ubuntu',
+                 'mail_server': 'ubuntu',
                  'messages': ['Test message body 1', 'Test message body 2'],
                  'subjects': ['Test message subject 1', 'Test message subject 2'],
                  'encrypt': True}
@@ -117,4 +117,4 @@ def run_test():
 
 if __name__ == '__main__':
     run_test()
-    
+

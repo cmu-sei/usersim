@@ -57,12 +57,12 @@ def test_good_cases(task, good_cases):
         task['config'] = config
         api.new_task(task)
         print('Correctly accepted %s' % config_name)
-        result = sim.cycle()
-        for task_id, exception in result:
-            if not exception:
-                continue
-            print(exception)
-            print('*'*80)
+        #result = sim.cycle()
+        #for task_id, exception in result:
+        #    if not exception:
+        #        continue
+        #    print(exception)
+        #    print('*'*80)
 
 def run_test():
     task = {'type': 'samba', 'config': None}
