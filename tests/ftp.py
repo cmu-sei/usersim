@@ -57,10 +57,10 @@ def test_good_cases(task, good_cases):
         sim = usersim.UserSim(True)
         api.new_task(task)
         print('Correctly accepted %s' % config_name)
-        result = sim.cycle()
-        if result:
-            print('    Feedback from task:')
-            print('    %s' % str(result))
+        #result = sim.cycle()
+        #if result:
+        #    print('    Feedback from task:')
+        #    print('    %s' % str(result))
 
 def run_test():
     task = {'type': 'ftp', 'config': None}
