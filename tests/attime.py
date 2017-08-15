@@ -22,7 +22,8 @@ def run_test():
 
     task_id = api.new_task(config)
 
-    print(sim._to_schedule[task_id]._trigger_time)
+    result = sim.cycle()
+    print(sim.status_task(task_id)['status'])
 
     while True:
         result = sim.cycle()
