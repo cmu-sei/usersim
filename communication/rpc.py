@@ -39,6 +39,9 @@ class RPCCommunication(object):
 
     def serve_all(self):
         while True:
+            # If we're having trouble talking to the server, give it a bit of time before trying again.
+            time.sleep(10)
+
             try:
                 self._connection = rpyc.connect(self._server_addr, self._server_port, service=UserSimService)
                 if self._name:
@@ -56,9 +59,6 @@ class RPCCommunication(object):
                 print('Exception raised while polling the RPC socket. Trying to reconnect.\n', traceback.format_exc())
             finally:
                 self._connection.close()
-
-            # If we're having trouble talking to the server, give it a bit of time before trying again.
-            time.sleep(10)
 
     def _handle_communication(self):
         """ Forward feedback messages to the server.
