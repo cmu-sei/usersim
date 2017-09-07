@@ -150,8 +150,9 @@ def check_config(config, parameters, defaults):
         parameters (dict): The return from a task.parameters call. Contains two keys, 'required' and 'optional', whose
             values are dict objects containing the keys that are required to be in config, and optional ones that may
             be in config. In these sub-dicts, the values are description strings that have at least one ':' (colon)
-            character. Everything before the last ':' character is loaded as YAML, and it should describe the expected
-            type structure of that particular parameter. For example, a list of strings should be written as follows:
+            character. Everything before the last ':' character is loaded as YAML (preferably compact), and it should
+            describe the expected type structure of that particular parameter. For example, a list of strings should be
+            written as follows:
                 '[str]: blah blah your description here'
             A dictionary whose keys are ints and values are strs should be as follows:
                 '{int: str}: some description here'
