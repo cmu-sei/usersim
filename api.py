@@ -3,6 +3,7 @@ unless otherwise noted.
 """
 import re
 
+import config as config_module
 import externalvars
 import usersim
 from usersim import States
@@ -137,6 +138,39 @@ def validate_config(config):
     task_config = config['config']
 
     return task.validate(task_config)
+
+def check_config(config, parameters, defaults):
+    """ Asserts that all of the types in config match the types in the description strings in parameters. In addition,
+    missing optional keys are added to the config from defaults.
+
+    Args:
+        config (dict): A dictionary to check. Should contain all keys from parameters['required']. Each key's value
+            must be of the same type specified in that key's description string in parameters (both required and
+            optional).
+        parameters (dict): The return from a task.parameters call. Contains two keys, 'required' and 'optional', whose
+            values are dict objects containing the keys that are required to be in config, and optional ones that may
+            be in config. In these sub-dicts, the values are description strings that have at least one ':' (colon)
+            character. Everything before the last ':' character is loaded as YAML (preferably compact), and it should
+            describe the expected type structure of that particular parameter. For example, a list of strings should be
+            written as follows:
+                '[str]: blah blah your description here'
+            A dictionary whose keys are ints and values are strs should be as follows:
+                '{int: str}: some description here'
+            Valid type strings (the 'str' or 'int' above) are the following:
+                str, int, float, bool, any, task
+            Where 'any' includes any of the first four, while 'task' indicates that the parameter is actually a task
+            dict which should be validated with validate_config.
+        defaults (dict): A dictionary whose keys are the same as the keys in parameters['optional'], and whose values
+            are sane defaults for those parameters. These values should still have the same type as indicated by the
+            description string in parameters.
+
+    Raises:
+        TypeError:
+
+    Returns:
+        dict: config with its parameters type-checked, and missing optional values inserted.
+    """
+    return config_module.validate(config, parameters['required'], parameters['optional'], defaults)
 
 def get_tasks(filter_result=True):
     """ Get the tasks and their (human-readable) parameters currently available to this simulation. Certain special
