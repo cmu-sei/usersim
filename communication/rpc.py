@@ -3,6 +3,7 @@ control over the usersim than any of the other communication options.
 """
 import inspect
 import platform
+import random
 import threading
 import time
 import traceback
@@ -38,6 +39,9 @@ class RPCCommunication(object):
 
     def serve_all(self):
         while True:
+            # If we're having trouble talking to the server, give it a bit of time before trying again.
+            time.sleep(10)
+
             try:
                 self._connection = rpyc.connect(self._server_addr, self._server_port, service=UserSimService)
                 if self._name:
@@ -60,16 +64,21 @@ class RPCCommunication(object):
         """ Forward feedback messages to the server.
         """
         while True:
+            fb_list = list()
             while not self._feedback_queue.empty():
-                status_dict, exception = self._feedback_queue.get()
-                # Try to minimize spikes.
-                time.sleep(1)
-                try:
-                    self._connection.root.push_feedback(status_dict, exception)
-                except Exception:
-                    print('Exception raised while attempting to push feedback to the server.\n', traceback.format_exc())
-                    # Don't drop feedback messages if possible.
-                    self._feedback_queue.put((status_dict, exception))
+                fb_message = self._feedback_queue.get()
+                fb_list.append(fb_message)
 
-            # Don't waste CPU cycles.
-            time.sleep(10)
+            try:
+                if fb_list:
+                    self._connection.root.bulk_feedback(fb_list)
+            except Exception:
+                print('Exception raised while attempting to push feedback to the server.\n', traceback.format_exc())
+                # Don't drop feedback messages if possible.
+                for fb_message in fb_list:
+                    self._feedback_queue.put(fb_message)
+
+            # Using a random int here in order to avoid syncing client feedback sends, hopefully reducing peak load on
+            # the server.
+            sleep_duration = random.randint(5, 115)
+            time.sleep(sleep_duration)
