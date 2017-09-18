@@ -47,8 +47,12 @@ class Task(object):
 
         Returns:
             dict of dicts: A dictionary whose keys are 'required' and 'optional', and whose values are dictionaries
-                containing the required and optional parameters of the class as keys and human-readable (str)
-                descriptions and requirements for each key as values.
+                containing the required and optional parameters of the class as keys and a string formatted as follows:
+                "type: human-readable description" where type can be any of the following strings: "str", "int",
+                "float", "bool", "any", or "task", or any of these types may be encased in [square] or {curly} brackets
+                to indicate a list or dict, respectively. Such a dict object must include both key and value types,
+                like so: {str: int}. The space is important to the parser.
+                These types may be nested together to form any list or dict nested structure, such as a list of lists.
         """
         raise NotImplementedError("Not yet implemented.")
 
@@ -57,8 +61,7 @@ class Task(object):
         """ Validates the given configuration dictionary.
 
         Args:
-            conf_dict (dict): The dictionary to validate. Its keys and values are subclass-specific. Its values should
-                be assumed to be str type and converted appropriately.
+            conf_dict (dict): The dictionary to validate. Its keys and values are subclass-specific.
 
         Raises:
             KeyError: If a required configuration option is missing. The error message is the missing key.
