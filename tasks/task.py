@@ -11,10 +11,9 @@ class Task(object):
         raise NotImplementedError("Not yet implemented.")
 
     def cleanup(self):
-        """ Called in the event __call__ raises an exception or when the stop method returns True. This method should
-        never raise an exception. Use this method to handle cleaning up any open handles, files, or whatever needs to be
-        closed in order to free up the memory that this object is using. This method must be overridden, but it is fine
-        for it not to actually do anything if that is intended functionality.
+        """ Called when the stop method returns True. Use this method to handle cleaning up any open handles, files, or
+        whatever needs to be closed in order to free up the memory that this object is using. This method must be
+        overridden, but it is fine for it not to actually do anything if that is intended functionality.
         """
         raise NotImplementedError("Not yet implemented.")
 
