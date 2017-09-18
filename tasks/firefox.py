@@ -38,34 +38,36 @@ class SharedDriver(object):
         return cls
 
     @classmethod
-    def get(cls, site):
+    def get(cls, site, task_id):
         """ Adds the _get() action to the queue. This method is required in order to avoid driver initialization sync
         issues.
 
         Args:
             site (str): URL to visit.
         """
-        cls._add_action(functools.partial(cls._driver.get, site))
+        cls._add_action(functools.partial(cls._driver.get, site), task_id)
 
     @classmethod
     def _action_executor(cls):
         """ Services actions in the queue, which are functools.partial objects.
         """
         while True:
-            action = cls._action_queue.get()
+            action_details = cls._action_queue.get()
+            action = action_details[0]
+            task_id = action_details[1]
             try:
                 action()
             except Exception:
-                api.add_feedback(self._task_id, traceback.format_exc())
+                api.add_feedback(task_id, traceback.format_exc())
 
     @classmethod
-    def _add_action(cls, partial_function):
+    def _add_action(cls, partial_function, task_id):
         """ Adds actions to the queue.
 
         Args:
             partial_function (functools.partial): The action to be called from within the driver thread.
         """
-        cls._action_queue.put(partial_function)
+        cls._action_queue.put((partial_function, task_id))
 
     @classmethod
     def _make_driver(cls):
@@ -132,7 +134,7 @@ class Firefox(task.Task):
         websites.
         """
         site_request = random.choice(self._sites)
-        self._driver.get(site_request)
+        self._driver.get(site_request, self._task_id)
 
     def cleanup(self):
         """ Doesn't need to do anything.
