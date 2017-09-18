@@ -219,7 +219,7 @@ def type_check(config, type_tree):
             type_check(key, key_type)
             type_check(value, value_type)
         return config
-    elif isinstance(config, dict) and isinstance(type_tree, TaskConfig):
+    elif isinstance(config, dict) and type_tree is TaskConfig:
         # Then we need to use the API to validate it.
         return api.validate_config(config)
 
