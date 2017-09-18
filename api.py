@@ -157,7 +157,7 @@ def check_config(config, parameters, defaults):
             A dictionary whose keys are ints and values are strs should be as follows:
                 '{int: str}: some description here'
             Valid type strings (the 'str' or 'int' above) are the following:
-                str, int, float, bool, any, task
+                str, int, float, bool, any, number, task
             Where 'any' includes any of the first four, while 'task' indicates that the parameter is actually a task
             dict which should be validated with validate_config.
         defaults (dict): A dictionary whose keys are the same as the keys in parameters['optional'], and whose values

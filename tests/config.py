@@ -18,6 +18,8 @@ def test_yaml():
         someint: 42
         somestr: "blah"
         somefloat: 3.14159
+        somenumber: 5
+        othernumber: 2.53
         somelist:
             - 3.5
     """
@@ -34,6 +36,8 @@ def test_yaml():
     assert data_dict['someint'] == 42
     assert data_dict['somestr'] == 'blah'
     assert data_dict['somefloat'] == 3.14159
+    assert data_dict['somenumber'] == 5
+    assert data_dict['othernumber'] == 2.53
 
     for task in structure:
         api.validate_config(task)

@@ -19,6 +19,7 @@ primitives = {'str': str,
               'float': float,
               'bool': bool,
               'any': (str, int, float, bool),
+              'number': (int, float),
               'task': TaskConfig}
 
 def yaml_to_python(yaml_string):
@@ -103,15 +104,15 @@ def parse_primitive(string):
     """ Check if a string matches a key in the primitives dict.
 
     Args:
-        string (str): String to evaluate. Must be 'str', 'int', 'bool', 'float', 'any', or 'task'.
+        string (str): String to evaluate. Must be 'str', 'int', 'bool', 'float', 'any', 'number', or 'task'.
 
     Raises:
         TypeError: If string is not in the primitives dict.
 
     Returns:
         type or tuple: If string is 'str', 'int', 'bool', or 'float', returns the corresponding type's built-in. If
-            string is 'any', returns a tuple containing all of the aforementioned types. If string is 'task', returns
-            the TaskConfig class.
+            string is 'any', returns a tuple containing all of the aforementioned types. If string is 'number',
+            returns a tuple containing the int and float built-ints. If string is 'task', returns the TaskConfig class.
     """
     if string not in primitives:
         raise TypeError('{} is not a valid primitive type.'.format(string))
