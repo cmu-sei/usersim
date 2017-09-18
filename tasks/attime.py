@@ -48,9 +48,11 @@ class AtTime(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        required = {'time': '24-hour time code in HHMM format'}
-        optional = {'seconds': 'positive decimal number less than 60 - default is 0',
-                    'date': 'date stamp in YYYY-MM-DD format - default is today, or tomorrow if time was passed today'}
+        required = {'time': 'str: 24-hour time code in HHMM format',
+                    'task': 'task: The task to be triggered.'}
+        optional = {'seconds': 'float: positive decimal number less than 60 - default is 0',
+                    'date': 'str: date stamp in YYYY-MM-DD format - default is today, or tomorrow if time was passed '
+                            'today'}
 
         return {'required': required, 'optional': optional}
 
