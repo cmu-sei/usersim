@@ -7,11 +7,6 @@ class Task(object):
     def __call__(self):
         """ Periodically called while the object is scheduled. This gives the object its behavior, whatever that may
         entail.
-
-        Returns:
-            dict or None: If this task wants another task to be scheduled, this call should return the
-                configuration for that task as a dict. Otherwise, it should not return anything, which is equivalent
-                to returning None.
         """
         raise NotImplementedError("Not yet implemented.")
 
