@@ -55,6 +55,14 @@ class SharedDriver(object):
             action_details = cls._action_queue.get()
             action = action_details[0]
             task_id = action_details[1]
+
+            try:
+                title = cls._driver.title
+            except WebDriverException as e:
+                cls._driver = None
+                cls._make_driver()
+                cls._add_action(action, task_id)
+
             try:
                 action()
             except Exception:
