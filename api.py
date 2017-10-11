@@ -183,6 +183,9 @@ def get_tasks(filter_result=True):
         dict of dicts of dicts: A dictionary whose keys are task names, and whose values are dictionaries whose keys are
             'required' and 'optional', and whose values are dictionaries whose keys are the parameter name, and whose
             values are human-readable strings indicating what is expected for the parameter.
+            There is also a new key at the same dictionary level as the 'required' and 'optional' keys, 'description'.
+            The 'description' key contains a human-readable short summary of what the task tries to do, if such a
+            description is provided by the task. Otherwise, it will be the string 'No description provided.'
     """
     special_tasks = [re.compile('task$'), re.compile('test')]
 
@@ -194,7 +197,14 @@ def get_tasks(filter_result=True):
                 break
         else:
             # Else statements of a for-loop are triggered if a break was not triggered within the for-loop.
-            available_tasks[key] = tasks.task_dict[key].parameters()
+            parameters = tasks.task_dict[key].parameters()
+            try:
+                assert parameters is not None
+            except AssertionError:
+                raise AssertionError('{} parameters method returns None.'.format(key))
+            available_tasks[key] = parameters
+            doc = tasks.task_dict[key].__doc__ or 'No description provided.'
+            available_tasks[key]['description'] = ' '.join(doc.strip().split())
 
     return available_tasks
 
