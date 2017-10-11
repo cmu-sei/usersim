@@ -1,10 +1,19 @@
-import win32com.client
+import platform
+
+try:
+    import win32com.client
+except ImportError:
+    # Tasks must be importable on any platform.
+    pass
 
 from tasks import outlook
 
 
 class OutlookSend(outlook.Outlook):
     def __init__(self, config):
+        if not platform.system() == 'Windows':
+            raise OSError('This task is only compatible with Windows.')
+
         self._config = config
         self._outlook = outlook.SharedOutlook()
 

@@ -3,6 +3,7 @@
 # Adapted from code written by Rotem Guttman and Joe Vessella
 
 import functools
+import platform
 import queue
 import random
 import threading
@@ -10,11 +11,15 @@ import time
 import traceback
 
 import psutil
-import pythoncom
-import win32api
-import win32com.client
-import win32con
-import win32process
+try:
+    import pythoncom
+    import win32api
+    import win32com.client
+    import win32con
+    import win32process
+except ImportError:
+    # Tasks must be importable on any platform.
+    pass
 
 import api
 from tasks import task
@@ -123,6 +128,8 @@ class IEBrowser(task.Task):
     def __init__(self, config):
         """ Validates config and stores it as an attribute. Also creates the IEManager.
         """
+        if not platform.system() == 'Windows':
+            raise OSError('This task is only compatible with Windows.')
         self._config = self.validate(config)
         IEManager()
 
