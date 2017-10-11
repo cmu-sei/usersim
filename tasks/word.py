@@ -3,11 +3,16 @@
 # Adapted from code written by Rotem Guttman and Joe Vessella
 
 import os
+import platform
 import random
 import time
 
-import pythoncom
-import win32com.client
+try:
+    import pythoncom
+    import win32com.client
+except ImportError:
+    # All tasks should be importable and then checked on initialization.
+    pass
 
 from tasks import task
 
@@ -22,6 +27,8 @@ class Word(task.Task):
         """ Validates config and stores it as an attribute. Also initializes the self._converter dictionary and the list
         of filenames to choose from when creating new files.
         """
+        if not platform.system() == 'Windows':
+            raise OSError('This task is only compatible with Windows.')
         self._config = self.validate(config)
         self._converter = {} # Cannot be populated until Word is launched; see self._start_word()
         self._filename_bank = ['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf', 'hotel', 'india',

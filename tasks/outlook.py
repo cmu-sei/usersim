@@ -1,11 +1,16 @@
 import os
+import platform
 import random
 import re
 import subprocess
 import time
 
-import pythoncom
-import win32com.client
+try:
+    import pythoncom
+    import win32com.client
+except ImportError:
+    # Tasks must be importable on any platform.
+    pass
 
 import api
 from tasks import task
@@ -46,6 +51,8 @@ class SharedOutlook(object):
 
 class Outlook(task.Task):
     def __init__(self, config):
+        if not platform.system() == 'Windows':
+            raise OSError('This task is only compatible with Windows.')
         self._config = config
         self._outlook = SharedOutlook()
         # Compile all the regexes since they will be checked on each message.
