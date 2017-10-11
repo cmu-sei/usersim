@@ -174,6 +174,7 @@ class IEBrowser(task.Task):
         params = {'required': {'sites': 'list: List of websites (strings) to visit.'},
                   'optional': {'close_browser': 'bool: If True, the browser window will close after visiting a website.'
                                                 ' Defaults to False.'}}
+        return params
 
     @classmethod
     def validate(cls, config):
