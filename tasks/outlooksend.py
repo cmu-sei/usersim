@@ -10,6 +10,8 @@ from tasks import outlook
 
 
 class OutlookSend(outlook.Outlook):
+    """ Interact with Outlook to send emails. Requires Outlook and OutlookRedemption to be installed. Windows-only.
+    """
     def __init__(self, config):
         if not platform.system() == 'Windows':
             raise OSError('This task is only compatible with Windows.')

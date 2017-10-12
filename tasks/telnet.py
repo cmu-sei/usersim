@@ -1,9 +1,12 @@
-from tasks import task
 import telnetlib
 import time
 
+from tasks import task
+
 
 class Telnet(task.Task):
+    """ Connect to the configured machine and send it a list of commands via Telnet.
+    """
     def __init__(self, config):
         self._config = self.validate(config)
 

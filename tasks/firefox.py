@@ -126,8 +126,7 @@ class SharedDriver(object):
 
 
 class Firefox(task.Task):
-    """ Firefox module for UserSim. Connects to specified websites using Mozilla Firefox browser. Subsequent website
-    visits will use the same window and tab.
+    """ Connects to specified websites using Firefox. Subsequent website visits will use the same window and tab.
     """
     def __init__(self, config):
         """ Validates config and stores it as an attribute. Determines and stores as an attribute the operating system

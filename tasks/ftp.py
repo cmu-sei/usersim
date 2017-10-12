@@ -9,7 +9,7 @@ from tasks import task
 
 
 class FTP(task.Task):
-    """ FTP module for UserSim. Connects to and authenticates with an FTP server, then attempts to download a file.
+    """ Connects to and authenticates with an FTP server, then attempts to download a file.
     """
     def __init__(self, config):
         """ Validates config and stores it as an attribute.

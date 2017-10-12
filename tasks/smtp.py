@@ -10,8 +10,7 @@ from tasks import task
 
 
 class SMTP(task.Task):
-    """ SMTP module for User Sim. Sends e-mails using SMTP. Uses SSL encryption and connects to an Exchange server if
-    desired.
+    """ Sends e-mails using SMTP. SSL encryption is available.
     """
     def __init__(self, config):
         self._config = config

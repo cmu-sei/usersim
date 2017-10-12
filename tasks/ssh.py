@@ -14,7 +14,7 @@ MAX_RECV = 4096
 BLOCKING = True
 
 class SSH(task.Task):
-    """ SSH module for UserSim. Connects to and authenticates with a host, then sends a sequence of shell commands.
+    """ Connects to and authenticates with a host via SSH, then sends a sequence of shell commands.
     """
     def __init__(self, config):
         """ Validates config and stores it as an attribute

@@ -8,7 +8,8 @@ import subprocess
 from tasks import task
 
 class Shell(task.Task):
-    """ Shell module for UserSim. Executes a random shell command from the configuration dictionary.
+    """ Executes a random shell command from the configuration dictionary, or can execute all of them in sequence if the
+    'script' parameter is set to true.
     """
     def __init__(self, config):
         """ Validates config and stores it as an attribute

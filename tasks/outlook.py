@@ -50,6 +50,9 @@ class SharedOutlook(object):
         cls.mapi_utils = None
 
 class Outlook(task.Task):
+    """ Interacts with Outlook for reading emails. Regular expressions can be used to react to email content. Requires
+    Outlook and OutlookRedemption to be installed. Windows-only.
+    """
     def __init__(self, config):
         if not platform.system() == 'Windows':
             raise OSError('This task is only compatible with Windows.')
