@@ -6,7 +6,7 @@ from tasks import task
 
 
 class Frequency(task.Task):
-    """ Schedules the nested task an average of <frequency> times per hour. There is no hard upper limit, but some tasks
+    """ Schedules the nested task an average of frequency times per hour. There is no hard upper limit, but some tasks
     at a high frequency will run the CPU at 100% (generally, ones that interact with external programs).
     """
     def __init__(self, config):

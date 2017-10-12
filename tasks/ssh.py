@@ -106,9 +106,9 @@ class SSH(task.Task):
                                'user': 'username to login with, ex. "level1"',
                                'password': 'password to login with, ex. "level1"',
                                'command_list': 'list of strings to send as commands, ex. ["ls -la", "cat README"]'},
-                  'optional': {'port': 'the port on which to connect to the SSH server, ex. 22.  Default: 22',
+                  'optional': {'port': 'the port on which to connect to the SSH server, ex. 22.  Default is 22',
                                'policy': 'which policy to adopt in regards to missing host keys, should be one of '
-                                         'AutoAdd, Reject, or Warning. Default: Warning'}}
+                                         'AutoAdd, Reject, or Warning. Default is Warning'}}
         return params
 
     @classmethod
