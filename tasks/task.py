@@ -1,5 +1,5 @@
 class Task(object):
-    """ All methods must be overridden by subclasses.
+    """ The highest common ancestor for all other tasks.
     """
     def __init__(self, config):
         raise NotImplementedError("Not yet implemented.")

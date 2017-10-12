@@ -5,6 +5,9 @@ from tasks import task
 
 
 class AtTime(task.Task):
+    """ Schedules the nested task as soon as possible after the specified time passes. If the specified time has already
+    passed today, the trigger time will be set at the same time tomorrow instead.
+    """
     def __init__(self, config):
         config = self.validate(config)
         time = datetime.datetime.strptime(config['time'], '%H%M').time()

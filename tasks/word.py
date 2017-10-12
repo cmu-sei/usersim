@@ -18,15 +18,11 @@ from tasks import task
 
 
 class Word(task.Task):
-    """ Word module for UserSim. Creates a Word document and 'types' text from a source file into it. May require
-    registry edits on guest OS to make sure Word does not give warnings.
-        * WARNING: This module will edit and possibly delete existing Word files in the user's 'Documents' folder if *
-        *   the 'new_doc' parameter is set to False (it is set to True by default).                                  *
+    """ Creates a Word document and 'types' text from a source file into it. May require registry edits on guest OS to
+    make sure Word does not give warnings. This module will edit and possibly delete existing Word files in the user's
+    'Documents' folder if the 'new_doc' parameter is set to False (it is set to True by default). Windows-only.
     """
     def __init__(self, config):
-        """ Validates config and stores it as an attribute. Also initializes the self._converter dictionary and the list
-        of filenames to choose from when creating new files.
-        """
         if not platform.system() == 'Windows':
             raise OSError('This task is only compatible with Windows.')
         self._config = self.validate(config)

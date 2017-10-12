@@ -5,6 +5,8 @@ from tasks import attime
 
 
 class Delay(attime.AtTime):
+    """ Schedules the nested task as soon as possible after the specified delay has elapsed.
+    """
     def __init__(self, config):
         days = config['days']
         hours = config['hours']

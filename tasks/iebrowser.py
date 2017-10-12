@@ -123,7 +123,7 @@ class IEManager(object):
 
 
 class IEBrowser(task.Task):
-    """ InternetExplorer module for User Sim. Opens an instance of Internet Explorer and visits a website.
+    """ Opens an instance of Internet Explorer and visits a website at random from the configuration. Windows-only.
     """
     def __init__(self, config):
         """ Validates config and stores it as an attribute. Also creates the IEManager.

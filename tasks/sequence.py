@@ -3,7 +3,7 @@ from tasks import task
 
 
 class Sequence(task.Task):
-    """ Executes nested tasks in sequence.
+    """ Executes nested tasks in sequence. This task is only stopped after the last nested task has stopped.
     """
     def __init__(self, config):
         self._tasks = config['tasks']

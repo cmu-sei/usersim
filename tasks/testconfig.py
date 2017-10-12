@@ -4,6 +4,8 @@ import api
 
 
 class TestConfig(test.Test):
+    """ Task for testing parameters and validate methods.
+    """
     @classmethod
     def parameters(cls):
         """ Parameters to test.

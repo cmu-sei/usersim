@@ -2,6 +2,8 @@ from tasks import task
 
 
 class Test(task.Task):
+    """ Common ancestor of other testing tasks.
+    """
     def __init__(self, config):
         print('%s task initialized.' % self.__class__)
 
