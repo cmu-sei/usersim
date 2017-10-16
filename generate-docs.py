@@ -1,84 +1,57 @@
+import inspect
 import os
 import subprocess
 
 import api
 
 
-# Shamelessly ripped from PyLaTeX utils.py, edited May 8, MIT License.
-_latex_special_chars = {'&': r'\&',
-                        '%': r'\%',
-                        '$': r'\$',
-                        '#': r'\#',
-                        '_': r'\_',
-                        '{': r'\{',
-                        '}': r'\}',
-                        '~': r'\textasciitilde{}',
-                        '^': r'\^{}',
-                        '\\': r'\textbackslash{}',
-                        '\n': '\\newline%\n',
-                        '-': r'{-}',
-                        '\xA0': '~',  # Non-breaking space
-                        '[': r'{[}',
-                        ']': r'{]}',
-}
-
-# Shamelessly ripped from PyLaTeX utils.py, edited May 8, MIT License.
-def escape_latex(s):
-    """ Escape a string for use in a LaTeX document.
-
-    Args:
-        s (str): The string to escape.
-
-    Returns:
-        str: A string with its characters escaped for use in a LaTeX document.
-    """
-    return ''.join(_latex_special_chars.get(c, c) for c in s)
-
 tasks = api.get_tasks()
 
-dynamic_document = '\\chapter{Task Parameters}\n\n'
+# Generate API reference.
+api_reference = ['# API Reference']
 
-def itemize(parameter_dict):
-    dynamic_document = ''
+api_functions = sorted(inspect.getmembers(api, inspect.isfunction), key=lambda x: x[0])
 
-    dynamic_document += '\\begin{itemize}\n'
-    for item in sorted(parameter_dict):
-        description = parameter_dict[item].rsplit(':', 1)[-1]
-        dynamic_document += '\\item {}: {}\n'.format(escape_latex(item), escape_latex(description))
-    dynamic_document += '\\end{itemize}\n'
+for name, function in api_functions:
+    api_reference.append('## ' + name)
+    doc = function.__doc__.strip()
+    if doc:
+        api_reference.append(doc)
 
-    return dynamic_document
+with open('docs/api-reference.md', 'w') as f:
+    f.write('\n\n'.join(api_reference))
 
+# Generate Task parameters document.
+tasks_doc = ['# Task Parameters']
+
+tasks = api.get_tasks()
 for task in sorted(tasks):
-    parameters = tasks[task]
-    description = parameters['description']
-    try:
-        required = parameters['required']
-    except KeyError:
-        required = {}
-    try:
-        optional = parameters['optional']
-    except KeyError:
-        optional = {}
+    tasks_doc.append('## ' + task)
+    description = tasks[task]['description']
+    required = tasks[task]['required']
+    optional = tasks[task]['optional']
 
-    dynamic_document += '\\subsection{{{}}}\n\n'.format(task)
+    tasks_doc.append('### Description')
+    tasks_doc.append(description)
 
-    dynamic_document += escape_latex(description) + '\n\n'
+    parameter_list = []
+    for key in sorted(required):
+        # TODO: Find a way to guarantee separation of types and parameter description. This breaks if a ':' is in the
+        # description.
+        parameter_desc = required[key]
+        parameter_list.append('* ' + key + ' - ' + parameter_desc)
 
-    if required:
-        dynamic_document += '\\subsubsection{{Required Parameters}}\n\n'
-        dynamic_document += itemize(required)
+    if parameter_list:
+        tasks_doc.append('### Required\n' + '\n'.join(parameter_list))
 
-    if optional:
-        dynamic_document += '\\subsubsection{{Optional Parameters}}\n\n'
-        dynamic_document += itemize(optional)
+    parameter_list = []
+    for key in sorted(optional):
+        # TODO: Same as above. Also make this into a function.
+        parameter_desc = optional[key].rsplit(':', 1)[-1]
+        parameter_list.append('* ' + key + ' - ' + parameter_desc)
 
-cwd = os.getcwd()
-os.chdir('docs/latex/')
-print(os.listdir())
-with open('dynamic.tex', 'w') as f:
-    f.write(dynamic_document)
+    if parameter_list:
+        tasks_doc.append('### Optional\n' + '\n'.join(parameter_list))
 
-subprocess.run(['latexmk', '-pdf', 'developer-guide.tex'], check=True, timeout=60)
-subprocess.run(['latexmk', '-pdf', 'user-guide.tex'], check=True, timeout=60)
-subprocess.run(['latexmk', '-c'], check=True, timeout=60)
+with open('docs/tasks.md', 'w') as f:
+    f.write('\n\n\n\n'.join(tasks_doc))
