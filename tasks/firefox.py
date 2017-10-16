@@ -174,7 +174,7 @@ class Firefox(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {'required': {'sites': 'list: list of sites to connect to (full addresses with http://).'
+        params = {'required': {'sites': 'list: list of sites to connect to (must be FQDN).'
                                         ' One will be randomly chosen each time the module is run.'},
                   'optional': {}}
 

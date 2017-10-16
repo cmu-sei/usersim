@@ -69,8 +69,7 @@ class SMTP(task.Task):
                                'destinations': 'list: A list of e-mail addresses (strings) to send e-mails to. One will'
                                                ' be chosen at random.',
                                'mail_server': 'str: Hostname of the e-mail server to use, with port optionally '
-                                              'specified by a '
-                                       'colon, e.g. "domain.org" or "domain.org:25". Port defalts to 25.'},
+                                              'specified by a colon. Port defalts to 25.'},
                   'optional': {'messages': 'list: A list of messages (strings) to form the body of an e-mail. One will '
                                            'be chosen at random. Default behavior is to randomly generate messages.',
                                'subjects': 'list: a list of subjects (strings) to form the subject of an e-mail. One '
