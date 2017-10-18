@@ -2,15 +2,26 @@
 import datetime
 import os
 import re
+import sys
 import zipfile
 
-block_cipher = None
+# PyInstaller's default path does not include the usersim root directory, but I want to generate the dynamic docs before
+# doing a build to guarantee that the docs include the latest version.
+sys.path.append(os.getcwd())
+import gendocs
+# Then remove it again after the import to avoid any unintended side effects. PyInstaller's base path may not include
+# the current directory for a reason.
+sys.path.pop()
 
+
+gendocs.generate()
+
+block_cipher = None
 
 a = Analysis(['main.py'],
              pathex=[],
              binaries=[],
-             datas=[],
+             datas=[('docs/*.md', 'docs')],
              hiddenimports=[],
              hookspath=['hooks/'],
              runtime_hooks=[],
