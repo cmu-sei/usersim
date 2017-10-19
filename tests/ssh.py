@@ -55,7 +55,7 @@ def test_good_cases(task, good_cases):
     for config_name, config in good_cases:
         task['config'] = config
         sim = usersim.UserSim(True)
-        api.new_task(task)
+        api.validate_config(task)
         #result = sim.cycle()
         #for item in result:
         #    print(item)
@@ -103,15 +103,15 @@ def run_test():
             'policy': 'AutoBAD'
             }
     missing_opts = {
-            'host': '',
-            'user': '',
-            'password': '',
+            'host': 'localhost',
+            'user': 'test',
+            'password': 'test',
             'command_list': ['echo hello', 'ls', 'exit']
             }
     good_config = {
-            'host': '',
-            'user': '',
-            'password': '',
+            'host': 'localhost',
+            'user': 'test',
+            'password': 'test',
             'command_list': ['echo hello', 'ls', 'exit'],
             'port': 22,
             'policy': 'AutoAdd'
