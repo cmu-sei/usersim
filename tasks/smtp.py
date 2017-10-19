@@ -19,14 +19,14 @@ class SMTP(task.Task):
         """ Generates a message and subject header if necessary, then sends an e-mail as specified in the config.
         """
         if not self._config['messages']:
-            body = str()
+            body = ''
             for _ in range(random.randint(1, 200)):
                 body += random.choice('abcdefghijklmnopqrstuvwxyz')
         else:
             body = random.choice(self._config['messages'])
 
         if not self._config['subjects']:
-            subject = str()
+            subject = ''
             for _ in range(random.randint(1, 50)):
                 subject += random.choice('abcdefghijklmnopqrstuvwxyz')
         else:
@@ -53,7 +53,7 @@ class SMTP(task.Task):
         Returns:
             str: An arbitrary string giving more detailed, task-specific status for the given task.
         """
-        return str()
+        return ''
 
     @classmethod
     def parameters(cls):
@@ -121,7 +121,7 @@ class SMTP(task.Task):
             raise ValueError('mail_server: {} Must be non-empty'.format(str(config['mail_server'])))
 
         if 'messages' not in config:
-            config['messages'] = list()
+            config['messages'] = []
         if not isinstance(config['messages'], list):
             raise ValueError('messages: Must be a list of strings'.format(str(config['messages'])))
         for message in config['messages']:
@@ -129,7 +129,7 @@ class SMTP(task.Task):
                 raise ValueError('messages: Must be a list of strings'.format(str(config['messages'])))
 
         if 'subjects' not in config:
-            config['subjects'] = list()
+            config['subjects'] = []
         if not isinstance(config['subjects'], list):
             raise ValueError('subjects: Must be a list of strings'.format(str(config['subjects'])))
         for subject in config['subjects']:

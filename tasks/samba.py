@@ -51,7 +51,7 @@ class Samba(task.Task):
         Returns:
             str: An arbitrary string giving more detailed, task-specific status for the given task.
         """
-        return str()
+        return ''
 
     @classmethod
     def parameters(cls):
@@ -131,7 +131,7 @@ class Samba(task.Task):
                 raise ValueError('files: {} Must be a list of strings'.format(str(config['files'])))
 
         if 'write_dir' not in config:
-            config['write_dir'] = str()
+            config['write_dir'] = ''
         if not isinstance(config['write_dir'], str):
             raise ValueError('write_dir: {} Must be a string'.format(str(config['write_dir'])))
 
@@ -141,7 +141,7 @@ class Samba(task.Task):
         """ Send an echo request to the server with a randomly-generated string.
         """
         length = random.randint(1, 100)
-        data = str()
+        data = ''
 
         for _ in range(length):
             data += random.choice('abcdefghijklmnopqrstuvwxyz')
@@ -157,7 +157,7 @@ class Samba(task.Task):
                 failures.
         """
         file_paths = self._config['files']
-        failures = list()
+        failures = []
 
         for file_path in file_paths:
             try:
@@ -180,7 +180,7 @@ class Samba(task.Task):
                 failures.
         """
         file_paths = self._config['files']
-        failures = list()
+        failures = []
 
         for file_path in file_paths:
             try:
@@ -228,7 +228,7 @@ class Samba(task.Task):
         try:
             share, path = write_dir.split('/', 1)
         except ValueError:
-            share, path = write_dir, str()
+            share, path = write_dir, ''
 
         path = os.path.join(path, os.path.basename(local_path))
 

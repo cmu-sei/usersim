@@ -189,7 +189,7 @@ def get_tasks(filter_result=True):
     """
     special_tasks = [re.compile('task$'), re.compile('test')]
 
-    available_tasks = dict()
+    available_tasks = {}
 
     for key in tasks.task_dict:
         for filtered in special_tasks:

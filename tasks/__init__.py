@@ -4,9 +4,9 @@ import os
 import sys
 
 
-__all__ = list()
-loaded = list()
-task_dict = dict()
+__all__ = []
+loaded = []
+task_dict = {}
 
 py_files = os.listdir(os.path.dirname(__file__))
 special_modules = ['__init__.py', 'task.py']

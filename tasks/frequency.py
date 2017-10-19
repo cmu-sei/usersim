@@ -78,7 +78,7 @@ class Frequency(task.Task):
             dict: The given configuration dict with arguments converted to their required formats with missing
                 optional arguments added with default arguments.
         """
-        converted = dict()
+        converted = {}
 
         if 'frequency' not in config:
             raise KeyError('frequency')

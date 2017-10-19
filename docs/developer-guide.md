@@ -238,7 +238,7 @@ Also like in the Args section, complex return value types should specify the top
 the description should clarify what it contains, like so:
 
 ```
-def fetch_dict():
+def fetch_{}:
     """ Fetch a dict object with particular keys.
 
     Returns:

@@ -62,7 +62,7 @@ class Word(task.Task):
         Returns:
             str: An arbitrary string giving more detailed, task-specific status for the given task.
         """
-        return str()
+        return ''
 
     @classmethod
     def parameters(cls):

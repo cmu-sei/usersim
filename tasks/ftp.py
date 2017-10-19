@@ -40,7 +40,7 @@ class FTP(task.Task):
         Returns:
             str: An arbitrary string giving more detailed, task-specific status for the given task.
         """
-        return str()
+        return ''
 
     @classmethod
     def parameters(cls):
@@ -94,7 +94,7 @@ class FTP(task.Task):
             config['user'] = 'anonymous'
             config['password'] = 'anonymous@'
         if 'password' not in config:
-            config['password'] = str()
+            config['password'] = ''
 
         return config
 

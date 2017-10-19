@@ -74,7 +74,7 @@ class Outlook(task.Task):
         return True
 
     def status(self):
-        return str()
+        return ''
 
     def _nuke_folders(self):
         DEFAULTS = ['Inbox', 'Deleted Items', 'Outbox', 'Drafts', 'Sent Items', 'RSS Feeds']
@@ -145,7 +145,7 @@ class Outlook(task.Task):
 
         item_store = folder.Items
         message = item_store.GetFirst()
-        delete_after = list()
+        delete_after = []
         handled_messages = 0
 
         while message:
@@ -247,9 +247,9 @@ class Outlook(task.Task):
             dict: With keys 'required' and 'optional', whose values are dicts with the task's required and optional
                 config keys, and whose values are human-readable strings giving information about that key.
         """
-        config = dict()
+        config = {}
 
-        required = dict()
+        required = {}
 
         optional = {'unread': 'bool: Read only unread messages if True, otherwise read all messages. (default True)',
                     'open_links': 'int: Percent chance to open any given link. (default 0)',
@@ -284,8 +284,8 @@ class Outlook(task.Task):
                     'delete_handled': False,
                     'display_messages': False,
                     'nuke_outlook': False,
-                    'nuke_folders': list(),
-                    'regexes': dict()}
+                    'nuke_folders': [],
+                    'regexes': {}}
 
         required = cls.parameters()['required']
         optional = cls.parameters()['optional']

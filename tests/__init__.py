@@ -6,8 +6,8 @@ import textwrap
 import traceback
 
 
-__all__ = list()
-loaded = list()
+__all__ = []
+loaded = []
 
 py_files = os.listdir(os.path.dirname(__file__))
 special_modules = ['__init__.py']
@@ -41,8 +41,8 @@ del special_modules
 
 # Importable test runner.
 def run_all_tests():
-    successes = list()
-    failures = list()
+    successes = []
+    failures = []
 
     for test in loaded:
         try:

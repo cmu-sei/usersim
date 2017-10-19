@@ -50,7 +50,7 @@ def yaml_to_python(yaml_string):
         return node.value
 
     def dict_constructor(loader, node):
-        return dict()
+        return {}
 
     # For whatever reason, shorthand tags do not work.
     yaml_2002_prefix = 'tag:yaml.org,2002:'

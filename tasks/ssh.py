@@ -50,7 +50,7 @@ class SSH(task.Task):
         Returns:
             str: An arbitrary string giving more detailed, task-specific status for the given task.
         """
-        return str()
+        return ''
 
     def ssh_to(self, host, user, password, command_list, policy, port):
         """ Connects to an SSH server at host:port with user as the username and password as the password. Proceeds to
@@ -66,8 +66,8 @@ class SSH(task.Task):
         ssh.connect(host, port, user, password)
         channel = ssh.invoke_shell()
         channel.setblocking(int(BLOCKING))
-        channel.sendall(str())
-        incoming = str()
+        channel.sendall('')
+        incoming = ''
 
         # Receive the welcome message from the server and print it.  If any of this fails, something went wrong with
         # the connection.
@@ -79,7 +79,7 @@ class SSH(task.Task):
         for command in command_list:
             channel.sendall(command + '\n')
             time.sleep(.5)
-            incoming = str()
+            incoming = ''
             while channel.recv_ready():
                 incoming += channel.recv(MAX_RECV).decode()
                 time.sleep(.1)

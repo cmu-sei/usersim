@@ -74,7 +74,7 @@ class OutlookSend(outlook.Outlook):
             dict: With keys 'required' and 'optional', whose values are dicts with the task's required and optional
                 config keys, and whose values are human-readable strings giving information about that key.
         """
-        config = dict()
+        config = {}
 
         required = {'username': 'str: The "From" address.',
                     'destination': 'str: The "To" address.',
@@ -98,7 +98,7 @@ class OutlookSend(outlook.Outlook):
             KeyError: If a required key is missing.
             ValueError: If a key's value is not valid.
         """
-        defaults = {'attachments': list(),
+        defaults = {'attachments': [],
                     'dynamic': False}
 
         required = cls.parameters()['required']

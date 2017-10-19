@@ -30,7 +30,7 @@ class Telnet(task.Task):
         return True
 
     def status(self):
-        return str()
+        return ''
 
     def telnet_to(self, hostname, port, username, password, commandlist):
         telnetclient = telnetlib.Telnet(hostname, port, 10)

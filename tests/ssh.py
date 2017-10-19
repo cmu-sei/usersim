@@ -87,10 +87,10 @@ def run_test():
             'user': 'admin',
             'password': 'badpassword',
             'command_list': ['echo hello'],
-            'port': str()
+            'port': ''
             }
     blank_host = {
-            'host': str(),
+            'host': '',
             'user': 'admin',
             'password': 'badpassword',
             'command_list': ['echo hello']
