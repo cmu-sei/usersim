@@ -40,7 +40,7 @@ def start_server():
         data = conn.recv(20)
         if not data:
             break
-        print ("received data: " + str(data))
+        print('received data: ' + str(data))
         conn.send(data)
 
     conn.close()

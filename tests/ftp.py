@@ -11,8 +11,8 @@ def testbad_key_cases(task, bad_key_cases):
     accepts a bad config dictionary.
 
     Args:
-        task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        bad_key_cases: A list of tuples of the form ("config_name", config). config should be missing at least one key.
+        task: A task dictionary mapping 'type' to the task name (e.g. 'ssh')
+        bad_key_cases: A list of tuples of the form ('config_name', config). config should be missing at least one key.
 
     Raises:
         AssertionError: If api.new_task does not raise a KeyError
@@ -23,15 +23,15 @@ def testbad_key_cases(task, bad_key_cases):
             api.new_task(task)
             raise AssertionError('Incorrectly accepted %s' % config_name)
         except KeyError:
-            print("Correctly rejected %s" % config_name)
+            print('Correctly rejected %s' % config_name)
 
 def testbad_value_cases(task, bad_value_cases):
     """ Used to test configs with invalid values. This function will raise an assertion error if validate incorrectly
     accepts a bad config dictionary.
 
     Args:
-        task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        bad_value_cases: A list of tuples of the form ("config_name", config). config should have at least one invalid
+        task: A task dictionary mapping 'type' to the task name (e.g. 'ssh')
+        bad_value_cases: A list of tuples of the form ('config_name', config). config should have at least one invalid
             value.
 
     Raises:
@@ -43,14 +43,14 @@ def testbad_value_cases(task, bad_value_cases):
             api.new_task(task)
             raise AssertionError('Incorrectly accepted %s' % config_name)
         except ValueError:
-            print("Correctly rejected %s" % config_name)
+            print('Correctly rejected %s' % config_name)
 
 def test_good_cases(task, good_cases):
     """ Used to test properly formatted configs. Prints feedback from the task.
 
     Args:
-        task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        good_cases: A list of tuples of the form ("config_name, config"). config should be properly formatted.
+        task: A task dictionary mapping 'type' to the task name (e.g. 'ssh')
+        good_cases: A list of tuples of the form ('config_name, config'). config should be properly formatted.
     """
     for config_name, config in good_cases:
         task['config'] = config
@@ -74,11 +74,11 @@ def run_test():
     missing_password = {'site': 'speedtest.tele2.net', 'file': '100KB.zip', 'user': 'anonymous'}
     complete_config = {'site': 'speedtest.tele2.net', 'file': '512KB.zip',
                       'user': 'anonymous', 'password': 'anonymous@'}
-    bad_key_cases = [("empty", empty), ("missing_site", missing_site), ("missing_file", missing_file)]
-    bad_value_cases = [("none_args", none_args), ("blank_site", blank_site), ("blank_file", blank_file)]
-    good_cases = [("missing_opts", missing_opts),
-                  ("missing_password", missing_password),
-                  ("complete_config", complete_config)]
+    bad_key_cases = [('empty', empty), ('missing_site', missing_site), ('missing_file', missing_file)]
+    bad_value_cases = [('none_args', none_args), ('blank_site', blank_site), ('blank_file', blank_file)]
+    good_cases = [('missing_opts', missing_opts),
+                  ('missing_password', missing_password),
+                  ('complete_config', complete_config)]
     testbad_key_cases(task, bad_key_cases)
     testbad_value_cases(task, bad_value_cases)
     test_good_cases(task, good_cases)

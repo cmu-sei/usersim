@@ -12,8 +12,8 @@ def test_bad_key_cases(task, bad_key_cases):
     accepts a bad config dictionary.
 
     Args:
-        task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        bad_key_cases: A list of tuples of the form ("configName", config). config should be missing at least one key.
+        task: A task dictionary mapping 'type' to the task name (e.g. 'ssh')
+        bad_key_cases: A list of tuples of the form ('configName', config). config should be missing at least one key.
 
     Raises:
         AssertionError: If api.new_task does not raise a KeyError
@@ -31,8 +31,8 @@ def test_bad_value_cases(task, bad_value_cases):
     accepts a bad config dictionary.
 
     Args:
-        task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        bad_value_cases: A list of tuples of the form ("configName", config). config should have at least one invalid
+        task: A task dictionary mapping 'type' to the task name (e.g. 'ssh')
+        bad_value_cases: A list of tuples of the form ('configName', config). config should have at least one invalid
             value.
 
     Raises:
@@ -50,8 +50,8 @@ def test_good_cases(task, good_cases):
     """ Used to test properly formatted configs. Prints feedback from the task.
 
     Args:
-        task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        good_cases: A list of tuples of the form ("configName", config). config should be properly formatted.
+        task: A task dictionary mapping 'type' to the task name (e.g. 'ssh')
+        good_cases: A list of tuples of the form ('configName', config). config should be properly formatted.
     """
     sim = usersim.UserSim(True)
     for config_name, config in good_cases:

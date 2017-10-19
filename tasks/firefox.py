@@ -120,9 +120,9 @@ class SharedDriver(object):
             str: 'No active Firefox driver.' or 'Active Firefox driver.'.
         """
         if not cls._driver:
-            return "No active Firefox driver."
+            return 'No active Firefox driver.'
 
-        return "Active Firefox driver."
+        return 'Active Firefox driver.'
 
 
 class Firefox(task.Task):
@@ -202,14 +202,14 @@ class Firefox(task.Task):
 
         site_list = conf_dict['sites']
         if not isinstance(site_list, list):
-            raise ValueError("sites: {} Websites to visit must be a list of strings.".format(str(site_list)))
+            raise ValueError('sites: {} Websites to visit must be a list of strings.'.format(str(site_list)))
         for site in site_list:
             if not isinstance(site, str):
-                raise ValueError("sites: {} Listed website is not a string.".format(str(site)))
+                raise ValueError('sites: {} Listed website is not a string.'.format(str(site)))
 
-        url_pattern = "^(http|https)://"
+        url_pattern = '^(http|https)://'
         for item in site_list:
             if not re.match(url_pattern, item):
-                raise ValueError("Incorrect URL pattern: '{}' - must start with 'http://' or 'https://'".format(item))
+                raise ValueError('Incorrect URL pattern: {} - must start with http:// or https://'.format(item))
 
         return conf_dict

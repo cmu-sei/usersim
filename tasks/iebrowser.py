@@ -98,7 +98,7 @@ class IEManager(object):
         """ Create an instance of Internet Explorer.
         """
         pythoncom.CoInitialize()
-        cls._ie = win32com.client.gencache.EnsureDispatch("InternetExplorer.Application")
+        cls._ie = win32com.client.gencache.EnsureDispatch('InternetExplorer.Application')
         cls._ie.Visible = True
 
     @classmethod

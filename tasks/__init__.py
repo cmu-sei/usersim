@@ -15,7 +15,7 @@ def get_matching_class(module_name, loaded_module):
     for class_name, class_obj in inspect.getmembers(loaded_module, inspect.isclass):
         if class_name.lower() == module_name:
             return class_obj
-    raise AttributeError("Could not find a matching class.")
+    raise AttributeError('Could not find a matching class.')
 
 def load_modules():
     global __all__
