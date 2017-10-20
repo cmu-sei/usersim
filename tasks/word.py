@@ -25,7 +25,7 @@ class Word(task.Task):
     def __init__(self, config):
         if not platform.system() == 'Windows':
             raise OSError('This task is only compatible with Windows.')
-        self._config = self.validate(config)
+        self._config = config
         self._converter = {} # Cannot be populated until Word is launched; see self._start_word()
         self._filename_bank = ['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf', 'hotel', 'india',
                                'juliett', 'kilo', 'lima', 'mike', 'november', 'oscar', 'papa', 'quebec', 'romeo',

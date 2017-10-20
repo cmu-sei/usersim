@@ -8,7 +8,7 @@ class Telnet(task.Task):
     """ Connect to the configured machine and send it a list of commands via Telnet.
     """
     def __init__(self, config):
-        self._config = self.validate(config)
+        self._config = config
 
     def __call__(self):
         self.telnet_to(self._config['host'],

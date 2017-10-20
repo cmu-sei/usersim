@@ -9,7 +9,6 @@ class AtTime(task.Task):
     passed today, the trigger time will be set at the same time tomorrow instead.
     """
     def __init__(self, config):
-        config = self.validate(config)
         time = datetime.datetime.strptime(config['time'], '%H%M').time()
         seconds = datetime.timedelta(seconds=config['seconds'])
         date = datetime.datetime.strptime(config['date'], '%Y-%m-%d').date()

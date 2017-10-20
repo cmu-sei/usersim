@@ -130,7 +130,7 @@ class IEBrowser(task.Task):
         """
         if not platform.system() == 'Windows':
             raise OSError('This task is only compatible with Windows.')
-        self._config = self.validate(config)
+        self._config = config
         IEManager()
 
     def __call__(self):

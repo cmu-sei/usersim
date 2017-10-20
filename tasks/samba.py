@@ -17,7 +17,7 @@ class Samba(task.Task):
     guests can upload files to it!
     """
     def __init__(self, config, debug=False):
-        self._config = self.validate(config)
+        self._config = config
         self._smb_con = None
         self._debug = debug
 

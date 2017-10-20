@@ -1,11 +1,11 @@
 # Ali Kidwai
 # June 16, 2017
 # Adapted from code written by Rotem Guttman and Joe Vessella
-
 import random
 import subprocess
 
 from tasks import task
+
 
 class Shell(task.Task):
     """ Executes a random shell command from the configuration dictionary, or can execute all of them in sequence if the
@@ -14,7 +14,7 @@ class Shell(task.Task):
     def __init__(self, config):
         """ Validates config and stores it as an attribute
         """
-        self._config = self.validate(config)
+        self._config = config
 
     def __call__(self):
         """ Creates a Popen object from the subprocess module and sends a random command from config['commands'] to

@@ -10,7 +10,6 @@ class Frequency(task.Task):
     at a high frequency will run the CPU at 100% (generally, ones that interact with external programs).
     """
     def __init__(self, config):
-        config = self.validate(config)
         freq = config['frequency']
         reps = config['repetitions']
         task = config['task']

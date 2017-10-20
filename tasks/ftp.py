@@ -14,7 +14,7 @@ class FTP(task.Task):
     def __init__(self, config):
         """ Validates config and stores it as an attribute.
         """
-        self._config = self.validate(config)
+        self._config = config
 
     def __call__(self):
         """ Connects to the ftp server as specified in config and attempts to download file from server.
