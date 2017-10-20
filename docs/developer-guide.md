@@ -283,6 +283,8 @@ will (obviously) need to import the `tasks.task` module in order to create a sub
 The following methods are **required** to be implemented, but it is highly encouraged to make your code as modular
 and clean as possible by breaking more complex behavior into separate methods.
 
+You should also add a short summary to your class-level docstring, describing what your task does.
+
 ## __init__
 
 As with any Python class, the `__init__` method is your constructor. All `Task` subclasses have an
@@ -421,213 +423,6 @@ Returns:
 """
 ```
 
-# <a name="api">UserSim API Reference
-
-## add\_feedback
-
-```
-"""
-Create an additional feedback message. This will mostly be used from within threads supporting a main task, for example, managing interaction with an external program. 
-
-Args:
-    task_id (int): The task ID of the calling task. This can be accessed from within a task object by using self._task_id. If task_id < 1, no feedback will be generated.
-    error (str): A description of the error, or a traceback.format_exc().
-"""
-```
-
-## check\_config
-
-```
-""" Asserts that all of the types in config match the types in the description strings in parameters. In addition missing optional keys are added to the config from defaults.
-
-Args:
-    config (dict): A dictionary to check. Should contain all keys from parameters['required']. Each key's value must be of the same type specified in that key's description string in parameters (both required and optional).
-    parameters (dict): The return from a task.parameters call. Contains two keys, 'required' and 'optional', whose values are dict objects containing the keys that are required to be in config, and optional ones that may be in config. In these sub-dicts, the values are description strings that have at least one ':' (colon) character. Everything before the last ':' character is loaded as YAML (preferably compact), and it should describe the expected type structure of that particular parameter. For example, a list of strings should be written as follows:
-            '[str]: blah blah your description here'
-        A dictionary whose keys are ints and values are strs should be as follows:
-            '{int: str}: some description here'
-        Valid type strings (the 'str' or 'int' above) are the following:
-            str, int, float, bool, any, task
-        Where 'any' includes any of the first four, while 'task' indicates that the parameter is actually a task dict which should be validated with validate_config.
-    defaults (dict): A dictionary whose keys are the same as the keys in parameters['optional'], and whose values are sane defaults for those parameters. These values should still have the same type as indicated by the description string in parameters.
-
-Raises:
-    TypeError:
-
-Returns:
-    dict: config with its parameters type-checked, and missing optional values inserted.
-"""
-```
-
-## external\_lookup
-
-```
-"""
-Look up a variable external to the usersim. First looks at environment variables, then looks at VMWare guestinfo variables. Only returns a value for an exact match. 
-
-Args:
-    var_name (str): The name of the variable to lookup. 
-
-Returns:
-    str: Returns the value of the variable. If the variable is not found, returns an empty string.
-"""
-```
-
-## get\_tasks
-
-```
-"""
-Get the tasks and their (human-readable) parameters currently available to this simulation. Certain special tasks will be filtered by default. 
-
-Args:
-    filter_result (bool): True - filters special tasks, False - no filter is applied. 
-
-Returns:
-    dict of dicts of dicts: A dictionary whose keys are task names, and whose values are dictionaries whose keys are 'required' and 'optional', and whose values are dictionaries whose keys are the parameter name, and whose values are human-readable strings indicating what is expected for the parameter.
-"""
-```
-
-## new\_task
-
-```
-"""
-Inserts a new task into the user simulator. 
-
-Args:
-    task_config (dict): A dictionary with the following key:value pairs.
-        'type':str
-        'config':dict
-    start_paused (bool): True if the new task should be paused initially, False otherwise.
-    reset (bool): True if the simulator should be reset, False otherwise. This option should only be used for writing tests. 
-
-Raises:
-    KeyError: See validate_config docstring.
-    ValueError: See validate_config docstring. 
-
-Returns:
-    int: The new task's unique ID.
-"""
-```
-
-## pause\_all
-
-```
-"""
-Pause all currently scheduled tasks.
-"""
-```
-
-## pause\_task
-
-```
-"""
-Pause a single task. 
-
-Args:
-    task_id (int > 0): The task ID returned by an earlier call to new_task. 
-
-Returns:
-    bool: True if the operation succeeded, False otherwise.
-"""
-```
-
-## status\_all
-
-```
-"""
-Get a list of the status of all managed tasks. 
-
-Returns:
-    list of dicts: Each dictionary will have the following key:value pairs:
-        'id':int
-        'type':str
-        'state':str
-        'status':str
-"""
-```
-
-## status\_task
-
-```
-"""
-Get the status of a single task. 
-
-Args:
-    task_id (int > 0): The task ID returned by an earlier call to new_task. 
-
-Returns:
-    dict: A dictionary with the following key:value pairs:
-        'id':int
-        'type':str
-        'state':str
-        'status':str
-"""
-```
-
-## stop\_all
-
-```
-"""
-Stop all tasks that are currently scheduled or paused.
-"""
-```
-
-## stop\_task
-
-```
-"""
-Stop a single task. 
-
-Args:
-    task_id (int > 0): The task ID returned by an earlier call to new_task. 
-
-Returns:
-    bool: True if the operation succeeded, False otherwise.
-"""
-```
-
-## unpause\_all
-
-```
-"""
-Unpause all currently paused tasks.
-"""
-```
-
-## unpause\_task
-
-```
-"""
-Unpause a single task. 
-
-Args:
-    task_id (int > 0): The task ID returned by an earlier call to new_task. 
-
-Returns:
-    bool: True if the operation succeeded, False otherwise.
-"""
-```
-
-## validate\_config
-
-```
-"""
-Validate a config dictionary without instantiating a Task subclass. 
-
-Args:
-    config (dict): A dictionary with the following key:value pairs.
-        'type':str
-        'config':dict 
-
-Raises:
-    KeyError: If a required key is missing from config or config['config'] or if the task type does not exist.
-    ValueError: If the given value of an option under config['config'] is invalid. 
-
-Returns:
-    dict: The dictionary associated with config's 'config' key, after processing it with the given task's validate method. This does NOT include the 'type' and 'config' keys as above - only the actual configuration for the given task.
-"""
-```
-
 # Creating a New Task
 
 In this chapter, we'll be discussing how to create your own Task subclass. There will be a tutorial, followed by some
@@ -638,9 +433,18 @@ how-to information on some additional subjects not covered by the tutorial.
 In this tutorial, we'll create a task that, by default, will print out 'Hello, World!', but takes an optional parameter
 that will change allow the user to specify a particular name to greet.
 
-We'll begin by importing our task parent class and creating the declaration for our subclass:
+We'll begin by importing our task parent class and creating the declaration for our subclass, and a short summary of
+what the task does:
 
-\lstinputlisting{developer-content/imports}
+```
+import api
+from tasks import task
+
+
+class HelloTask(task.Task):
+    """ This task prints out a 'Hello, World!' statement by default, but the recipient can be optionally specified.
+    """
+```
 
 It's important to note here that your module file **must** be the same as the name of your class, but lowercase.
 Therefore, this file should be named `hellotask.py` and it should be in the `tasks` directory.
@@ -649,36 +453,53 @@ You should also give a short summary of what your task does as a class-level doc
 
 We'll define our very simple `__init__` method next:
 
-\lstinputlisting{developer-content/init}
+```
+    def __init__(self, config):
+        self._config = config
+```
 
 Since new task construction is guaranteed to call our `validate` method, we don't need to call it ourselves.
 It doesn't hurt anything to call it, but it's a waste of a step.
 
 We're going to write our `parameters` and `validate` methods next. First, `parameters`:
 
-\lstinputlisting{developer-content/parameters}
+```
+    @classmethod
+    def parameters(cls):
+        required = {}
+        optional = {'recipient': 'str| The recipient of the greeting. Default is "World"'}
+
+        return {'required': required, 'optional': optional}
+```
 
 Next, we'll write the `validate` method. Note that the `check_config` call takes care of a lot of
 checking we'd otherwise need to do manually:
 
-\lstinputlisting{developer-content/validate}
+```
+    @classmethod
+    def validate(cls, config):
+        return api.check_config(config, cls.parameters(), {'recipient': 'World'})
+```
 
 Next, we'll implement the `__call__` method:
 
-\lstinputlisting{developer-content/call}
+```
+    def __call__(self):
+        print('Hello, {}!'.format(self._config['recipient']))
+```
 
-Finally, we'll implement the `cleanup`, `stop`, and lstinline{status} methods.
+Finally, we'll implement the `cleanup`, `stop`, and `status` methods.
 
-\lstinputlisting{developer-content/cleanupstopstatus}
+```
+    def cleanup(self):
+        pass
 
-Here is our complete task in one block of code:
+    def stop(self):
+        return True
 
-\lstinputlisting{developer-content/imports}
-\lstinputlisting{developer-content/init}
-\lstinputlisting{developer-content/parameters}
-\lstinputlisting{developer-content/validate}
-\lstinputlisting{developer-content/call}
-\lstinputlisting{developer-content/cleanupstopstatus}
+    def status(self):
+        return 'Everything is A-OK!'
+```
 
 ## How-To Information
 
@@ -747,10 +568,7 @@ your task's `validate` method should probably validate that nested task's config
 add it to the UserSim's internal structures, which will make the task trigger during the next cycle (unless you choose
 to start it paused).
 
-Note: pending the proposed change to the task `parameters` method, your validate may not need to call
-`validate_config` at all.
-
-Please see the [API Reference](#api) for the full API reference.
+Please see the API Reference for the full API reference.
 
 ### Platform-Locked Tasks
 
