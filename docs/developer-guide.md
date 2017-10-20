@@ -347,7 +347,8 @@ Returns:
 This method returns what amounts to a specification for the task's config dictionary. The intention was to have a
 dictionary with two keys, 'required' and 'optional', each with dictionaries holding the required and optional keys,
 respectively, and their human-readable description. Your description string should be prefixed with
-a type specification, followed by a ':' (colon) character. For example:
+a type specification, followed by a ':' (colon) character. **This also means you must not use the ':' character later in 
+string.** For example:
 
 ```
 required = {'a_number': 'int: A number to use, for reasons.'}
