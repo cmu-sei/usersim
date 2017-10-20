@@ -45,6 +45,7 @@ def run_all_tests():
     failures = []
 
     for test in loaded:
+        print('*** Running test {} ***'.format(test.__name__))
         try:
             test.run_test()
         except Exception:
