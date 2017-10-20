@@ -140,8 +140,9 @@ double quotes for the literal instead of using backslashes to escape the contain
 ### Comments
 Sometimes, you will have to do things you are not proud of in order to get your code to work. In these situations, it is
 *imperative* that you add a comment explaining why your code is doing something that looks out of place. For
-example, suppose you have a function that will only write to a file-like object, but you actually want to use its output
-in your code. In order to work around this limitation, you might want to use an io.BytesIO object, like the following:
+example, suppose you are using a library function that will only write to a file-like object, but you actually want to 
+use its output in your code. In order to work around this limitation, you might want to use an io.BytesIO object, like 
+the following:
 
 ```
 def get_string(obj):
