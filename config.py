@@ -246,7 +246,7 @@ def validate(config, required_, optional_, defaults):
             keys.
         required_ (dict): A dict containing the task's required keys mapped to str values of the form
             'type: description', where type may be 'str', 'bool', 'int', 'float', 'any', 'task', or such a string may be
-            nested within any number of [] or {}. The rightmost ':' character will be used to split, so it must be
+            nested within any number of [] or {}. The '|' character will be used to split, so it must be
             present in the value string.
         optional_ (dict): A dict containing the task's optional keys, otherwise identical to required_.
         defaults (dict): A dict whose keys match the keys in optional_, and whose values are considered sane defaults.
