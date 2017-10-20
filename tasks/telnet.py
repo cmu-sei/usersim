@@ -1,6 +1,7 @@
 import telnetlib
 import time
 
+import api
 from tasks import task
 
 
@@ -59,28 +60,5 @@ class Telnet(task.Task):
         return parameters
 
     @classmethod
-    def validate(cls, conf_dict):
-        parameters = cls.parameters()
-        required = parameters['required']
-        optional = parameters['optional']
-
-        for item in required:
-            if item not in conf_dict:
-                raise KeyError(item)
-
-        for item in ['host', 'username', 'password']:
-            if not isinstance(conf_dict[item], str):
-                raise ValueError(item + ': {} Must be string'.format(str(conf_dict[item])))
-
-        if not isinstance(conf_dict['commandlist'], list):
-            raise ValueError('commandlist: {} Must be list of strings'.format(str(conf_dict['commandlist'])))
-        for item in conf_dict['commandlist']:
-            if not isinstance(item, str):
-                raise ValueError('commandlist: {} Must be list of strings'.format(str(conf_dict['commandlist'])))
-
-        if 'port' not in conf_dict:
-            conf_dict['port'] = 23
-        elif not isinstance(conf_dict['port'], int):
-            raise ValueError('port: {} Must be an int.'.format(str(conf_dict['port'])))
-
-        return conf_dict
+    def validate(cls, config):
+        return api.check_config(config, cls.parameters(), {'port': 23})

@@ -181,9 +181,9 @@ class Firefox(task.Task):
         return params
 
     @classmethod
-    def validate(cls, conf_dict):
-        """ Validates the given configuration dictionary.  Makes sure that config['required'] is a list of strings.
-        Does not actually check if the strings are valid.
+    def validate(cls, config):
+        """ Validates the given configuration dictionary.  Makes sure that config['sites'] is a list of strings.
+        Only checks that the strings start with http:// or https://
 
         Args:
             config (dict): The dictionary to validate. See parameters() for required format.
@@ -192,24 +192,13 @@ class Firefox(task.Task):
             KeyError: If a required configuration option is missing.  The error message relays the missing key.
             ValueError: If a configuration option's value is not valid.  The error message relays the proper format.
         """
+        config = api.check_config(config, cls.parameters(), {})
 
-        params = cls.parameters()
-        required = params['required']
-
-        for item in required:
-            if item not in conf_dict:
-                raise KeyError(item)
-
-        site_list = conf_dict['sites']
-        if not isinstance(site_list, list):
-            raise ValueError('sites: {} Websites to visit must be a list of strings.'.format(str(site_list)))
-        for site in site_list:
-            if not isinstance(site, str):
-                raise ValueError('sites: {} Listed website is not a string.'.format(str(site)))
+        site_list = config['sites']
 
         url_pattern = '^(http|https)://'
         for item in site_list:
             if not re.match(url_pattern, item):
                 raise ValueError('Incorrect URL pattern: {} - must start with http:// or https://'.format(item))
 
-        return conf_dict
+        return config

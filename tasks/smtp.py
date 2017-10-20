@@ -6,6 +6,7 @@ from email.mime.text import MIMEText
 import random
 import smtplib
 
+import api
 from tasks import task
 
 
@@ -98,53 +99,17 @@ class SMTP(task.Task):
         Returns:
             dict: The dict given as the config argument with missing optional parameters updated with default values.
         """
-        if 'email_addr' not in config:
-            raise KeyError('email_addr')
-        if not isinstance(config['email_addr'], str):
-            raise ValueError('email_addr: {} Must be a string'.format(str(config['email_addr'])))
+        defaults = {'messages': [],
+                    'subjects': [],
+                    'encrypt': False,
+                    'port': 25}
+        config = api.check_config(config, cls.parameters(), defaults)
 
-        if 'destinations' not in config:
-            raise KeyError('destinations')
-        if not isinstance(config['destinations'], list):
-            raise ValueError('destinations: {} Must be a list of strings'.format(str(config['destinations'])))
         if not config['destinations']:
             raise ValueError('destinations: {} Must be non-empty'.format(str(config['destinations'])))
-        for destination in config['destinations']:
-            if not isinstance(destination, str):
-                raise ValueError('destinations: {} Must be a list of strings'.format(str(config['destinations'])))
 
-        if 'mail_server' not in config:
-            raise KeyError('mail_server')
-        if not isinstance(config['mail_server'], str):
-            raise ValueError('mail_server: {} Must be a string'.format(str(config['mail_server'])))
         if not config['mail_server']:
             raise ValueError('mail_server: {} Must be non-empty'.format(str(config['mail_server'])))
-
-        if 'messages' not in config:
-            config['messages'] = []
-        if not isinstance(config['messages'], list):
-            raise ValueError('messages: Must be a list of strings'.format(str(config['messages'])))
-        for message in config['messages']:
-            if not isinstance(message, str):
-                raise ValueError('messages: Must be a list of strings'.format(str(config['messages'])))
-
-        if 'subjects' not in config:
-            config['subjects'] = []
-        if not isinstance(config['subjects'], list):
-            raise ValueError('subjects: Must be a list of strings'.format(str(config['subjects'])))
-        for subject in config['subjects']:
-            if not isinstance(subject, str):
-                raise ValueError('subjects: Must be a list of strings'.format(str(config['subjects'])))
-
-        if 'encrypt' not in config:
-            config['encrypt'] = False
-        if not isinstance(config['encrypt'], bool):
-            raise ValueError('encrypt: Must be a bool'.format(str(config['encrypt'])))
-
-        if 'port' not in config:
-            config['port'] = 25
-        if not isinstance(config['port'], int):
-            raise ValueError('port: Must be an int'.format(str(config['port'])))
 
         return config
 

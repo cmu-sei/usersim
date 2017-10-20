@@ -78,7 +78,8 @@ class Word(task.Task):
                   'optional': {'text_source': 'str| Name of the file to source text from. Defaults to '
                                            'aliceinwonderland.txt',
                                'file_types': '[str]| A list of strings representing different filetypes to save the '
-                                            'document as, e.g. ["docx", "dotm"]. Defaults to ["docx"].',
+                                            'document as, e.g. ["docx", "dotm"]. Defaults to ["docx"]. '
+                                            'Can be "docx", "docm", "doc", "dotx", "dotm", "dot", "rtf", "txt", "xml".',
                                'new_doc': 'bool| Create a new document if True, otherwise modify an existing doc, if '
                                           'there is one. Defaults to True.',
                                'cleanup': 'bool| If True, delete the file created by this task on completion. Defaults'
@@ -100,33 +101,21 @@ class Word(task.Task):
         Returns:
             dict: The dict given as the config argument with missing optional parameters added with default values.
         """
-        if 'text_source' not in config or not config['text_source']:
-            config['text_source'] = 'aliceinwonderland.txt'
-        elif not isinstance(config['text_source'], str):
-            raise ValueError('text_source: {} Must be a string'.format(str(config['text_source'])))
+        defaults = {'text_source': 'aliceinwonderland.txt',
+                    'file_types': ['docx'],
+                    'new_doc': True,
+                    'cleanup': False}
+        config = api.check_config(config, cls.parameters(), defaults)
 
-        if 'file_types' not in config:
-            config['file_types'] = ['docx']
-        elif not isinstance(config['file_types'], list):
-            raise ValueError('file_types: {} Must be a list of strings'.format(str(config['file_types'])))
+        if not config['text_source']:
+            config['text_source'] = 'aliceinwonderland.txt'
+
         if not config['file_types']:
             raise ValueError('file_types: {} Must be non-empty'.format(str(config['file_types'])))
+
         for filetype in config['file_types']:
-            if not isinstance(filetype, str):
-                raise ValueError('file_types: {} Must be a list of strings'.format(str(config['file_types'])))
             if filetype not in {'docx', 'docm', 'doc', 'dotx', 'dotm', 'dot', 'rtf', 'txt', 'xml'}:
-                raise ValueError('file_types: {} Contains invalid filetype '.format(str(config['file_types'])) +
-                                 filetype)
-
-        if 'new_doc' not in config:
-            config['new_doc'] = True
-        if not isinstance(config['new_doc'], bool):
-            raise ValueError('new_doc: {} Must be a bool'.format(str(config['new_doc'])))
-
-        if 'cleanup' not in config:
-            config['cleanup'] = False
-        if not isinstance(config['cleanup'], bool):
-            raise ValueError('cleanup: {} Must be a bool'.format(str(config['cleanup'])))
+                raise ValueError('file_types: {} Contains invalid filetype '.format(config['file_types']) + filetype)
 
         return config
 

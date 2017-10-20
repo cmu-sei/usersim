@@ -409,7 +409,7 @@ order to make repeated calls to your `validate` with the return of a previous ca
 ```
 """
 Args:
-    conf_dict (dict): The dictionary to be validated.
+    config (dict): The dictionary to be validated.
 
 Raises:
     KeyError: If a required configuration option is missing. The exception message is

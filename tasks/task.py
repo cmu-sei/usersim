@@ -51,11 +51,11 @@ class Task(object):
         raise NotImplementedError('Not yet implemented.')
 
     @classmethod
-    def validate(cls, conf_dict):
+    def validate(cls, config):
         """ Validates the given configuration dictionary.
 
         Args:
-            conf_dict (dict): The dictionary to validate. Its keys and values are subclass-specific.
+            config (dict): The dictionary to validate. Its keys and values are subclass-specific.
 
         Raises:
             KeyError: If a required configuration option is missing. The error message is the missing key.
@@ -63,6 +63,6 @@ class Task(object):
                 key: value requirement
 
         Returns:
-            dict: The dict given as the conf_dict argument with missing optional parameters added with default values.
+            dict: The dict given as the config argument with missing optional parameters added with default values.
         """
         raise NotImplementedError('Not yet implemented.')

@@ -4,6 +4,7 @@
 import random
 import subprocess
 
+import api
 from tasks import task
 
 
@@ -59,7 +60,7 @@ class Shell(task.Task):
                 descriptions and requirements for each key as values.
         """
         params = {'required': {'commands': '[str]| A list of strings to send as commands, ex. ["ls -l", "cat README"]'},
-                  'optional': {'script': 'bool| If True, execute the commands in order.'}}
+                  'optional': {'script': 'bool| If True, execute the commands in order. Default is False.'}}
         return params
 
     @classmethod
@@ -78,18 +79,11 @@ class Shell(task.Task):
         Returns:
             dict: The dict given as the config argument
         """
-        if 'commands' not in config:
-            raise KeyError('commands')
-        if not isinstance(config['commands'], list):
-            raise ValueError('commands: {} Must be a list of strings'.format(str(config['commands'])))
+        config = api.check_config(config, cls.parameters(), {'script': False})
+
         if not config['commands']:
             raise ValueError('commands: {} Cannot be empty'.format(str(config['commands'])))
-        for command in config['commands']:
-            if not isinstance(command, str):
-                raise ValueError('commands: {} Must be a list of strings'.format(str(config['commands'])))
 
-        if 'script' not in config:
-            config['script'] = False
         return config
 
     @staticmethod

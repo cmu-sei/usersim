@@ -7,6 +7,7 @@ import time
 
 import paramiko
 
+import api
 from tasks import task
 
 
@@ -124,37 +125,21 @@ class SSH(task.Task):
                 key: value requirement
 
         Returns:
-            dict: The dict given as the conf_dict argument with missing optional parameters added with default values.
+            dict: The dict given as the config argument with missing optional parameters added with default values.
         """
-        params = cls.parameters()
-        reqd_params = params['required']
-        for key in reqd_params:
-            if key not in config:
-                raise KeyError(key)
+        defaults = {'port': 22,
+                    'policy': 'Warning'}
+        config = api.check_config(config, cls.parameters(), defaults)
 
-        for key in ['host', 'user', 'password']:
-            if type(config[key]) != str:
-                raise ValueError(key + ': {} Must be a string'.format(str(config[key])))
         if not config['host']:
             raise ValueError('host: {} Must be non-empty'.format(str(config['host'])))
-        if type(config['command_list']) != list:
-            raise ValueError('command_list: {} Must be a list of strings'.format(str(config['command_list'])))
         if not config['command_list']:
             raise ValueError('command_list: {} Must be non-empty'.format(str(config['host'])))
-        for command in config['command_list']:
-            if type(command) != str:
-                raise ValueError('command_list: {} Must be a list of strings'.format(str(config['command_list'])))
 
-        if 'policy' not in config:
-            config['policy'] = 'Warning'
-        if 'port' not in config:
-            config['port'] = 22
         if config['policy'] not in ['AutoAdd', 'Reject', 'Warning']:
             raise ValueError('policy: {} Must be one of "AutoAdd", "Reject", '
                              'or "Warning"'.format(str(config['policy'])))
-        if type(config['port']) != int:
-            raise ValueError('port: {} Must be an int'.format(str(config['port'])))
-        if config['port'] < 1 or config['port'] > 65536:
-            raise ValueError('port: {} Must be in the range [1, 65536]'.format(str(config['port'])))
+        if config['port'] < 1 or config['port'] > 65535:
+            raise ValueError('port: {} Must be in the range [1, 65535]'.format(str(config['port'])))
 
         return config

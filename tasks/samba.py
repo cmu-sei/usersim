@@ -8,6 +8,7 @@ import time
 from smb.SMBConnection import SMBConnection
 from smb.smb_structs import OperationFailure
 
+import api
 from tasks import task
 
 
@@ -95,45 +96,18 @@ class Samba(task.Task):
                 key: value requirement
 
         Returns:
-            dict: The dict given as the conf_dict argument with missing optional parameters added with default values.
+            dict: The dict given as the config argument with missing optional parameters added with default values.
         """
-        if 'address' not in config:
-            raise KeyError('address')
-        if not isinstance(config['address'], str):
-            raise ValueError('address: {} Must be a string'.format(str(config['address'])))
+        defaults = {'port': 445,
+                    'user': '',
+                    'password': '',
+                    'upload': False,
+                    'files': [],
+                    'write_dir': ''}
+        config = api.check_config(config, cls.parameters(), defaults)
 
-        if 'port' not in config:
-            config['port'] = 445
-        if not isinstance(config['port'], int):
-            raise ValueError('port: {} Must be an int'.format(str(config['port'])))
         if config['port'] < 0 or config['port'] > 65535:
             raise ValueError('port: {} Must be in the range [0, 65535]'.format(str(config['port'])))
-
-        if 'user' not in config:
-            config['user'] = ''
-        if not isinstance(config['user'], str):
-            raise ValueError('user: {} Must be a string'.format(str(config['user'])))
-
-        if 'password' not in config:
-            config['password'] = ''
-        if not isinstance(config['password'], str):
-            raise ValueError('password: {} Must be a string'.format(str(config['password'])))
-
-        if 'upload' not in config:
-            config['upload'] = False
-
-        if 'files' not in config:
-            config['files'] = []
-        if not isinstance(config['files'], list):
-            raise ValueError('files: {} Must be a list of strings'.format(str(config['files'])))
-        for file in config['files']:
-            if not isinstance(file, str):
-                raise ValueError('files: {} Must be a list of strings'.format(str(config['files'])))
-
-        if 'write_dir' not in config:
-            config['write_dir'] = ''
-        if not isinstance(config['write_dir'], str):
-            raise ValueError('write_dir: {} Must be a string'.format(str(config['write_dir'])))
 
         return config
 
