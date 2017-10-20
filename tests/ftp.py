@@ -2,11 +2,11 @@
 # June 16, 2017
 # Tests for FTP module for UserSim. Makes sure that FTP rejects incorrect configs and accepts correct configs. Prints
 # output from correct configs.
-
 import api
 import usersim
 
-def testbad_key_cases(task, bad_key_cases):
+
+def test_bad_key_cases(task, bad_key_cases):
     """ Used to test configs with missing keys. This function will raise an assertion error if validate incorrectly
     accepts a bad config dictionary.
 
@@ -25,7 +25,7 @@ def testbad_key_cases(task, bad_key_cases):
         except KeyError:
             print('Correctly rejected %s' % config_name)
 
-def testbad_value_cases(task, bad_value_cases):
+def test_bad_value_cases(task, bad_value_cases):
     """ Used to test configs with invalid values. This function will raise an assertion error if validate incorrectly
     accepts a bad config dictionary.
 
@@ -57,10 +57,6 @@ def test_good_cases(task, good_cases):
         sim = usersim.UserSim(True)
         api.new_task(task)
         print('Correctly accepted %s' % config_name)
-        #result = sim.cycle()
-        #if result:
-        #    print('    Feedback from task:')
-        #    print('    %s' % str(result))
 
 def run_test():
     task = {'type': 'ftp', 'config': None}
@@ -79,8 +75,8 @@ def run_test():
     good_cases = [('missing_opts', missing_opts),
                   ('missing_password', missing_password),
                   ('complete_config', complete_config)]
-    testbad_key_cases(task, bad_key_cases)
-    testbad_value_cases(task, bad_value_cases)
+    test_bad_key_cases(task, bad_key_cases)
+    test_bad_value_cases(task, bad_value_cases)
     test_good_cases(task, good_cases)
 
 if __name__ == '__main__':

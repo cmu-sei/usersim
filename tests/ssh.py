@@ -2,9 +2,9 @@
 # June 16, 2017
 # Tests for SSH module for UserSim. Makes sure that SSH rejects incorrect configs and accepts correct configs. Prints
 # output from correct configs.
-
 import api
 import usersim
+
 
 def test_bad_key_cases(task, bad_key_cases):
     """ Used to test configs with missing keys. This function will raise an assertion error if validate incorrectly
@@ -56,9 +56,6 @@ def test_good_cases(task, good_cases):
         task['config'] = config
         sim = usersim.UserSim(True)
         api.validate_config(task)
-        #result = sim.cycle()
-        #for item in result:
-        #    print(item)
         print('Correctly accepted %s' % config_name)
 
 def run_test():

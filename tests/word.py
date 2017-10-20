@@ -7,6 +7,7 @@ import platform
 import api
 import usersim
 
+
 def test_bad_value_cases(task, bad_value_cases):
     """ Used to test configs with invalid values. This function will raise an assertion error if validate incorrectly
     accepts a bad config dictionary.
