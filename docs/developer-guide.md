@@ -24,6 +24,11 @@ with Office. You will also need Outlook Redemption installed in order to interac
 get Redemption under a developer license for no charge from the official website which is
 <http://www.dimastr.com/redemption/home.htm> as of this writing.
 
+You must also get the `geckodriver` for Firefox from <https://github.com/mozilla/geckodriver/releases>. If you are
+targeting an older version of Firefox, you may need an older version of the driver, as well as to get a corresponding
+version of the `selenium` library. The `geckodriver` binaries will need to be put in the `geckodriver/` directory (see
+`geckodriver/README.md` for naming).
+
 ## Environment
 
 You may have your Python interpreter installed in any manner you'd like. However, as a recommendation of good practice,
