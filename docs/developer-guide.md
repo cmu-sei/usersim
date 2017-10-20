@@ -762,8 +762,17 @@ your task from running on different platforms.
 
 There is a `tests` directory in the source tree, in which a number of test modules exist. The only defined
 structure is that there exists a `run_test` function in a test file. This test may cover nearly anything, but
-generally should be limited to things that are testable programmatically, such as configuration. If you want to
-implement a test for your task, take a look at some of the existing tests for other tasks.
+generally should be limited to things that are testable programmatically without network dependencies, such as 
+configuration. If you want to implement a test for your task, take a look at some of the existing tests for other tasks.
+
+**Note that if your task only runs on a specific platform, say Windows, your test must check if it is running on the
+right platform, and return if not.** This is typically done with a call to `platform.system()`, but this is up to you.
+
+Example:
+```
+if not platform.system() == 'Windows':
+    return
+```
 
 # Building the UserSim
 
