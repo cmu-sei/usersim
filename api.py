@@ -165,7 +165,8 @@ def check_config(config, parameters, defaults):
             description string in parameters.
 
     Raises:
-        TypeError:
+        KeyError: If a key is missing from config. Exception message is the missing key.
+        ValueError: If any parameter's value is invalid. Exception message is the reason it is invalid.
 
     Returns:
         dict: config with its parameters type-checked, and missing optional values inserted.
