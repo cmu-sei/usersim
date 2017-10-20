@@ -50,11 +50,11 @@ class Telnet(task.Task):
 
     @classmethod
     def parameters(cls):
-        parameters = {'required': {'host': 'str: host to connect to',
-                                   'username': 'str: username to connect with',
-                                   'password': 'str: password to connect with',
-                                   'commandlist': 'list: list of commands to send over telnet'},
-                      'optional': {'port': 'int: port to connect on, default 23'}}
+        parameters = {'required': {'host': 'str| host to connect to',
+                                   'username': 'str| username to connect with',
+                                   'password': 'str| password to connect with',
+                                   'commandlist': '[str]| commands to send'},
+                      'optional': {'port': 'int| port to connect on, default 23'}}
 
         return parameters
 

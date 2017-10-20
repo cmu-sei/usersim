@@ -251,15 +251,15 @@ class Outlook(task.Task):
 
         required = {}
 
-        optional = {'unread': 'bool: Read only unread messages if True, otherwise read all messages. (default True)',
-                    'open_links': 'int: Percent chance to open any given link. (default 0)',
-                    'open_attachments': 'int: Percent chance to open any attachment. (default 0)',
-                    'delete_handled': 'bool: Delete handled emails if True, otherwise do not delete. (default False)',
-                    'display_messages': 'bool: Display messages visually if True, otherwise do not. (default False)',
-                    'nuke_outlook': 'bool: Empty Outlook folders if True, otherwise do not. (default False)',
-                    'nuke_folders': 'list(str): If nuke_outlook is True, specifies a list of folders to empty. Optional'
+        optional = {'unread': 'bool| Read only unread messages if True, otherwise read all messages. (default True)',
+                    'open_links': 'int| Percent chance to open any given link. (default 0)',
+                    'open_attachments': 'int| Percent chance to open any attachment. (default 0)',
+                    'delete_handled': 'bool| Delete handled emails if True, otherwise do not delete. (default False)',
+                    'display_messages': 'bool| Display messages visually if True, otherwise do not. (default False)',
+                    'nuke_outlook': 'bool| Empty Outlook folders if True, otherwise do not. (default False)',
+                    'nuke_folders': '[str]| If nuke_outlook is True, specifies a list of folders to empty. Optional'
                                     ' even when nuke_outlook is True. If nuke_outlook is False, this does nothing.',
-                    'regexes': 'dict(str, task): A dictionary mapping a regular expression string to a Task '
+                    'regexes': '{str: task}| A dictionary mapping a regular expression string to a Task '
                                'configuration. If the regex finds a match in an email, the associated task is spawned.'}
 
         config['required'] = required

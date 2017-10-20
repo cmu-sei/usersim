@@ -52,9 +52,9 @@ class Frequency(task.Task):
                 containing the required and optional parameters and their descriptions for the Frequency task,
                 respectively.
         """
-        params = {'required': {'task': 'the configuration of another task',
-                               'frequency': 'positive decimal number - avg number of triggers per hour',
-                               'repetitions': 'non-negative integer - 0 for unlimited'},
+        params = {'required': {'task': 'task| the configuration of another task',
+                               'frequency': 'number| positive decimal number - avg number of triggers per hour',
+                               'repetitions': 'int| non-negative integer - 0 for unlimited'},
                   'optional': {}}
 
         return params

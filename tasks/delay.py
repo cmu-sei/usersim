@@ -22,11 +22,11 @@ class Delay(attime.AtTime):
 
     @classmethod
     def parameters(cls):
-        required = {'task': 'task: The task to be triggered'}
-        optional = {'days': 'int: Number of days to delay the nested task. Must not be negative. Default 0.',
-                    'hours': 'int: Number of hours to delay the nested task. Must not be negative. Default 0.',
-                    'minutes': 'int: Number of minutes to delay the nested task. Must not be negative. Default 0.',
-                    'seconds': 'int: Number of seconds to delay the nested task. Must not be negative. Default 0.'}
+        required = {'task': 'task| The task to be triggered'}
+        optional = {'days': 'int| Number of days to delay the nested task. Must not be negative. Default 0.',
+                    'hours': 'int| Number of hours to delay the nested task. Must not be negative. Default 0.',
+                    'minutes': 'int| Number of minutes to delay the nested task. Must not be negative. Default 0.',
+                    'seconds': 'int| Number of seconds to delay the nested task. Must not be negative. Default 0.'}
         return {'required': required, 'optional': optional}
 
     @classmethod

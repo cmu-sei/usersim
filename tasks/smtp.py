@@ -65,19 +65,19 @@ class SMTP(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {'required': {'email_addr': 'str: E-mail address from which e-mails are sent, e.g. user@example.com',
-                               'destinations': 'list: A list of e-mail addresses (strings) to send e-mails to. One will'
+        params = {'required': {'email_addr': 'str| E-mail address from which e-mails are sent, e.g. user@example.com',
+                               'destinations': '[str]| A list of e-mail addresses to send e-mails to. One will'
                                                ' be chosen at random.',
-                               'mail_server': 'str: Hostname of the e-mail server to use, with port optionally '
+                               'mail_server': 'str| Hostname of the e-mail server to use, with port optionally '
                                               'specified by a colon. Port defalts to 25.'},
-                  'optional': {'messages': 'list: A list of messages (strings) to form the body of an e-mail. One will '
+                  'optional': {'messages': '[str]| A list of messages to form the body of an e-mail. One will '
                                            'be chosen at random. Default behavior is to randomly generate messages.',
-                               'subjects': 'list: a list of subjects (strings) to form the subject of an e-mail. One '
+                               'subjects': '[str]| a list of subjects to form the subject of an e-mail. One '
                                            'will be chosen at random. Default behavior is to randomly generate subject '
                                            'headers.',
-                               'encrypt': 'bool: Whether to use SSL encryption when connecting to the e-mail server. '
+                               'encrypt': 'bool| Whether to use SSL encryption when connecting to the e-mail server. '
                                           'Defaults to False.',
-                               'port': 'int: Mail server port. Default is 25.'}}
+                               'port': 'int| Mail server port. Default is 25.'}}
 
         return params
 

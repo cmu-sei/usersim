@@ -76,13 +76,13 @@ class OutlookSend(outlook.Outlook):
         """
         config = {}
 
-        required = {'username': 'str: The "From" address.',
-                    'destination': 'str: The "To" address.',
-                    'subject': 'str: Subject line. Specify empty string if optional parameter "dynamic" is used.',
-                    'body': 'str: Message body. Specify empty string if optional parameter "dynamic" is used.'}
+        required = {'username': 'str| The "From" address.',
+                    'destination': 'str| The "To" address.',
+                    'subject': 'str| Subject line. Specify empty string if optional parameter "dynamic" is used.',
+                    'body': 'str| Message body. Specify empty string if optional parameter "dynamic" is used.'}
 
-        optional = {'attachments': 'list(str): A list of paths to files that should be attached.',
-                    'dynamic': 'bool: Generate subject and body. Default False.'}
+        optional = {'attachments': '[str]| A list of paths to files that should be attached.',
+                    'dynamic': 'bool| Generate subject and body. Default False.'}
 
 
         config['required'] = required

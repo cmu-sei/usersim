@@ -63,18 +63,18 @@ class Samba(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {'required': {'address': 'str: the Samba server address'},
-                  'optional': {'port': 'int: the port for the Samba server. Defaults to 445',
-                               'user': 'str: a username to authenticate with the server if necessary',
-                               'password': 'str: password for user',
-                               'upload': 'bool: True to use the files parameter as a list of local files to upload, '
+        params = {'required': {'address': 'str| the Samba server address'},
+                  'optional': {'port': 'int| the port for the Samba server. Defaults to 445',
+                               'user': 'str| a username to authenticate with the server if necessary',
+                               'password': 'str| password for user',
+                               'upload': 'bool| True to use the files parameter as a list of local files to upload, '
                                          'False to use the files parameter as a list of remote files to download. '
                                          'Default False',
-                               'files': 'list: a list of file paths (strings) to download from the Samba share if '
+                               'files': '[str]| a list of file paths (strings) to download from the Samba share if '
                                         'upload is False, otherwise a list of local paths to upload. If not '
                                         'specified, the task will send SMB Echo requests with random strings instead. '
                                         'It is best to use forward slashes (/) to specify paths, even on Windows',
-                               'write_dir': 'str: A writeable path. If upload is False, then this is a local path in '
+                               'write_dir': 'str| A writeable path. If upload is False, then this is a local path in '
                                             'which files will be downloaded. If upload is True, then this is a remote '
                                             'path (including the share name) on the remote Samba server. If not '
                                             'specified, then downloads will not save downloaded files to the disk, and'

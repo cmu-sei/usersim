@@ -283,7 +283,7 @@ will (obviously) need to import the `tasks.task` module in order to create a sub
 The following methods are **required** to be implemented, but it is highly encouraged to make your code as modular
 and clean as possible by breaking more complex behavior into separate methods.
 
-## \_\_init\_\_
+## __init__
 
 As with any Python class, the `__init__` method is your constructor. All `Task` subclasses have an
 `__init__` method that takes a `config` argument. This argument is a config dictionary that is
@@ -299,7 +299,7 @@ Args:
 """
 ```
 
-## \_\_call\_\_
+## __call__
 
 `__call__` is known as a magic method. A class implementing this method becomes callable, but you don't really
 need to worry about what that means in order to write a task. This method is called each time the UserSim cycles, until
@@ -346,25 +346,25 @@ Returns:
 
 This method returns what amounts to a specification for the task's config dictionary. The intention was to have a
 dictionary with two keys, 'required' and 'optional', each with dictionaries holding the required and optional keys,
-respectively, and their human-readable description. Your description string should be prefixed with
-a type specification, followed by a ':' (colon) character. **This also means you must not use the ':' character later in 
-string.** For example:
+respectively, and their human-readable description. Your description string should be prefixed with a type 
+specification, followed by a '|' (pipe) character. This is the character you get by pressing shift and the key above 
+Enter. For example:
 
 ```
-required = {'a_number': 'int: A number to use, for reasons.'}
+required = {'a_number': 'int| A number to use, for reasons.'}
 ```
 
 To be more specific, this type specification is YAML format. It's best to use compact YAML, however. Specifically, if
 one of your keys takes a list of strings, your type specification would simply be:
 
 ```
-'somekey': '[str]: Describe what this key is for and any additional constraints.'
+'somekey': '[str]| Describe what this key is for and any additional constraints.'
 ```
 
 A dict whose keys are ints and whose values are bools would be as follows:
 
 ```
-'anotherkey': '{int: bool}: Describe what this dict is used for and any additional'
+'anotherkey': '{int: bool}| Describe what this dict is used for and any additional'
     ' constraints on it.'
 ```
 

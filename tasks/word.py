@@ -75,13 +75,13 @@ class Word(task.Task):
                 descriptions and requirements for each key as values.
         """
         params = {'required': {},
-                  'optional': {'text_source': 'str: Name of the file to source text from. Defaults to '
+                  'optional': {'text_source': 'str| Name of the file to source text from. Defaults to '
                                            'aliceinwonderland.txt',
-                               'file_types': 'list: A list of strings representing different filetypes to save the '
+                               'file_types': '[str]| A list of strings representing different filetypes to save the '
                                             'document as, e.g. ["docx", "dotm"]. Defaults to ["docx"].',
-                               'new_doc': 'bool: Create a new document if True, otherwise modify an existing doc, if '
+                               'new_doc': 'bool| Create a new document if True, otherwise modify an existing doc, if '
                                           'there is one. Defaults to True.',
-                               'cleanup': 'bool: If True, delete the file created by this task on completion. Defaults'
+                               'cleanup': 'bool| If True, delete the file created by this task on completion. Defaults'
                                           ' to False.'}}
         return params
 

@@ -58,8 +58,8 @@ class Shell(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {'required': {'commands': 'list: A list of strings to send as commands, ex. ["ls -la", "cat README"]'},
-                  'optional': {'script': 'bool: If True, execute the commands in order.'}}
+        params = {'required': {'commands': '[str]| A list of strings to send as commands, ex. ["ls -l", "cat README"]'},
+                  'optional': {'script': 'bool| If True, execute the commands in order.'}}
         return params
 
     @classmethod

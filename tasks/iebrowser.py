@@ -171,8 +171,8 @@ class IEBrowser(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {'required': {'sites': 'list: List of websites (strings) to visit.'},
-                  'optional': {'close_browser': 'bool: If True, the browser window will close after visiting a website.'
+        params = {'required': {'sites': 'list| List of websites (strings) to visit.'},
+                  'optional': {'close_browser': 'bool| If True, the browser window will close after visiting a website.'
                                                 ' Defaults to False.'}}
         return params
 

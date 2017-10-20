@@ -40,7 +40,7 @@ class Sequence(task.Task):
 
     @classmethod
     def parameters(cls):
-        required = {'tasks': '[task]: A list of tasks. Must contain at least two tasks.'}
+        required = {'tasks': '[task]| A list of tasks. Must contain at least two tasks.'}
         optional = {}
 
         return {'required': required, 'optional': optional}

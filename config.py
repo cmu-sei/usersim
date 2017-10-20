@@ -262,12 +262,12 @@ def validate(config, required_, optional_, defaults):
     optional = {}
 
     for key, value in required_.items():
-        type_string = value.rsplit(':', 1)[0].strip()
+        type_string = value.split('|', 1)[0].strip()
         type_tree = yaml.load(type_string)
         required[key] = parse_item(type_tree)
 
     for key, value in optional_.items():
-        type_string = value.rsplit(':', 1)[0].strip()
+        type_string = value.split('|', 1)[0].strip()
         type_tree = yaml.load(type_string)
         optional[key] = parse_item(type_tree)
 

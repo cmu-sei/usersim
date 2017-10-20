@@ -53,11 +53,11 @@ class FTP(task.Task):
                 descriptions and requirements for each key as values.
         """
         params = {'required': {
-                    'site': 'str: ftp server to access',
-                    'file': 'str: Name of file to download'},
+                    'site': 'str| ftp server to access',
+                    'file': 'str| Name of file to download'},
                   'optional': {
-                    'user': 'str: user to log in with. Defaults to "anonymous"',
-                    'password': 'str: password to log in with. If user is "anonymous", password defaults to '
+                    'user': 'str| user to log in with. Defaults to "anonymous"',
+                    'password': 'str| password to log in with. If user is "anonymous", password defaults to '
                                 '"anonymous@". If user is not "anonymous", defaults to empty string.'}}
         return params
 

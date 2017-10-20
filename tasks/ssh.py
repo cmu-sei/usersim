@@ -102,12 +102,12 @@ class SSH(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {'required': {'host': 'the hostname to connect to, ex. "io.smashthestack.org"',
-                               'user': 'username to login with, ex. "level1"',
-                               'password': 'password to login with, ex. "level1"',
-                               'command_list': 'list of strings to send as commands, ex. ["ls -la", "cat README"]'},
-                  'optional': {'port': 'the port on which to connect to the SSH server, ex. 22.  Default is 22',
-                               'policy': 'which policy to adopt in regards to missing host keys, should be one of '
+        params = {'required': {'host': 'str| the hostname to connect to, ex. "io.smashthestack.org"',
+                               'user': 'str| username to login with, ex. "level1"',
+                               'password': 'str| password to login with, ex. "level1"',
+                               'command_list': '[str]| commands to send, ex. ["ls -la", "cat README"]'},
+                  'optional': {'port': 'int| the port on which to connect to the SSH server, ex. 22.  Default is 22',
+                               'policy': 'str| which policy to adopt in regards to missing host keys, should be one of '
                                          'AutoAdd, Reject, or Warning. Default is Warning'}}
         return params
 
