@@ -2,4 +2,4 @@ import os
 
 
 def lookup(var_name):
-    return os.environ.get(var_name, str())
+    return os.environ.get(var_name, '')

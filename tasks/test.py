@@ -24,7 +24,7 @@ class Test(task.Task):
     @classmethod
     def parameters(cls):
         print('%s parameters class method called.' % cls)
-        return dict()
+        return {'required': {}, 'optional': {}}
 
     @classmethod
     def validate(cls, config):

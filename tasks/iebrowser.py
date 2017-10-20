@@ -98,7 +98,7 @@ class IEManager(object):
         """ Create an instance of Internet Explorer.
         """
         pythoncom.CoInitialize()
-        cls._ie = win32com.client.gencache.EnsureDispatch("InternetExplorer.Application")
+        cls._ie = win32com.client.gencache.EnsureDispatch('InternetExplorer.Application')
         cls._ie.Visible = True
 
     @classmethod
@@ -130,7 +130,7 @@ class IEBrowser(task.Task):
         """
         if not platform.system() == 'Windows':
             raise OSError('This task is only compatible with Windows.')
-        self._config = self.validate(config)
+        self._config = config
         IEManager()
 
     def __call__(self):
@@ -159,7 +159,7 @@ class IEBrowser(task.Task):
         Returns:
             str: An arbitrary string giving more detailed, task-specific status for the given task.
         """
-        return str()
+        return ''
 
     @classmethod
     def parameters(cls):
@@ -171,8 +171,8 @@ class IEBrowser(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {'required': {'sites': 'list: List of websites (strings) to visit.'},
-                  'optional': {'close_browser': 'bool: If True, the browser window will close after visiting a website.'
+        params = {'required': {'sites': 'list| Possible websites to visit. One is chosen at random.'},
+                  'optional': {'close_browser': 'bool| If True, the browser window will close after visiting a website.'
                                                 ' Defaults to False.'}}
         return params
 
@@ -192,19 +192,9 @@ class IEBrowser(task.Task):
         Returns:
             dict: The dict given as the config argument with missing optional parameters added with default values.
         """
-        if 'sites' not in config:
-            raise KeyError('sites')
-        if not isinstance(config['sites'], list):
-            raise ValueError('sites: {} Must be a list of strings'.format(str(config['sites'])))
+        config = api.check_config(config, cls.parameters(), {'close_browser': False})
+
         if not config['sites']:
             raise ValueError('sites: {} Must be non-empty'.format(str(config['sites'])))
-        for site in config['sites']:
-            if not isinstance(site, str):
-                raise ValueError('sites: {} Must be a list of strings'.format(str(config['sites'])))
-
-        if 'close_browser' not in config:
-            config['close_browser'] = False
-        if not isinstance(config['close_browser'], bool):
-            raise ValueError('close_browser: {} Must be a bool'.format(str(config['close_browser'])))
 
         return config

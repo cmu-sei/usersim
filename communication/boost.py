@@ -31,8 +31,8 @@ class BoostCommunication(object):
             None: If no (valid) messages are available.
             list of dicts: See config.string_to_python
         """
-        message = str()
-        last_error = str()
+        message = ''
+        last_error = ''
 
         while True:
             # Need to stitch messages together if a config is too large for the message queue.

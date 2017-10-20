@@ -2,17 +2,17 @@
 # June 16, 2017
 # Tests for SSH module for UserSim. Makes sure that SSH rejects incorrect configs and accepts correct configs. Prints
 # output from correct configs.
-
 import api
 import usersim
+
 
 def test_bad_key_cases(task, bad_key_cases):
     """ Used to test configs with missing keys. This function will raise an assertion error if validate incorrectly
     accepts a bad config dictionary.
 
     Args:
-        task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        bad_key_cases: A list of tuples of the form ("config_name", config). config should be missing at least one key.
+        task: A task dictionary mapping 'type' to the task name (e.g. 'ssh')
+        bad_key_cases: A list of tuples of the form ('config_name', config). config should be missing at least one key.
 
     Raises:
         AssertionError: If api.new_task does not raise a KeyError
@@ -30,8 +30,8 @@ def test_bad_value_cases(task, bad_value_cases):
     accepts a bad config dictionary.
 
     Args:
-        task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        bad_value_cases: A list of tuples of the form ("config_name", config). config should have at least one invalid
+        task: A task dictionary mapping 'type' to the task name (e.g. 'ssh')
+        bad_value_cases: A list of tuples of the form ('config_name', config). config should have at least one invalid
             value.
 
     Raises:
@@ -49,16 +49,13 @@ def test_good_cases(task, good_cases):
     """ Used to test properly formatted configs.
 
     Args:
-        task: A task dictionary mapping "type" to the task name (e.g. "ssh")
-        good_cases: A list of tuples of the form ("config_name, config"). config should be properly formatted.
+        task: A task dictionary mapping 'type' to the task name (e.g. 'ssh')
+        good_cases: A list of tuples of the form ('config_name, config'). config should be properly formatted.
     """
     for config_name, config in good_cases:
         task['config'] = config
         sim = usersim.UserSim(True)
-        api.new_task(task)
-        #result = sim.cycle()
-        #for item in result:
-        #    print(item)
+        api.validate_config(task)
         print('Correctly accepted %s' % config_name)
 
 def run_test():
@@ -87,10 +84,10 @@ def run_test():
             'user': 'admin',
             'password': 'badpassword',
             'command_list': ['echo hello'],
-            'port': str()
+            'port': ''
             }
     blank_host = {
-            'host': str(),
+            'host': '',
             'user': 'admin',
             'password': 'badpassword',
             'command_list': ['echo hello']
@@ -103,15 +100,15 @@ def run_test():
             'policy': 'AutoBAD'
             }
     missing_opts = {
-            'host': '',
-            'user': '',
-            'password': '',
+            'host': 'localhost',
+            'user': 'test',
+            'password': 'test',
             'command_list': ['echo hello', 'ls', 'exit']
             }
     good_config = {
-            'host': '',
-            'user': '',
-            'password': '',
+            'host': 'localhost',
+            'user': 'test',
+            'password': 'test',
             'command_list': ['echo hello', 'ls', 'exit'],
             'port': 22,
             'policy': 'AutoAdd'

@@ -1,6 +1,7 @@
 import telnetlib
 import time
 
+import api
 from tasks import task
 
 
@@ -8,7 +9,7 @@ class Telnet(task.Task):
     """ Connect to the configured machine and send it a list of commands via Telnet.
     """
     def __init__(self, config):
-        self._config = self.validate(config)
+        self._config = config
 
     def __call__(self):
         self.telnet_to(self._config['host'],
@@ -30,7 +31,7 @@ class Telnet(task.Task):
         return True
 
     def status(self):
-        return str()
+        return ''
 
     def telnet_to(self, hostname, port, username, password, commandlist):
         telnetclient = telnetlib.Telnet(hostname, port, 10)
@@ -50,37 +51,14 @@ class Telnet(task.Task):
 
     @classmethod
     def parameters(cls):
-        parameters = {'required': {'host': 'str: host to connect to',
-                                   'username': 'str: username to connect with',
-                                   'password': 'str: password to connect with',
-                                   'commandlist': 'list: list of commands to send over telnet'},
-                      'optional': {'port': 'int: port to connect on, default 23'}}
+        parameters = {'required': {'host': 'str| host to connect to',
+                                   'username': 'str| username to connect with',
+                                   'password': 'str| password to connect with',
+                                   'commandlist': '[str]| commands to send'},
+                      'optional': {'port': 'int| port to connect on, default 23'}}
 
         return parameters
 
     @classmethod
-    def validate(cls, conf_dict):
-        parameters = cls.parameters()
-        required = parameters['required']
-        optional = parameters['optional']
-
-        for item in required:
-            if item not in conf_dict:
-                raise KeyError(item)
-
-        for item in ['host', 'username', 'password']:
-            if not isinstance(conf_dict[item], str):
-                raise ValueError(item + ': {} Must be string'.format(str(conf_dict[item])))
-
-        if not isinstance(conf_dict['commandlist'], list):
-            raise ValueError('commandlist: {} Must be list of strings'.format(str(conf_dict['commandlist'])))
-        for item in conf_dict['commandlist']:
-            if not isinstance(item, str):
-                raise ValueError('commandlist: {} Must be list of strings'.format(str(conf_dict['commandlist'])))
-
-        if 'port' not in conf_dict:
-            conf_dict['port'] = 23
-        elif not isinstance(conf_dict['port'], int):
-            raise ValueError('port: {} Must be an int.'.format(str(conf_dict['port'])))
-
-        return conf_dict
+    def validate(cls, config):
+        return api.check_config(config, cls.parameters(), {'port': 23})

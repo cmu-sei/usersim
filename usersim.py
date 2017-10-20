@@ -29,15 +29,15 @@ class _UserSim(object):
     def __init__(self):
         self._feedback_queue = queue.Queue()
 
-        self._scheduled = dict()
-        self._paused = dict()
+        self._scheduled = {}
+        self._paused = {}
 
         # Used in order to keep the sanity checks in _resolve_actions.
-        self._new = dict()
+        self._new = {}
 
-        self._to_schedule = dict()
-        self._to_pause = dict()
-        self._to_stop = dict()
+        self._to_schedule = {}
+        self._to_pause = {}
+        self._to_stop = {}
 
         # Works around the problems with initializing some tasks from threads that are not the main thread, such as
         # Outlook.
@@ -77,11 +77,11 @@ class _UserSim(object):
                 # Manually set the state to stopped because the final status will still say the task is scheduled.
                 final_status = self.status_task(task_id)
                 final_status['state'] = States.STOPPED
-                self._add_feedback(final_status, str())
+                self._add_feedback(final_status, '')
 
                 self.stop_task(task_id)
 
-        feedback = list()
+        feedback = []
         while not self._feedback_queue.empty():
             feedback.append(self._feedback_queue.get())
         return feedback
@@ -134,7 +134,7 @@ class _UserSim(object):
                 'state':str
                 'status':str
         """
-        status_list = list()
+        status_list = []
 
         with self._operation_lock:
             for key in self._scheduled:
@@ -277,7 +277,7 @@ class _UserSim(object):
         """
         assert task_id > 0
 
-        status_dict = dict()
+        status_dict = {}
 
         if task_id in self._to_schedule:
             task = self._to_schedule[task_id]
@@ -393,7 +393,7 @@ class _UserSim(object):
                 assert task_ is task
                 assert task_id not in self._paused
                 self._paused[task_id] = task
-            self._to_pause = dict()
+            self._to_pause = {}
 
             for task_id, task in self._to_schedule.items():
                 # As above, if the following three lines raise, something is wrong.
@@ -405,7 +405,7 @@ class _UserSim(object):
                 assert task_ is task
                 assert task_id not in self._scheduled
                 self._scheduled[task_id] = task
-            self._to_schedule = dict()
+            self._to_schedule = {}
 
             for task_id, task in self._to_stop.items():
                 task_ = self._scheduled.pop(task_id, None)
@@ -424,7 +424,7 @@ class _UserSim(object):
                     status = self._status_single(task_id)
                     self._add_feedback(status, 'Exception while calling task cleanup:\n\n' + traceback.format_exc())
 
-            self._to_stop = dict()
+            self._to_stop = {}
 
     @staticmethod
     def _new_id():

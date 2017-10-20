@@ -8,6 +8,7 @@ import time
 from smb.SMBConnection import SMBConnection
 from smb.smb_structs import OperationFailure
 
+import api
 from tasks import task
 
 
@@ -17,7 +18,7 @@ class Samba(task.Task):
     guests can upload files to it!
     """
     def __init__(self, config, debug=False):
-        self._config = self.validate(config)
+        self._config = config
         self._smb_con = None
         self._debug = debug
 
@@ -51,7 +52,7 @@ class Samba(task.Task):
         Returns:
             str: An arbitrary string giving more detailed, task-specific status for the given task.
         """
-        return str()
+        return ''
 
     @classmethod
     def parameters(cls):
@@ -63,18 +64,18 @@ class Samba(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {'required': {'address': 'str: the Samba server address'},
-                  'optional': {'port': 'int: the port for the Samba server. Defaults to 445',
-                               'user': 'str: a username to authenticate with the server if necessary',
-                               'password': 'str: password for user',
-                               'upload': 'bool: True to use the files parameter as a list of local files to upload, '
+        params = {'required': {'address': 'str| the Samba server address'},
+                  'optional': {'port': 'int| the port for the Samba server. Defaults to 445',
+                               'user': 'str| a username to authenticate with the server if necessary',
+                               'password': 'str| password for user',
+                               'upload': 'bool| True to use the files parameter as a list of local files to upload, '
                                          'False to use the files parameter as a list of remote files to download. '
                                          'Default False',
-                               'files': 'list: a list of file paths (strings) to download from the Samba share if '
+                               'files': '[str]| a list of file paths (strings) to download from the Samba share if '
                                         'upload is False, otherwise a list of local paths to upload. If not '
                                         'specified, the task will send SMB Echo requests with random strings instead. '
                                         'It is best to use forward slashes (/) to specify paths, even on Windows',
-                               'write_dir': 'str: A writeable path. If upload is False, then this is a local path in '
+                               'write_dir': 'str| A writeable path. If upload is False, then this is a local path in '
                                             'which files will be downloaded. If upload is True, then this is a remote '
                                             'path (including the share name) on the remote Samba server. If not '
                                             'specified, then downloads will not save downloaded files to the disk, and'
@@ -95,45 +96,18 @@ class Samba(task.Task):
                 key: value requirement
 
         Returns:
-            dict: The dict given as the conf_dict argument with missing optional parameters added with default values.
+            dict: The dict given as the config argument with missing optional parameters added with default values.
         """
-        if 'address' not in config:
-            raise KeyError('address')
-        if not isinstance(config['address'], str):
-            raise ValueError('address: {} Must be a string'.format(str(config['address'])))
+        defaults = {'port': 445,
+                    'user': '',
+                    'password': '',
+                    'upload': False,
+                    'files': [],
+                    'write_dir': ''}
+        config = api.check_config(config, cls.parameters(), defaults)
 
-        if 'port' not in config:
-            config['port'] = 445
-        if not isinstance(config['port'], int):
-            raise ValueError('port: {} Must be an int'.format(str(config['port'])))
         if config['port'] < 0 or config['port'] > 65535:
             raise ValueError('port: {} Must be in the range [0, 65535]'.format(str(config['port'])))
-
-        if 'user' not in config:
-            config['user'] = ''
-        if not isinstance(config['user'], str):
-            raise ValueError('user: {} Must be a string'.format(str(config['user'])))
-
-        if 'password' not in config:
-            config['password'] = ''
-        if not isinstance(config['password'], str):
-            raise ValueError('password: {} Must be a string'.format(str(config['password'])))
-
-        if 'upload' not in config:
-            config['upload'] = False
-
-        if 'files' not in config:
-            config['files'] = []
-        if not isinstance(config['files'], list):
-            raise ValueError('files: {} Must be a list of strings'.format(str(config['files'])))
-        for file in config['files']:
-            if not isinstance(file, str):
-                raise ValueError('files: {} Must be a list of strings'.format(str(config['files'])))
-
-        if 'write_dir' not in config:
-            config['write_dir'] = str()
-        if not isinstance(config['write_dir'], str):
-            raise ValueError('write_dir: {} Must be a string'.format(str(config['write_dir'])))
 
         return config
 
@@ -141,7 +115,7 @@ class Samba(task.Task):
         """ Send an echo request to the server with a randomly-generated string.
         """
         length = random.randint(1, 100)
-        data = str()
+        data = ''
 
         for _ in range(length):
             data += random.choice('abcdefghijklmnopqrstuvwxyz')
@@ -157,7 +131,7 @@ class Samba(task.Task):
                 failures.
         """
         file_paths = self._config['files']
-        failures = list()
+        failures = []
 
         for file_path in file_paths:
             try:
@@ -180,7 +154,7 @@ class Samba(task.Task):
                 failures.
         """
         file_paths = self._config['files']
-        failures = list()
+        failures = []
 
         for file_path in file_paths:
             try:
@@ -228,7 +202,7 @@ class Samba(task.Task):
         try:
             share, path = write_dir.split('/', 1)
         except ValueError:
-            share, path = write_dir, str()
+            share, path = write_dir, ''
 
         path = os.path.join(path, os.path.basename(local_path))
 

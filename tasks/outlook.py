@@ -74,7 +74,7 @@ class Outlook(task.Task):
         return True
 
     def status(self):
-        return str()
+        return ''
 
     def _nuke_folders(self):
         DEFAULTS = ['Inbox', 'Deleted Items', 'Outbox', 'Drafts', 'Sent Items', 'RSS Feeds']
@@ -145,7 +145,7 @@ class Outlook(task.Task):
 
         item_store = folder.Items
         message = item_store.GetFirst()
-        delete_after = list()
+        delete_after = []
         handled_messages = 0
 
         while message:
@@ -247,19 +247,19 @@ class Outlook(task.Task):
             dict: With keys 'required' and 'optional', whose values are dicts with the task's required and optional
                 config keys, and whose values are human-readable strings giving information about that key.
         """
-        config = dict()
+        config = {}
 
-        required = dict()
+        required = {}
 
-        optional = {'unread': 'bool: Read only unread messages if True, otherwise read all messages. (default True)',
-                    'open_links': 'int: Percent chance to open any given link. (default 0)',
-                    'open_attachments': 'int: Percent chance to open any attachment. (default 0)',
-                    'delete_handled': 'bool: Delete handled emails if True, otherwise do not delete. (default False)',
-                    'display_messages': 'bool: Display messages visually if True, otherwise do not. (default False)',
-                    'nuke_outlook': 'bool: Empty Outlook folders if True, otherwise do not. (default False)',
-                    'nuke_folders': 'list(str): If nuke_outlook is True, specifies a list of folders to empty. Optional'
+        optional = {'unread': 'bool| Read only unread messages if True, otherwise read all messages. (default True)',
+                    'open_links': 'int| Percent chance to open any given link. (default 0)',
+                    'open_attachments': 'int| Percent chance to open any attachment. (default 0)',
+                    'delete_handled': 'bool| Delete handled emails if True, otherwise do not delete. (default False)',
+                    'display_messages': 'bool| Display messages visually if True, otherwise do not. (default False)',
+                    'nuke_outlook': 'bool| Empty Outlook folders if True, otherwise do not. (default False)',
+                    'nuke_folders': '[str]| If nuke_outlook is True, specifies a list of folders to empty. Optional'
                                     ' even when nuke_outlook is True. If nuke_outlook is False, this does nothing.',
-                    'regexes': 'dict(str, task): A dictionary mapping a regular expression string to a Task '
+                    'regexes': '{str: task}| A dictionary mapping a regular expression string to a Task '
                                'configuration. If the regex finds a match in an email, the associated task is spawned.'}
 
         config['required'] = required
@@ -268,7 +268,7 @@ class Outlook(task.Task):
         return config
 
     @classmethod
-    def validate(cls, conf_dict):
+    def validate(cls, config):
         """ Validate the task configuration.
 
         Raises:
@@ -284,46 +284,13 @@ class Outlook(task.Task):
                     'delete_handled': False,
                     'display_messages': False,
                     'nuke_outlook': False,
-                    'nuke_folders': list(),
-                    'regexes': dict()}
+                    'nuke_folders': [],
+                    'regexes': {}}
 
-        required = cls.parameters()['required']
-        optional = cls.parameters()['optional']
+        config = api.check_config(config, cls.parameters(), defaults)
 
-        for key in required:
-            if key not in conf_dict:
-                raise KeyError(key)
-            else:
-                # TODO: Validate that the value given matches the type given in parameters.
-                pass
-
-        for key in optional:
-            if key not in conf_dict:
-                conf_dict[key] = defaults[key]
-            else:
-                # TODO: Validate that the value given matches the type given in parameters.
-                pass
-
-        # NOTE: Temporary until parsing type annotations is implemented.
-        if not isinstance(conf_dict['unread'], bool):
-            raise ValueError('unread: {} Must be bool'.format(str(conf_dict['unread'])))
-        if not isinstance(conf_dict['nuke_outlook'], bool):
-            raise ValueError('nuke_outlook: {} Must be bool'.format(str(conf_dict['nuke_outlook'])))
-        if not isinstance(conf_dict['delete_handled'], bool):
-            raise ValueError('delete_handled: {} Must be bool'.format(str(conf_dict['delete_handled'])))
-        if not isinstance(conf_dict['display_messages'], bool):
-            raise ValueError('display_messages: {} Must be bool'.format(str(conf_dict['display_messages'])))
-        if not isinstance(conf_dict['nuke_folders'], list):
-            raise ValueError('nuke_folders: {} Must be list of strings'.format(str(conf_dict['nuke_folders'])))
-        for folder in conf_dict['nuke_folders']:
-            if not isinstance(folder, str):
-                raise ValueError('nuke_folders: {} Got a non-str item.'.format(str(folder)))
-        if not isinstance(conf_dict['regexes'], dict):
-            raise ValueError('regexes: {} Must be dict mapping str to task dict'.format(str(conf_dict['regexes'])))
-        ### End temporary.
-
-        open_links = conf_dict['open_links']
-        open_attachments = conf_dict['open_attachments']
+        open_links = config['open_links']
+        open_attachments = config['open_attachments']
 
         # 101 because the upper bound is exclusive.
         if open_links not in range(101):
@@ -331,20 +298,15 @@ class Outlook(task.Task):
         if open_attachments not in range(101):
             raise ValueError('open_attachments: {} Must be between 0 and 100.'.format(str(open_attachments)))
 
-        regexes = conf_dict['regexes']
+        regexes = config['regexes']
         for regex in regexes:
             try:
-                # First test that this is a valid regex - regex correctness can't be tested and is up to the user.
+                # Test that this is a valid regex - regex correctness can't be tested and is up to the user.
                 re.compile(regex)
             except Exception:
                 raise ValueError('regexes: {} Is not a valid regular expression.'.format(str(regex)))
 
-            try:
-                api.validate_config(regexes[regex])
-            except Exception:
-                raise ValueError('regexes: {} Bad config value.'.format(str(regexes[regex])))
-
-        return conf_dict
+        return config
 
     @staticmethod
     def _get_email_host(address):

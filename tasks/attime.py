@@ -9,7 +9,6 @@ class AtTime(task.Task):
     passed today, the trigger time will be set at the same time tomorrow instead.
     """
     def __init__(self, config):
-        config = self.validate(config)
         time = datetime.datetime.strptime(config['time'], '%H%M').time()
         seconds = datetime.timedelta(seconds=config['seconds'])
         date = datetime.datetime.strptime(config['date'], '%Y-%m-%d').date()
@@ -51,20 +50,20 @@ class AtTime(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        required = {'time': 'str: 24-hour time code in HHMM format',
-                    'task': 'task: The task to be triggered.'}
-        optional = {'seconds': 'float: positive decimal number less than 60 - default is 0',
-                    'date': 'str: date stamp in YYYY-MM-DD format - default is today, or tomorrow if time was passed '
+        required = {'time': 'str| 24-hour time code in HHMM format',
+                    'task': 'task| The task to be triggered.'}
+        optional = {'seconds': 'number| positive decimal number less than 60 - default is 0',
+                    'date': 'str| date stamp in YYYY-MM-DD format - default is today, or tomorrow if time was passed '
                             'today'}
 
         return {'required': required, 'optional': optional}
 
     @classmethod
-    def validate(cls, conf_dict):
+    def validate(cls, config):
         """ Validates the given configuration dictionary.
 
         Args:
-            conf_dict (dict): The dictionary to validate. Its keys and values are subclass-specific.
+            config (dict): The dictionary to validate. Its keys and values are subclass-specific.
 
         Raises:
             KeyError: If a required configuration option is missing. The error message is the missing key.
@@ -72,35 +71,28 @@ class AtTime(task.Task):
                 key: value requirement
 
         Returns:
-            dict: The dict given as the conf_dict argument with missing optional parameters added with default values.
-                'time':str - HHMM formatted timestamp
-                'seconds':float - 0 <= number < 60, default 0
-                'date':str - YYYY-MM-DD formatted date, default today
+            dict: The dict given as the config argument with missing optional parameters added with default values.
         """
-        for key in cls.parameters()['required']:
-            if key not in conf_dict:
-                raise KeyError(key)
+        defaults = {'seconds': 0.0, 'date': str(datetime.datetime.today().date())}
 
-        time = conf_dict['time']
+        config = api.check_config(config, cls.parameters(), defaults)
+
+        time = config['time']
         try:
-            datetime.datetime.strptime(str(time), '%H%M').time()
+            datetime.datetime.strptime(time, '%H%M').time()
         except Exception:
-            raise ValueError('time: {} Must be in HHMM format'.format(str(time)))
+            raise ValueError('time: {} Must be in HHMM format'.format(time))
 
-        seconds = conf_dict.get('seconds', 0.0)
+        seconds = config['seconds']
         try:
-            seconds = float(seconds)
             assert 0 <= seconds and seconds < 60
-        except Exception:
+        except AssertionError:
             raise ValueError('seconds: {} Must be a number between 0 and 60 non-inclusive'.format(str(seconds)))
 
-        date = conf_dict.get('date', str(datetime.datetime.today().date()))
+        date = config['date']
         try:
-            datetime.datetime.strptime(str(date), '%Y-%m-%d').date()
+            datetime.datetime.strptime(date, '%Y-%m-%d').date()
         except Exception:
-            raise ValueError('date: {} Must be in YYYY-MM-DD format'.format(str(date)))
+            raise ValueError('date: {} Must be in YYYY-MM-DD format'.format(date))
 
-        task = conf_dict['task']
-        api.validate_config(task)
-
-        return {'time': time, 'seconds': seconds, 'date': date, 'task': task}
+        return config

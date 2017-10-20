@@ -15,13 +15,13 @@ class TestConfig(test.Test):
             containing the required and optional parameters of the class as keys and human-readable (str) descriptions
             and requirements for each key as values.
         """
-        required = {'someint': 'int: an int',
-                    'somestr': 'str: a string',
-                    'somefloat': 'float: a float',
-                    'somenumber': 'number: an int for testing',
-                    'othernumber': 'number: a float for testing'}
-        optional = {'somedict': '{str: int}: a dict mapping str to int',
-                    'somelist': '[float]: a list of floats'}
+        required = {'someint': 'int| an int',
+                    'somestr': 'str| a string',
+                    'somefloat': 'float| a float',
+                    'somenumber': 'number| an int for testing',
+                    'othernumber': 'number| a float for testing'}
+        optional = {'somedict': '{str: int}| a dict mapping str to int',
+                    'somelist': '[float]| a list of floats'}
 
         return {'required': required, 'optional': optional}
 

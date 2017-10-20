@@ -1,7 +1,7 @@
 from . import environment, guestinfo
 
 
-cache = dict()
+cache = {}
 
 def lookup(var_name):
     """ Try looking up an external variable.
@@ -12,7 +12,7 @@ def lookup(var_name):
     Returns:
         str: The output of the lookup. Empty string if nothing was found.
     """
-    value = cache.get(var_name, str())
+    value = cache.get(var_name, '')
     if not value:
         value = environment.lookup(var_name)
     if not value:

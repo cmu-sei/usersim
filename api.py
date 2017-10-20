@@ -153,9 +153,9 @@ def check_config(config, parameters, defaults):
             character. Everything before the last ':' character is loaded as YAML (preferably compact), and it should
             describe the expected type structure of that particular parameter. For example, a list of strings should be
             written as follows:
-                '[str]: blah blah your description here'
+                '[str]| blah blah your description here'
             A dictionary whose keys are ints and values are strs should be as follows:
-                '{int: str}: some description here'
+                '{int: str}| some description here'
             Valid type strings (the 'str' or 'int' above) are the following:
                 str, int, float, bool, any, number, task
             Where 'any' includes any of the first four, while 'task' indicates that the parameter is actually a task
@@ -165,7 +165,8 @@ def check_config(config, parameters, defaults):
             description string in parameters.
 
     Raises:
-        TypeError:
+        KeyError: If a key is missing from config. Exception message is the missing key.
+        ValueError: If any parameter's value is invalid. Exception message is the reason it is invalid.
 
     Returns:
         dict: config with its parameters type-checked, and missing optional values inserted.
@@ -189,7 +190,7 @@ def get_tasks(filter_result=True):
     """
     special_tasks = [re.compile('task$'), re.compile('test')]
 
-    available_tasks = dict()
+    available_tasks = {}
 
     for key in tasks.task_dict:
         for filtered in special_tasks:

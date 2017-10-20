@@ -40,14 +40,14 @@ class Sequence(task.Task):
 
     @classmethod
     def parameters(cls):
-        required = {'tasks': '[task]: A list of tasks. Must contain at least two tasks.'}
-        optional = dict()
+        required = {'tasks': '[task]| A list of tasks. Must contain at least two tasks.'}
+        optional = {}
 
         return {'required': required, 'optional': optional}
 
     @classmethod
     def validate(cls, config):
-        config = api.check_config(config, cls.parameters(), dict())
+        config = api.check_config(config, cls.parameters(), {})
 
         # It doesn't make sense to use this task if there are fewer than two tasks.
         if len(config['tasks']) < 2:

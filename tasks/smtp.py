@@ -6,6 +6,7 @@ from email.mime.text import MIMEText
 import random
 import smtplib
 
+import api
 from tasks import task
 
 
@@ -19,14 +20,14 @@ class SMTP(task.Task):
         """ Generates a message and subject header if necessary, then sends an e-mail as specified in the config.
         """
         if not self._config['messages']:
-            body = str()
+            body = ''
             for _ in range(random.randint(1, 200)):
                 body += random.choice('abcdefghijklmnopqrstuvwxyz')
         else:
             body = random.choice(self._config['messages'])
 
         if not self._config['subjects']:
-            subject = str()
+            subject = ''
             for _ in range(random.randint(1, 50)):
                 subject += random.choice('abcdefghijklmnopqrstuvwxyz')
         else:
@@ -53,7 +54,7 @@ class SMTP(task.Task):
         Returns:
             str: An arbitrary string giving more detailed, task-specific status for the given task.
         """
-        return str()
+        return ''
 
     @classmethod
     def parameters(cls):
@@ -65,19 +66,19 @@ class SMTP(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {'required': {'email_addr': 'str: E-mail address from which e-mails are sent, e.g. user@example.com',
-                               'destinations': 'list: A list of e-mail addresses (strings) to send e-mails to. One will'
+        params = {'required': {'email_addr': 'str| E-mail address from which e-mails are sent, e.g. user@example.com',
+                               'destinations': '[str]| A list of e-mail addresses to send e-mails to. One will'
                                                ' be chosen at random.',
-                               'mail_server': 'str: Hostname of the e-mail server to use, with port optionally '
+                               'mail_server': 'str| Hostname of the e-mail server to use, with port optionally '
                                               'specified by a colon. Port defalts to 25.'},
-                  'optional': {'messages': 'list: A list of messages (strings) to form the body of an e-mail. One will '
+                  'optional': {'messages': '[str]| A list of messages to form the body of an e-mail. One will '
                                            'be chosen at random. Default behavior is to randomly generate messages.',
-                               'subjects': 'list: a list of subjects (strings) to form the subject of an e-mail. One '
+                               'subjects': '[str]| a list of subjects to form the subject of an e-mail. One '
                                            'will be chosen at random. Default behavior is to randomly generate subject '
                                            'headers.',
-                               'encrypt': 'bool: Whether to use SSL encryption when connecting to the e-mail server. '
+                               'encrypt': 'bool| Whether to use SSL encryption when connecting to the e-mail server. '
                                           'Defaults to False.',
-                               'port': 'int: Mail server port. Default is 25.'}}
+                               'port': 'int| Mail server port. Default is 25.'}}
 
         return params
 
@@ -98,53 +99,17 @@ class SMTP(task.Task):
         Returns:
             dict: The dict given as the config argument with missing optional parameters updated with default values.
         """
-        if 'email_addr' not in config:
-            raise KeyError('email_addr')
-        if not isinstance(config['email_addr'], str):
-            raise ValueError('email_addr: {} Must be a string'.format(str(config['email_addr'])))
+        defaults = {'messages': [],
+                    'subjects': [],
+                    'encrypt': False,
+                    'port': 25}
+        config = api.check_config(config, cls.parameters(), defaults)
 
-        if 'destinations' not in config:
-            raise KeyError('destinations')
-        if not isinstance(config['destinations'], list):
-            raise ValueError('destinations: {} Must be a list of strings'.format(str(config['destinations'])))
         if not config['destinations']:
             raise ValueError('destinations: {} Must be non-empty'.format(str(config['destinations'])))
-        for destination in config['destinations']:
-            if not isinstance(destination, str):
-                raise ValueError('destinations: {} Must be a list of strings'.format(str(config['destinations'])))
 
-        if 'mail_server' not in config:
-            raise KeyError('mail_server')
-        if not isinstance(config['mail_server'], str):
-            raise ValueError('mail_server: {} Must be a string'.format(str(config['mail_server'])))
         if not config['mail_server']:
             raise ValueError('mail_server: {} Must be non-empty'.format(str(config['mail_server'])))
-
-        if 'messages' not in config:
-            config['messages'] = list()
-        if not isinstance(config['messages'], list):
-            raise ValueError('messages: Must be a list of strings'.format(str(config['messages'])))
-        for message in config['messages']:
-            if not isinstance(message, str):
-                raise ValueError('messages: Must be a list of strings'.format(str(config['messages'])))
-
-        if 'subjects' not in config:
-            config['subjects'] = list()
-        if not isinstance(config['subjects'], list):
-            raise ValueError('subjects: Must be a list of strings'.format(str(config['subjects'])))
-        for subject in config['subjects']:
-            if not isinstance(subject, str):
-                raise ValueError('subjects: Must be a list of strings'.format(str(config['subjects'])))
-
-        if 'encrypt' not in config:
-            config['encrypt'] = False
-        if not isinstance(config['encrypt'], bool):
-            raise ValueError('encrypt: Must be a bool'.format(str(config['encrypt'])))
-
-        if 'port' not in config:
-            config['port'] = 25
-        if not isinstance(config['port'], int):
-            raise ValueError('port: Must be an int'.format(str(config['port'])))
 
         return config
 

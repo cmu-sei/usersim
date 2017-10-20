@@ -24,6 +24,11 @@ with Office. You will also need Outlook Redemption installed in order to interac
 get Redemption under a developer license for no charge from the official website which is
 <http://www.dimastr.com/redemption/home.htm> as of this writing.
 
+You must also get the `geckodriver` for Firefox from <https://github.com/mozilla/geckodriver/releases>. If you are
+targeting an older version of Firefox, you may need an older version of the driver, as well as to get a corresponding
+version of the `selenium` library. The `geckodriver` binaries will need to be put in the `geckodriver/` directory (see
+`geckodriver/README.md` for naming).
+
 ## Environment
 
 You may have your Python interpreter installed in any manner you'd like. However, as a recommendation of good practice,
@@ -140,8 +145,9 @@ double quotes for the literal instead of using backslashes to escape the contain
 ### Comments
 Sometimes, you will have to do things you are not proud of in order to get your code to work. In these situations, it is
 *imperative* that you add a comment explaining why your code is doing something that looks out of place. For
-example, suppose you have a function that will only write to a file-like object, but you actually want to use its output
-in your code. In order to work around this limitation, you might want to use an io.BytesIO object, like the following:
+example, suppose you are using a library function that will only write to a file-like object, but you actually want to 
+use its output in your code. In order to work around this limitation, you might want to use an io.BytesIO object, like 
+the following:
 
 ```
 def get_string(obj):
@@ -238,7 +244,7 @@ Also like in the Args section, complex return value types should specify the top
 the description should clarify what it contains, like so:
 
 ```
-def fetch_dict():
+def fetch_{}:
     """ Fetch a dict object with particular keys.
 
     Returns:
@@ -282,7 +288,9 @@ will (obviously) need to import the `tasks.task` module in order to create a sub
 The following methods are **required** to be implemented, but it is highly encouraged to make your code as modular
 and clean as possible by breaking more complex behavior into separate methods.
 
-## \_\_init\_\_
+You should also add a short summary to your class-level docstring, describing what your task does.
+
+## __init__
 
 As with any Python class, the `__init__` method is your constructor. All `Task` subclasses have an
 `__init__` method that takes a `config` argument. This argument is a config dictionary that is
@@ -298,7 +306,7 @@ Args:
 """
 ```
 
-## \_\_call\_\_
+## __call__
 
 `__call__` is known as a magic method. A class implementing this method becomes callable, but you don't really
 need to worry about what that means in order to write a task. This method is called each time the UserSim cycles, until
@@ -345,24 +353,25 @@ Returns:
 
 This method returns what amounts to a specification for the task's config dictionary. The intention was to have a
 dictionary with two keys, 'required' and 'optional', each with dictionaries holding the required and optional keys,
-respectively, and their human-readable description. Your description string should be prefixed with
-a type specification, followed by a ':' (colon) character. For example:
+respectively, and their human-readable description. Your description string should be prefixed with a type 
+specification, followed by a '|' (pipe) character. This is the character you get by pressing shift and the key above 
+Enter. For example:
 
 ```
-required = {'a_number': 'int: A number to use, for reasons.'}
+required = {'a_number': 'int| A number to use, for reasons.'}
 ```
 
 To be more specific, this type specification is YAML format. It's best to use compact YAML, however. Specifically, if
 one of your keys takes a list of strings, your type specification would simply be:
 
 ```
-'somekey': '[str]: Describe what this key is for and any additional constraints.'
+'somekey': '[str]| Describe what this key is for and any additional constraints.'
 ```
 
 A dict whose keys are ints and whose values are bools would be as follows:
 
 ```
-'anotherkey': '{int: bool}: Describe what this dict is used for and any additional'
+'anotherkey': '{int: bool}| Describe what this dict is used for and any additional'
     ' constraints on it.'
 ```
 
@@ -405,7 +414,7 @@ order to make repeated calls to your `validate` with the return of a previous ca
 ```
 """
 Args:
-    conf_dict (dict): The dictionary to be validated.
+    config (dict): The dictionary to be validated.
 
 Raises:
     KeyError: If a required configuration option is missing. The exception message is
@@ -419,213 +428,6 @@ Returns:
 """
 ```
 
-# <a name="api">UserSim API Reference
-
-## add\_feedback
-
-```
-"""
-Create an additional feedback message. This will mostly be used from within threads supporting a main task, for example, managing interaction with an external program. 
-
-Args:
-    task_id (int): The task ID of the calling task. This can be accessed from within a task object by using self._task_id. If task_id < 1, no feedback will be generated.
-    error (str): A description of the error, or a traceback.format_exc().
-"""
-```
-
-## check\_config
-
-```
-""" Asserts that all of the types in config match the types in the description strings in parameters. In addition missing optional keys are added to the config from defaults.
-
-Args:
-    config (dict): A dictionary to check. Should contain all keys from parameters['required']. Each key's value must be of the same type specified in that key's description string in parameters (both required and optional).
-    parameters (dict): The return from a task.parameters call. Contains two keys, 'required' and 'optional', whose values are dict objects containing the keys that are required to be in config, and optional ones that may be in config. In these sub-dicts, the values are description strings that have at least one ':' (colon) character. Everything before the last ':' character is loaded as YAML (preferably compact), and it should describe the expected type structure of that particular parameter. For example, a list of strings should be written as follows:
-            '[str]: blah blah your description here'
-        A dictionary whose keys are ints and values are strs should be as follows:
-            '{int: str}: some description here'
-        Valid type strings (the 'str' or 'int' above) are the following:
-            str, int, float, bool, any, task
-        Where 'any' includes any of the first four, while 'task' indicates that the parameter is actually a task dict which should be validated with validate_config.
-    defaults (dict): A dictionary whose keys are the same as the keys in parameters['optional'], and whose values are sane defaults for those parameters. These values should still have the same type as indicated by the description string in parameters.
-
-Raises:
-    TypeError:
-
-Returns:
-    dict: config with its parameters type-checked, and missing optional values inserted.
-"""
-```
-
-## external\_lookup
-
-```
-"""
-Look up a variable external to the usersim. First looks at environment variables, then looks at VMWare guestinfo variables. Only returns a value for an exact match. 
-
-Args:
-    var_name (str): The name of the variable to lookup. 
-
-Returns:
-    str: Returns the value of the variable. If the variable is not found, returns an empty string.
-"""
-```
-
-## get\_tasks
-
-```
-"""
-Get the tasks and their (human-readable) parameters currently available to this simulation. Certain special tasks will be filtered by default. 
-
-Args:
-    filter_result (bool): True - filters special tasks, False - no filter is applied. 
-
-Returns:
-    dict of dicts of dicts: A dictionary whose keys are task names, and whose values are dictionaries whose keys are 'required' and 'optional', and whose values are dictionaries whose keys are the parameter name, and whose values are human-readable strings indicating what is expected for the parameter.
-"""
-```
-
-## new\_task
-
-```
-"""
-Inserts a new task into the user simulator. 
-
-Args:
-    task_config (dict): A dictionary with the following key:value pairs.
-        'type':str
-        'config':dict
-    start_paused (bool): True if the new task should be paused initially, False otherwise.
-    reset (bool): True if the simulator should be reset, False otherwise. This option should only be used for writing tests. 
-
-Raises:
-    KeyError: See validate_config docstring.
-    ValueError: See validate_config docstring. 
-
-Returns:
-    int: The new task's unique ID.
-"""
-```
-
-## pause\_all
-
-```
-"""
-Pause all currently scheduled tasks.
-"""
-```
-
-## pause\_task
-
-```
-"""
-Pause a single task. 
-
-Args:
-    task_id (int > 0): The task ID returned by an earlier call to new_task. 
-
-Returns:
-    bool: True if the operation succeeded, False otherwise.
-"""
-```
-
-## status\_all
-
-```
-"""
-Get a list of the status of all managed tasks. 
-
-Returns:
-    list of dicts: Each dictionary will have the following key:value pairs:
-        'id':int
-        'type':str
-        'state':str
-        'status':str
-"""
-```
-
-## status\_task
-
-```
-"""
-Get the status of a single task. 
-
-Args:
-    task_id (int > 0): The task ID returned by an earlier call to new_task. 
-
-Returns:
-    dict: A dictionary with the following key:value pairs:
-        'id':int
-        'type':str
-        'state':str
-        'status':str
-"""
-```
-
-## stop\_all
-
-```
-"""
-Stop all tasks that are currently scheduled or paused.
-"""
-```
-
-## stop\_task
-
-```
-"""
-Stop a single task. 
-
-Args:
-    task_id (int > 0): The task ID returned by an earlier call to new_task. 
-
-Returns:
-    bool: True if the operation succeeded, False otherwise.
-"""
-```
-
-## unpause\_all
-
-```
-"""
-Unpause all currently paused tasks.
-"""
-```
-
-## unpause\_task
-
-```
-"""
-Unpause a single task. 
-
-Args:
-    task_id (int > 0): The task ID returned by an earlier call to new_task. 
-
-Returns:
-    bool: True if the operation succeeded, False otherwise.
-"""
-```
-
-## validate\_config
-
-```
-"""
-Validate a config dictionary without instantiating a Task subclass. 
-
-Args:
-    config (dict): A dictionary with the following key:value pairs.
-        'type':str
-        'config':dict 
-
-Raises:
-    KeyError: If a required key is missing from config or config['config'] or if the task type does not exist.
-    ValueError: If the given value of an option under config['config'] is invalid. 
-
-Returns:
-    dict: The dictionary associated with config's 'config' key, after processing it with the given task's validate method. This does NOT include the 'type' and 'config' keys as above - only the actual configuration for the given task.
-"""
-```
-
 # Creating a New Task
 
 In this chapter, we'll be discussing how to create your own Task subclass. There will be a tutorial, followed by some
@@ -636,9 +438,18 @@ how-to information on some additional subjects not covered by the tutorial.
 In this tutorial, we'll create a task that, by default, will print out 'Hello, World!', but takes an optional parameter
 that will change allow the user to specify a particular name to greet.
 
-We'll begin by importing our task parent class and creating the declaration for our subclass:
+We'll begin by importing our task parent class and creating the declaration for our subclass, and a short summary of
+what the task does:
 
-\lstinputlisting{developer-content/imports}
+```
+import api
+from tasks import task
+
+
+class HelloTask(task.Task):
+    """ This task prints out a 'Hello, World!' statement by default, but the recipient can be optionally specified.
+    """
+```
 
 It's important to note here that your module file **must** be the same as the name of your class, but lowercase.
 Therefore, this file should be named `hellotask.py` and it should be in the `tasks` directory.
@@ -647,36 +458,53 @@ You should also give a short summary of what your task does as a class-level doc
 
 We'll define our very simple `__init__` method next:
 
-\lstinputlisting{developer-content/init}
+```
+    def __init__(self, config):
+        self._config = config
+```
 
 Since new task construction is guaranteed to call our `validate` method, we don't need to call it ourselves.
 It doesn't hurt anything to call it, but it's a waste of a step.
 
 We're going to write our `parameters` and `validate` methods next. First, `parameters`:
 
-\lstinputlisting{developer-content/parameters}
+```
+    @classmethod
+    def parameters(cls):
+        required = {}
+        optional = {'recipient': 'str| The recipient of the greeting. Default is "World"'}
+
+        return {'required': required, 'optional': optional}
+```
 
 Next, we'll write the `validate` method. Note that the `check_config` call takes care of a lot of
 checking we'd otherwise need to do manually:
 
-\lstinputlisting{developer-content/validate}
+```
+    @classmethod
+    def validate(cls, config):
+        return api.check_config(config, cls.parameters(), {'recipient': 'World'})
+```
 
 Next, we'll implement the `__call__` method:
 
-\lstinputlisting{developer-content/call}
+```
+    def __call__(self):
+        print('Hello, {}!'.format(self._config['recipient']))
+```
 
-Finally, we'll implement the `cleanup`, `stop`, and lstinline{status} methods.
+Finally, we'll implement the `cleanup`, `stop`, and `status` methods.
 
-\lstinputlisting{developer-content/cleanupstopstatus}
+```
+    def cleanup(self):
+        pass
 
-Here is our complete task in one block of code:
+    def stop(self):
+        return True
 
-\lstinputlisting{developer-content/imports}
-\lstinputlisting{developer-content/init}
-\lstinputlisting{developer-content/parameters}
-\lstinputlisting{developer-content/validate}
-\lstinputlisting{developer-content/call}
-\lstinputlisting{developer-content/cleanupstopstatus}
+    def status(self):
+        return 'Everything is A-OK!'
+```
 
 ## How-To Information
 
@@ -745,10 +573,7 @@ your task's `validate` method should probably validate that nested task's config
 add it to the UserSim's internal structures, which will make the task trigger during the next cycle (unless you choose
 to start it paused).
 
-Note: pending the proposed change to the task `parameters` method, your validate may not need to call
-`validate_config` at all.
-
-Please see the [API Reference](#api) for the full API reference.
+Please see the API Reference for the full API reference.
 
 ### Platform-Locked Tasks
 
@@ -761,8 +586,17 @@ your task from running on different platforms.
 
 There is a `tests` directory in the source tree, in which a number of test modules exist. The only defined
 structure is that there exists a `run_test` function in a test file. This test may cover nearly anything, but
-generally should be limited to things that are testable programmatically, such as configuration. If you want to
-implement a test for your task, take a look at some of the existing tests for other tasks.
+generally should be limited to things that are testable programmatically without network dependencies, such as 
+configuration. If you want to implement a test for your task, take a look at some of the existing tests for other tasks.
+
+**Note that if your task only runs on a specific platform, say Windows, your test must check if it is running on the
+right platform, and return if not.** This is typically done with a call to `platform.system()`, but this is up to you.
+
+Example:
+```
+if not platform.system() == 'Windows':
+    return
+```
 
 # Building the UserSim
 

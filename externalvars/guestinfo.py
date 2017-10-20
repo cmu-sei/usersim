@@ -20,7 +20,7 @@ def lookup(var_name):
     """
     process = Popen(command.format(var_name), stdout=PIPE, stderr=PIPE, shell=True)
     if process.stderr.read():
-        return str()
+        return ''
     else:
         value = process.stdout.read().decode().strip()
 

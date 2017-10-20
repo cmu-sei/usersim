@@ -64,7 +64,7 @@ class RPCCommunication(object):
         """ Forward feedback messages to the server.
         """
         while True:
-            fb_list = list()
+            fb_list = []
             while not self._feedback_queue.empty():
                 fb_message = self._feedback_queue.get()
                 fb_list.append(fb_message)

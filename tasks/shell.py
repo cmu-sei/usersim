@@ -1,11 +1,12 @@
 # Ali Kidwai
 # June 16, 2017
 # Adapted from code written by Rotem Guttman and Joe Vessella
-
 import random
 import subprocess
 
+import api
 from tasks import task
+
 
 class Shell(task.Task):
     """ Executes a random shell command from the configuration dictionary, or can execute all of them in sequence if the
@@ -14,7 +15,7 @@ class Shell(task.Task):
     def __init__(self, config):
         """ Validates config and stores it as an attribute
         """
-        self._config = self.validate(config)
+        self._config = config
 
     def __call__(self):
         """ Creates a Popen object from the subprocess module and sends a random command from config['commands'] to
@@ -46,7 +47,7 @@ class Shell(task.Task):
         Returns:
             str: An arbitrary string giving more detailed, task-specific status for the given task.
         """
-        return str()
+        return ''
 
     @classmethod
     def parameters(cls):
@@ -58,8 +59,8 @@ class Shell(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {'required': {'commands': 'list: A list of strings to send as commands, ex. ["ls -la", "cat README"]'},
-                  'optional': {'script': 'bool: If True, execute the commands in order.'}}
+        params = {'required': {'commands': '[str]| A list of strings to send as commands, ex. ["ls -l", "cat README"]'},
+                  'optional': {'script': 'bool| If True, execute the commands in order. Default is False.'}}
         return params
 
     @classmethod
@@ -78,18 +79,11 @@ class Shell(task.Task):
         Returns:
             dict: The dict given as the config argument
         """
-        if 'commands' not in config:
-            raise KeyError('commands')
-        if not isinstance(config['commands'], list):
-            raise ValueError('commands: {} Must be a list of strings'.format(str(config['commands'])))
+        config = api.check_config(config, cls.parameters(), {'script': False})
+
         if not config['commands']:
             raise ValueError('commands: {} Cannot be empty'.format(str(config['commands'])))
-        for command in config['commands']:
-            if not isinstance(command, str):
-                raise ValueError('commands: {} Must be a list of strings'.format(str(config['commands'])))
 
-        if 'script' not in config:
-            config['script'] = False
         return config
 
     @staticmethod

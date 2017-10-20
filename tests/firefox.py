@@ -1,7 +1,5 @@
-# Ali Kidwai
-# June 16, 2017
-# Tests for FTP module for UserSim. Makes sure that FTP rejects incorrect configs and accepts correct configs. Prints
-# output from correct configs.
+import platform
+
 import api
 import usersim
 
@@ -12,7 +10,7 @@ def test_bad_key_cases(task, bad_key_cases):
 
     Args:
         task: A task dictionary mapping 'type' to the task name (e.g. 'ssh')
-        bad_key_cases: A list of tuples of the form ('config_name', config). config should be missing at least one key.
+        bad_key_cases: A list of tuples of the form ('configName', config). config should be missing at least one key.
 
     Raises:
         AssertionError: If api.new_task does not raise a KeyError
@@ -31,7 +29,7 @@ def test_bad_value_cases(task, bad_value_cases):
 
     Args:
         task: A task dictionary mapping 'type' to the task name (e.g. 'ssh')
-        bad_value_cases: A list of tuples of the form ('config_name', config). config should have at least one invalid
+        bad_value_cases: A list of tuples of the form ('configName', config). config should have at least one invalid
             value.
 
     Raises:
@@ -50,34 +48,42 @@ def test_good_cases(task, good_cases):
 
     Args:
         task: A task dictionary mapping 'type' to the task name (e.g. 'ssh')
-        good_cases: A list of tuples of the form ('config_name, config'). config should be properly formatted.
+        good_cases: A list of tuples of the form ('configName, config'). config should be properly formatted.
     """
+    sim = usersim.UserSim(True)
     for config_name, config in good_cases:
         task['config'] = config
-        sim = usersim.UserSim(True)
         api.new_task(task)
         print('Correctly accepted %s' % config_name)
 
 def run_test():
-    task = {'type': 'ftp', 'config': None}
+    task = {'type': 'firefox', 'config': None}
     empty = {}
-    missing_site = {'file': '1KB.zip'}
-    missing_file = {'site': 'speedtest.tele2.net'}
-    none_args = {'site': None, 'file': None}
-    blank_site = {'site': '', 'file': '1KB.zip'}
-    blank_file = {'site': 'speedtest.tele2.net', 'file': ''}
-    missing_opts = {'site': 'speedtest.tele2.net', 'file': '1KB.zip'}
-    missing_password = {'site': 'speedtest.tele2.net', 'file': '100KB.zip', 'user': 'anonymous'}
-    complete_config = {'site': 'speedtest.tele2.net', 'file': '512KB.zip',
-                      'user': 'anonymous', 'password': 'anonymous@'}
-    bad_key_cases = [('empty', empty), ('missing_site', missing_site), ('missing_file', missing_file)]
-    bad_value_cases = [('none_args', none_args), ('blank_site', blank_site), ('blank_file', blank_file)]
-    good_cases = [('missing_opts', missing_opts),
-                  ('missing_password', missing_password),
-                  ('complete_config', complete_config)]
+    none_sites = {'sites': None}
+    bad_sites = {'sites': ['http://www.cmu.edu', 1, True]}
+    cmu = {'sites': ['http://www.cmu.edu']}
+    google = {'sites': ['https://www.google.com']}
+    wikipedia = {'sites': ['http://www.en.wikipedia.org/wiki/Main_Page']}
+    amazon = {'sites': ['http://www.amazon.com']}
+    cnn = {'sites': ['http://www.cnn.com']}
+    bbc = {'sites': ['http://www.bbc.co.uk']}
+    npr = {'sites': ['http://www.npr.org']}
+    all_sites = {'sites': ['http://www.cmu.edu',
+                           'https://www.google.com',
+                           'http://en.wikipedia.org/wiki/Main_Page',
+                           'http://www.amazon.com',
+                           'http://www.cnn.com',
+                           'http://www.bbc.co.uk',
+                           'http://www.npr.org']}
+    close = {'sites': ['http://www.cmu.edu'], 'close_browser': True}
+    bad_key_cases = [('empty', empty)]
+    bad_value_cases = [('none_sites', none_sites), ('bad_sites', bad_sites)]
+    good_cases = [('cmu', cmu), ('google', google), ('wikipedia', wikipedia), ('amazon', amazon), ('cnn', cnn),
+                  ('bbc', bbc), ('npr', npr), ('all_sites', all_sites), ('close', close)]
     test_bad_key_cases(task, bad_key_cases)
     test_bad_value_cases(task, bad_value_cases)
     test_good_cases(task, good_cases)
 
 if __name__ == '__main__':
     run_test()
+

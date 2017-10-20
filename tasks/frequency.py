@@ -10,7 +10,6 @@ class Frequency(task.Task):
     at a high frequency will run the CPU at 100% (generally, ones that interact with external programs).
     """
     def __init__(self, config):
-        config = self.validate(config)
         freq = config['frequency']
         reps = config['repetitions']
         task = config['task']
@@ -52,9 +51,9 @@ class Frequency(task.Task):
                 containing the required and optional parameters and their descriptions for the Frequency task,
                 respectively.
         """
-        params = {'required': {'task': 'the configuration of another task',
-                               'frequency': 'positive decimal number - avg number of triggers per hour',
-                               'repetitions': 'non-negative integer - 0 for unlimited'},
+        params = {'required': {'task': 'task| the configuration of another task',
+                               'frequency': 'number| positive decimal number - avg number of triggers per hour',
+                               'repetitions': 'int| non-negative integer - 0 for unlimited'},
                   'optional': {}}
 
         return params
@@ -64,10 +63,7 @@ class Frequency(task.Task):
         """ Check if the given configuration is valid.
 
         Args:
-            config (dict): Configuration dictionary with the following keys:
-                frequency (float > 0): Average number of occurences per hour.
-                repetitions (int >= 0): Maximum number of times to trigger. 0 indicates no maximum.
-                task (dict): Configuration for a nested task.
+            config (dict): Configuration dictionary, see parameters method.
 
         Raises:
             KeyError: If a required key is missing. The error message will be the missing key.
@@ -78,40 +74,12 @@ class Frequency(task.Task):
             dict: The given configuration dict with arguments converted to their required formats with missing
                 optional arguments added with default arguments.
         """
-        converted = dict()
+        config = api.check_config(config, cls.parameters(), {})
 
-        if 'frequency' not in config:
-            raise KeyError('frequency')
-        else:
-            freq = config['frequency']
-            try:
-                freq = float(freq)
-            except ValueError:
-                raise ValueError('frequency: {} Not a valid number.'.format(str(freq)))
-            if freq <= 0:
-                raise ValueError('frequency: {} Must be non-negative.'.format(str(freq)))
+        if config['frequency'] <= 0:
+            raise ValueError('frequency: {} Must be positive.'.format(freq))
 
-        if 'repetitions' not in config:
-            raise KeyError('repetitions')
-        else:
-            reps = config['repetitions']
-            try:
-                reps = int(reps)
-            except ValueError:
-                raise ValueError('repetitions: {} Not a valid number'.format(str(reps)))
-            if reps < 0:
-                raise ValueError('repetitions: {} Must be positive'.format(str(reps)))
+        if config['repetitions'] <= 0:
+            raise ValueError('repetitions: {} Must be positive'.format(str(reps)))
 
-        if 'task' not in config:
-            raise KeyError(param_missing % 'task')
-        else:
-            task = config['task']
-            if not isinstance(task, dict):
-                raise ValueError('task: {} Must be a dictionary.'.format(str(task)))
-            api.validate_config(task)
-
-        converted['frequency'] = freq
-        converted['repetitions'] = reps
-        converted['task'] = task
-
-        return converted
+        return config

@@ -50,7 +50,7 @@ def yaml_to_python(yaml_string):
         return node.value
 
     def dict_constructor(loader, node):
-        return dict()
+        return {}
 
     # For whatever reason, shorthand tags do not work.
     yaml_2002_prefix = 'tag:yaml.org,2002:'
@@ -107,7 +107,7 @@ def parse_primitive(string):
         string (str): String to evaluate. Must be 'str', 'int', 'bool', 'float', 'any', 'number', or 'task'.
 
     Raises:
-        TypeError: If string is not in the primitives dict.
+        ValueError: If string is not in the primitives dict.
 
     Returns:
         type or tuple: If string is 'str', 'int', 'bool', or 'float', returns the corresponding type's built-in. If
@@ -115,7 +115,7 @@ def parse_primitive(string):
             returns a tuple containing the int and float built-ints. If string is 'task', returns the TaskConfig class.
     """
     if string not in primitives:
-        raise TypeError('{} is not a valid primitive type.'.format(string))
+        raise ValueError('{} is not a valid primitive type.'.format(string))
 
     return primitives[string]
 
@@ -184,7 +184,7 @@ def parse_item(item):
             above. If it is a list or dict, it should have exactly one entry.
 
     Raises:
-        TypeError: If item is not a str, list, or dict object.
+        ValueError: If item is not a str, list, or dict object.
         Exception: Any exception that may be raised by parse_primitive or parse_collection.
     """
     if isinstance(item, str):
@@ -192,7 +192,7 @@ def parse_item(item):
     elif isinstance(item, (list, dict)):
         return parse_collection(item)
     else:
-        raise TypeError('Got an item that is not a str, list, or dict object: {}'.format(item))
+        raise ValueError('Got an item that is not a str, list, or dict object: {}'.format(item))
 
 def type_check(config, type_tree):
     """ Recursively checks if the types in config match the types in type_tree.
@@ -203,7 +203,7 @@ def type_check(config, type_tree):
             of this file, or can be a list or dict object.
 
     Raises:
-        TypeError: If there is a type mismatch between config and type_tree.
+        ValueError: If there is a type mismatch between config and type_tree.
 
     Returns:
         int, bool, float, str, list, or dict: Returns config as it was except in the case where type_tree is the
@@ -232,7 +232,7 @@ def type_check(config, type_tree):
         # config is not a list or dict after we've already checked those, and its type also doesn't match what it should
         # be, so raise an exception.
         type_ = type_tree if type_tree.__class__ == type else type_tree.__class__
-        raise TypeError('{} was an incorrect type - it should have been a {}'.format(config, type_))
+        raise ValueError('{} was an incorrect type - it should have been a {}'.format(config, type_))
 
     # It was a valid type, so it should be returned.
     return config
@@ -246,7 +246,7 @@ def validate(config, required_, optional_, defaults):
             keys.
         required_ (dict): A dict containing the task's required keys mapped to str values of the form
             'type: description', where type may be 'str', 'bool', 'int', 'float', 'any', 'task', or such a string may be
-            nested within any number of [] or {}. The rightmost ':' character will be used to split, so it must be
+            nested within any number of [] or {}. The '|' character will be used to split, so it must be
             present in the value string.
         optional_ (dict): A dict containing the task's optional keys, otherwise identical to required_.
         defaults (dict): A dict whose keys match the keys in optional_, and whose values are considered sane defaults.
@@ -262,12 +262,12 @@ def validate(config, required_, optional_, defaults):
     optional = {}
 
     for key, value in required_.items():
-        type_string = value.rsplit(':', 1)[0].strip()
+        type_string = value.split('|', 1)[0].strip()
         type_tree = yaml.load(type_string)
         required[key] = parse_item(type_tree)
 
     for key, value in optional_.items():
-        type_string = value.rsplit(':', 1)[0].strip()
+        type_string = value.split('|', 1)[0].strip()
         type_tree = yaml.load(type_string)
         optional[key] = parse_item(type_tree)
 

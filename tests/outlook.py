@@ -44,7 +44,7 @@ def run_test():
         return
     task = {'type': 'outlook', 'config': None}
 
-    bad_value_cases = list()
+    bad_value_cases = []
     bad_value_cases.append(('link_str', {'open_links': 'f'}))
     bad_value_cases.append(('link_low', {'open_links': -5}))
     bad_value_cases.append(('link_high', {'open_links': 105}))
@@ -57,10 +57,10 @@ def run_test():
     bad_value_cases.append(('nuke_outlook_int', {'nuke_outlook': 105}))
     bad_value_cases.append(('nuke_folders_int', {'nuke_folders': 105}))
     bad_value_cases.append(('regexes_int', {'regexes': 105}))
-    bad_value_cases.append(('regexes_invalid_key', {'regexes': {25: dict()}}))
+    bad_value_cases.append(('regexes_invalid_key', {'regexes': {25: {}}}))
     bad_value_cases.append(('regexes_invalid_value', {'regexes': {'test': 523}}))
 
-    good_cases = list()
+    good_cases = []
     good_cases.append(('link', {'open_links': 50}))
     good_cases.append(('attach', {'open_attachments': 50}))
     good_cases.append(('unread', {'unread': True}))

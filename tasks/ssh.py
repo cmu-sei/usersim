@@ -7,6 +7,7 @@ import time
 
 import paramiko
 
+import api
 from tasks import task
 
 
@@ -19,7 +20,7 @@ class SSH(task.Task):
     def __init__(self, config):
         """ Validates config and stores it as an attribute
         """
-        self._config = self.validate(config)
+        self._config = config
 
     def __call__(self):
         """ Connects to the SSH server specified in config.
@@ -50,7 +51,7 @@ class SSH(task.Task):
         Returns:
             str: An arbitrary string giving more detailed, task-specific status for the given task.
         """
-        return str()
+        return ''
 
     def ssh_to(self, host, user, password, command_list, policy, port):
         """ Connects to an SSH server at host:port with user as the username and password as the password. Proceeds to
@@ -66,8 +67,8 @@ class SSH(task.Task):
         ssh.connect(host, port, user, password)
         channel = ssh.invoke_shell()
         channel.setblocking(int(BLOCKING))
-        channel.sendall(str())
-        incoming = str()
+        channel.sendall('')
+        incoming = ''
 
         # Receive the welcome message from the server and print it.  If any of this fails, something went wrong with
         # the connection.
@@ -79,7 +80,7 @@ class SSH(task.Task):
         for command in command_list:
             channel.sendall(command + '\n')
             time.sleep(.5)
-            incoming = str()
+            incoming = ''
             while channel.recv_ready():
                 incoming += channel.recv(MAX_RECV).decode()
                 time.sleep(.1)
@@ -102,12 +103,12 @@ class SSH(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {'required': {'host': 'the hostname to connect to, ex. "io.smashthestack.org"',
-                               'user': 'username to login with, ex. "level1"',
-                               'password': 'password to login with, ex. "level1"',
-                               'command_list': 'list of strings to send as commands, ex. ["ls -la", "cat README"]'},
-                  'optional': {'port': 'the port on which to connect to the SSH server, ex. 22.  Default is 22',
-                               'policy': 'which policy to adopt in regards to missing host keys, should be one of '
+        params = {'required': {'host': 'str| the hostname to connect to, ex. "io.smashthestack.org"',
+                               'user': 'str| username to login with, ex. "level1"',
+                               'password': 'str| password to login with, ex. "level1"',
+                               'command_list': '[str]| commands to send, ex. ["ls -la", "cat README"]'},
+                  'optional': {'port': 'int| the port on which to connect to the SSH server, ex. 22.  Default is 22',
+                               'policy': 'str| which policy to adopt in regards to missing host keys, should be one of '
                                          'AutoAdd, Reject, or Warning. Default is Warning'}}
         return params
 
@@ -124,37 +125,21 @@ class SSH(task.Task):
                 key: value requirement
 
         Returns:
-            dict: The dict given as the conf_dict argument with missing optional parameters added with default values.
+            dict: The dict given as the config argument with missing optional parameters added with default values.
         """
-        params = cls.parameters()
-        reqd_params = params['required']
-        for key in reqd_params:
-            if key not in config:
-                raise KeyError(key)
+        defaults = {'port': 22,
+                    'policy': 'Warning'}
+        config = api.check_config(config, cls.parameters(), defaults)
 
-        for key in ['host', 'user', 'password']:
-            if type(config[key]) != str:
-                raise ValueError(key + ': {} Must be a string'.format(str(config[key])))
         if not config['host']:
             raise ValueError('host: {} Must be non-empty'.format(str(config['host'])))
-        if type(config['command_list']) != list:
-            raise ValueError('command_list: {} Must be a list of strings'.format(str(config['command_list'])))
         if not config['command_list']:
             raise ValueError('command_list: {} Must be non-empty'.format(str(config['host'])))
-        for command in config['command_list']:
-            if type(command) != str:
-                raise ValueError('command_list: {} Must be a list of strings'.format(str(config['command_list'])))
 
-        if 'policy' not in config:
-            config['policy'] = 'Warning'
-        if 'port' not in config:
-            config['port'] = 22
         if config['policy'] not in ['AutoAdd', 'Reject', 'Warning']:
             raise ValueError('policy: {} Must be one of "AutoAdd", "Reject", '
                              'or "Warning"'.format(str(config['policy'])))
-        if type(config['port']) != int:
-            raise ValueError('port: {} Must be an int'.format(str(config['port'])))
-        if config['port'] < 1 or config['port'] > 65536:
-            raise ValueError('port: {} Must be in the range [1, 65536]'.format(str(config['port'])))
+        if config['port'] < 1 or config['port'] > 65535:
+            raise ValueError('port: {} Must be in the range [1, 65535]'.format(str(config['port'])))
 
         return config

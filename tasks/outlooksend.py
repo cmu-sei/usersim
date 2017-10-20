@@ -74,15 +74,15 @@ class OutlookSend(outlook.Outlook):
             dict: With keys 'required' and 'optional', whose values are dicts with the task's required and optional
                 config keys, and whose values are human-readable strings giving information about that key.
         """
-        config = dict()
+        config = {}
 
-        required = {'username': 'str: The "From" address.',
-                    'destination': 'str: The "To" address.',
-                    'subject': 'str: Subject line. Specify empty string if optional parameter "dynamic" is used.',
-                    'body': 'str: Message body. Specify empty string if optional parameter "dynamic" is used.'}
+        required = {'username': 'str| The "From" address.',
+                    'destination': 'str| The "To" address.',
+                    'subject': 'str| Subject line. Specify empty string if optional parameter "dynamic" is used.',
+                    'body': 'str| Message body. Specify empty string if optional parameter "dynamic" is used.'}
 
-        optional = {'attachments': 'list(str): A list of paths to files that should be attached.',
-                    'dynamic': 'bool: Generate subject and body. Default False.'}
+        optional = {'attachments': '[str]| A list of paths to files that should be attached.',
+                    'dynamic': 'bool| Generate subject and body. Default False.'}
 
 
         config['required'] = required
@@ -91,48 +91,15 @@ class OutlookSend(outlook.Outlook):
         return config
 
     @classmethod
-    def validate(cls, conf_dict):
+    def validate(cls, config):
         """ Validate the task configuration.
 
         Raises:
             KeyError: If a required key is missing.
             ValueError: If a key's value is not valid.
         """
-        defaults = {'attachments': list(),
+        defaults = {'attachments': [],
                     'dynamic': False}
+        config = api.check_config(config, cls.parameters(), defaults)
 
-        required = cls.parameters()['required']
-        optional = cls.parameters()['optional']
-        for key in required:
-            if key not in conf_dict:
-                raise KeyError(key)
-            else:
-                # TODO: Validate that the value's type matches the type given by the parameters.
-                pass
-
-        for key in optional:
-            if key not in conf_dict:
-                conf_dict[key] = defaults[key]
-            else:
-                # TODO: Validate that the value's type matches the type given by the parameters.
-                pass
-
-        # NOTE: Temporary until type annotation parsing is implemented.
-        if not isinstance(conf_dict['username'], str):
-            raise ValueError('username: {} Must be a string.'.format(str(conf_dict['username'])))
-        if not isinstance(conf_dict['destination'], str):
-            raise ValueError('destination: {} Must be a string.'.format(str(conf_dict['destination'])))
-        if not isinstance(conf_dict['subject'], str):
-            raise ValueError('subject: {} Must be a string.'.format(str(conf_dict['subject'])))
-        if not isinstance(conf_dict['body'], str):
-            raise ValueError('body: {} Must be a string.'.format(str(conf_dict['body'])))
-
-        if not isinstance(conf_dict['attachments'], list):
-            raise ValueError('attachments: {} Must be a list of strings.'.format(str(conf_dict['attachments'])))
-        for item in conf_dict['attachments']:
-            if not isinstance(item, str):
-                raise ValueError('attachments: {} Must be a list of strings.'.format(str(item)))
-        if not isinstance(conf_dict['dynamic'], bool):
-            raise ValueError('dynamic: {} Must be True or False.'.format(str(conf_dict['dynamic'])))
-
-        return conf_dict
+        return config

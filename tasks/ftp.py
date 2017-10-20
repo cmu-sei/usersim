@@ -5,6 +5,7 @@
 import ftplib
 import time
 
+import api
 from tasks import task
 
 
@@ -14,12 +15,12 @@ class FTP(task.Task):
     def __init__(self, config):
         """ Validates config and stores it as an attribute.
         """
-        self._config = self.validate(config)
+        self._config = config
 
     def __call__(self):
         """ Connects to the ftp server as specified in config and attempts to download file from server.
         """
-        self.retrieveFile(self._config['site'], self._config['file'], self._config['user'], self._config['password'])
+        self.retrieve_file(self._config['site'], self._config['file'], self._config['user'], self._config['password'])
 
     def cleanup(self):
         """ Doesn't need to do anything
@@ -40,7 +41,7 @@ class FTP(task.Task):
         Returns:
             str: An arbitrary string giving more detailed, task-specific status for the given task.
         """
-        return str()
+        return ''
 
     @classmethod
     def parameters(cls):
@@ -53,12 +54,11 @@ class FTP(task.Task):
                 descriptions and requirements for each key as values.
         """
         params = {'required': {
-                    'site': 'str: ftp server to access',
-                    'file': 'str: Name of file to download'},
+                    'site': 'str| ftp server to access',
+                    'file': 'str| Name of file to download'},
                   'optional': {
-                    'user': 'str: user to log in with. Defaults to "anonymous"',
-                    'password': 'str: password to log in with. If user is "anonymous", password defaults to '
-                                '"anonymous@". If user is not "anonymous", defaults to empty string.'}}
+                    'user': 'str| user to log in with. Defaults to "anonymous"',
+                    'password': 'str| password to log in with. defaults to empty string.'}}
         return params
 
     @classmethod
@@ -77,28 +77,17 @@ class FTP(task.Task):
         Returns:
             dict: The dict given as the config argument, updated with default values for missing optional keys.
         """
-        for key in ['site', 'file']:
-            if key not in config:
-                raise KeyError(key)
+        defaults = {'user': 'anonymous', 'password': ''}
+        config = api.check_config(config, cls.parameters(), defaults)
 
-        if not isinstance(config['site'], str):
-            raise ValueError('site: {} Must be a string'.format(str(config['site'])))
         if not config['site']:
             raise ValueError('site: {} Must be non-empty'.format(config['site']))
-        if not isinstance(config['file'], str):
-            raise ValueError('file: {} Must be a string'.format(str(config['file'])))
         if not config['file']:
             raise ValueError('file: {} Must be non-empty'.format(config['file']))
 
-        if 'user' not in config:
-            config['user'] = 'anonymous'
-            config['password'] = 'anonymous@'
-        if 'password' not in config:
-            config['password'] = str()
-
         return config
 
-    def retrieveFile(self, server, filename, user, password):
+    def retrieve_file(self, server, filename, user, password):
         """ Attempts to download filename from server using user and password to log in if necessary.
 
         Args:
