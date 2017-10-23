@@ -40,9 +40,7 @@ def generate():
 
         parameter_list = []
         for key in sorted(required):
-            # TODO: Find a way to guarantee separation of types and parameter description. This breaks if a ':' is in the
-            # description.
-            parameter_desc = required[key]
+            parameter_desc = required[key].split('|', 1)[-1]
             parameter_list.append('* ' + key + ' - ' + parameter_desc)
 
         if parameter_list:
@@ -50,8 +48,7 @@ def generate():
 
         parameter_list = []
         for key in sorted(optional):
-            # TODO: Same as above. Also make this into a function.
-            parameter_desc = optional[key].rsplit(':', 1)[-1]
+            parameter_desc = optional[key].split('|', 1)[-1]
             parameter_list.append('* ' + key + ' - ' + parameter_desc)
 
         if parameter_list:
