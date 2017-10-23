@@ -24,11 +24,6 @@ with Office. You will also need Outlook Redemption installed in order to interac
 get Redemption under a developer license for no charge from the official website which is
 <http://www.dimastr.com/redemption/home.htm> as of this writing.
 
-You must also get the `geckodriver` for Firefox from <https://github.com/mozilla/geckodriver/releases>. If you are
-targeting an older version of Firefox, you may need an older version of the driver, as well as to get a corresponding
-version of the `selenium` library. The `geckodriver` binaries will need to be put in the `geckodriver/` directory (see
-`geckodriver/README.md` for naming).
-
 ## Environment
 
 You may have your Python interpreter installed in any manner you'd like. However, as a recommendation of good practice,
@@ -96,9 +91,14 @@ in order to install the various Win32 API extensions, which are used extensively
 
 ## Non-Python Dependencies
 
-Generally, non-Python binary dependencies should already be packaged with the source tree. An exception of note is a 
-Visual C++ redistributable. On Windows, you may need to install a version of the VC++ redistributable in order to get 
-Python to work.
+You must also get the `geckodriver` for Firefox from <https://github.com/mozilla/geckodriver/releases>. If you are
+targeting an older version of Firefox, you may need an older version of the driver, as well as to get a corresponding
+version of the `selenium` library. The `geckodriver` binaries will need to be put in the `geckodriver/` directory (see
+`geckodriver/README.md` for naming).
+
+On Windows, Python 3.5 requires the Visual Studio 2015 runtime or newer. As a developer, the Python 3.5 installer for
+Windows should also install this on your development system. However, any system to which you distribute a bundled
+version of the UserSim may raise a missing DLL error, and this is probably the source of the problem.
 
 # Code Style
 
