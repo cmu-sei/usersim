@@ -573,6 +573,18 @@ your task's `validate` method should probably validate that nested task's config
 add it to the UserSim's internal structures, which will make the task trigger during the next cycle (unless you choose
 to start it paused).
 
+Additionally, you may wish to use the States enumeration in conjunction with the status API functions. This class
+contains the following values, with their respective meanings:
+
+SCHEDULED - The task is currently scheduled to run.
+PAUSED - The task is currently paused.
+STOPPED - The task stopped at some point in the past, and no longer exists in memory.
+NEW - Should not occur in practice, as new tasks should be either paused or scheduled.
+TO_SCHEDULE - The task will be scheduled at the beginning of the next cycle.
+TO_PAUSE - The task will be paused at the beginning of the next cycle.
+TO_STOP - The task will be stopped at the beginning of the next cycle.
+UNKNOWN - Should never occur. Means that the task cannot be categorized in any of the other states.
+
 Please see the API Reference for the full API reference.
 
 ### Platform-Locked Tasks
