@@ -1,4 +1,8 @@
-### Hooks script for PyInstaller to correctly package all modules.
-### PyInstaller must be run with the --additional-hooks-dir option.
+# Hook script for Firefox task to package the required geckodriver.
+import platform
 
-datas = [('geckodriver/geckodriver' + ext, 'geckodriver') for ext in ('', '.exe')]
+
+geckodriver_path = 'geckodriver/geckodriver'
+if platform.system() == 'Windows':
+    geckodriver_path += '.exe'
+datas = [(geckodriver_path, 'geckodriver')]
