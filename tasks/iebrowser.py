@@ -43,7 +43,7 @@ class IEManager(object):
             t.daemon = True
             t.start()
 
-            cls._action_queue.put(cls._start_ie) # Internet Explorer must be started by the consumer thread
+            cls._action_queue.put((cls._start_ie, 0))
 
     @classmethod
     def _action_executor(cls):
@@ -55,14 +55,14 @@ class IEManager(object):
             try:
                 # Without the timeout, this would block forever if cls._persist is set to False after the get call
                 # already started.
-                action = cls._action_queue.get(timeout=1)
+                action, task_id = cls._action_queue.get(timeout=1)
             except queue.Empty:
                 continue
             else:
                 try:
                     action()
                 except Exception:
-                    api.add_feedback(self._task_id, traceback.format_exc())
+                    api.add_feedback(task_id, traceback.format_exc())
 
         cls._action_queue = None
         cls._persist = True
@@ -81,11 +81,11 @@ class IEManager(object):
             cls._ie = None
 
     @classmethod
-    def visit_site(cls, site):
+    def visit_site(cls, site, task_id):
         """ Add a _visit_site action to the action queue.
         """
         # Use functools.partial so that the action doesn't need any arguments
-        cls._action_queue.put(functools.partial(cls._visit_site, site))
+        cls._action_queue.put((functools.partial(cls._visit_site, site), task_id))
 
     @classmethod
     def close_browser(cls):
@@ -136,7 +136,7 @@ class IEBrowser(task.Task):
     def __call__(self):
         """ Visits a random site from self._config['sites'].
         """
-        IEManager.visit_site(random.choice(self._config['sites']))
+        IEManager.visit_site(random.choice(self._config['sites']), self._task_id)
         if self._config['close_browser']:
             IEManager.close_browser()
 
@@ -171,7 +171,7 @@ class IEBrowser(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {'required': {'sites': 'list| Possible websites to visit. One is chosen at random.'},
+        params = {'required': {'sites': '[str]| Possible websites to visit. One is chosen at random.'},
                   'optional': {'close_browser': 'bool| If True, the browser window will close after visiting a website.'
                                                 ' Defaults to False.'}}
         return params
