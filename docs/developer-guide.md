@@ -98,7 +98,8 @@ version of the `selenium` library. The `geckodriver` binaries will need to be pu
 
 On Windows, Python 3.5 requires the Visual Studio 2015 runtime or newer. As a developer, the Python 3.5 installer for
 Windows should also install this on your development system. However, any system to which you distribute a bundled
-version of the UserSim may raise a missing DLL error, and this is probably the source of the problem.
+version of the UserSim may raise a missing DLL error, and this is probably the source of the problem. **Note that you
+will need to match the x86 version with a 32-bit Python, and the x64 version with a 64-bit Python.**
 
 # Code Style
 
