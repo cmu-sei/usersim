@@ -38,7 +38,8 @@ Example:
 
 ## `xga` Mode
 
-Starts the UserSim in XGA communication mode. SEI internal.
+Starts the UserSim in XGA communication mode. SEI internal. Feedback exceptions will be written to the file
+`~/feedback.log` (that's in the logged-in user's home directory).
 
 Example:
 `./usersim xga`
