@@ -4,6 +4,7 @@ import platform
 import queue
 import random
 import re
+import sys
 import threading
 import traceback
 
@@ -82,7 +83,10 @@ class SharedDriver(object):
         """ Creates Mozilla driver (geckodriver) based on operating system.
         """
         if not cls._driver:
-            gecko_loc = os.path.join(os.getcwd(), 'geckodriver', 'geckodriver')
+            # Originally used os.getcwd(), but that fails when the program's working directory is anything but the
+            # usersim root (such as when XGA starts it).
+            usersim_path = os.path.dirname(sys.argv[0])
+            gecko_loc = os.path.join(usersim_path, 'geckodriver', 'geckodriver')
 
             if platform.system() == 'Windows':
                 gecko_loc += '.exe'
