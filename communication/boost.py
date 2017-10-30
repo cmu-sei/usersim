@@ -2,6 +2,7 @@
 
 May not successfully import if boostmq could not be imported.
 """
+import os
 import threading
 import time
 import sys
@@ -68,9 +69,25 @@ class BoostCommunication(object):
         send them.
         """
         while not self._feedback_queue.empty():
-            # Just empty the feedback queue so it doesn't eat more and more memory. EMS would need a lot of work to be
-            # compatible with this simulator.
-            self._feedback_queue.get()
+            # Put them in a log file, since there's nothing to listen for these, currently.
+            status, exception = self._feedback_queue.get()
+            if not exception:
+                continue
+
+            feedback = []
+            feedback.append('Type: {}'.format(status['type']))
+            feedback.append('ID: {}'.format(status['id']))
+            feedback.append('State: {}'.format(status['state']))
+            if status['status']:
+                feedback.append('Status: {}'.format(status['status']))
+            feedback.append('Exception: {}'.format(exception))
+            feedback.append('=' * 40)
+
+            try:
+                with open(os.path.expanduser(os.path.join('~', 'feedback.log')), 'a') as f:
+                    f.write('\n'.join(feedback) + '\n')
+            except Exception as e:
+                print(str(e))
 
     def _handle_communication(self):
         """ Periodically check if there are any new config files available or if there is any feedback that should be
