@@ -2,3 +2,4 @@
 *.pyo
 *.pyd
 geckodriver/geckodriver*
+example.yaml

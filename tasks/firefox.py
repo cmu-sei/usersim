@@ -88,7 +88,7 @@ class SharedDriver(object):
                 gecko_loc += '.exe'
 
             try:
-                cls._driver = webdriver.Firefox(executable_path=gecko_loc)
+                cls._driver = webdriver.Firefox(executable_path=gecko_loc, log_path=os.devnull)
             except WebDriverException:
                 # First, close the browser window that may have opened as a result of that call.
                 for process in psutil.process_iter():
