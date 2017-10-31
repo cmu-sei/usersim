@@ -22,13 +22,16 @@ def log_rotator():
     current_log = 1
     while True:
         # 2^20 = 1048576, which is 1MB.
-        if os.path.getsize(LOG_PATH.format(current_log)) > 1000:
-            # Current log is big, so rotate.
+        path = LOG_PATH.format(current_log)
+        if os.path.exists(path) and os.path.getsize(path) > 1048576:
+            # Current log is full, so rotate.
             current_log += 1
             if current_log > LOG_MAX:
                 current_log = 1
-                # Clear the log.
-                open(LOG_PATH.format(current_log), 'w').close()
+
+            # Clear the log.
+            open(LOG_PATH.format(current_log), 'w').close()
+
         yield LOG_PATH.format(current_log)
 
 LOG_ROTATOR = log_rotator()
@@ -47,6 +50,7 @@ def log_error(status, exception):
         with open(next(LOG_ROTATOR), 'a') as f:
             f.write('\n'.join(feedback) + '\n')
     except Exception as e:
+        # If the log file fails, then the only remaining option is to write it to stdout...
         print(str(e))
 
 class BoostCommunication(object):
