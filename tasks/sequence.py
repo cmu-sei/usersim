@@ -51,6 +51,6 @@ class Sequence(task.Task):
 
         # It doesn't make sense to use this task if there are fewer than two tasks.
         if len(config['tasks']) < 2:
-            raise ValueError('{}: {} Must contain at least two tasks.'.format('tasks', config['tasks']))
+            raise ValueError('tasks: {} Must contain at least two tasks.'.format(config['tasks']))
 
         return config
