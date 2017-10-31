@@ -15,6 +15,44 @@ import config
 from communication import common
 
 
+LOG_PATH = os.path.join(os.path.expanduser('~'), 'feedback{}.log')
+LOG_MAX = 5
+
+def log_rotator():
+    current_log = 1
+    while True:
+        # 2^20 = 1048576, which is 1MB.
+        path = LOG_PATH.format(current_log)
+        if os.path.exists(path) and os.path.getsize(path) > 1048576:
+            # Current log is full, so rotate.
+            current_log += 1
+            if current_log > LOG_MAX:
+                current_log = 1
+
+            # Clear the log.
+            open(LOG_PATH.format(current_log), 'w').close()
+
+        yield LOG_PATH.format(current_log)
+
+LOG_ROTATOR = log_rotator()
+
+def log_error(status, exception):
+    feedback = []
+    feedback.append('Type: {}'.format(status['type']))
+    feedback.append('ID: {}'.format(status['id']))
+    feedback.append('State: {}'.format(status['state']))
+    if status['status']:
+        feedback.append('Status: {}'.format(status['status']))
+    feedback.append('Exception: {}'.format(exception))
+    feedback.append('=' * 40)
+
+    try:
+        with open(next(LOG_ROTATOR), 'a') as f:
+            f.write('\n'.join(feedback) + '\n')
+    except Exception as e:
+        # If the log file fails, then the only remaining option is to write it to stdout...
+        print(str(e))
+
 class BoostCommunication(object):
     def __init__(self, feedback_queue):
         self._feedback_queue = feedback_queue
@@ -73,21 +111,7 @@ class BoostCommunication(object):
             status, exception = self._feedback_queue.get()
             if not exception:
                 continue
-
-            feedback = []
-            feedback.append('Type: {}'.format(status['type']))
-            feedback.append('ID: {}'.format(status['id']))
-            feedback.append('State: {}'.format(status['state']))
-            if status['status']:
-                feedback.append('Status: {}'.format(status['status']))
-            feedback.append('Exception: {}'.format(exception))
-            feedback.append('=' * 40)
-
-            try:
-                with open(os.path.expanduser(os.path.join('~', 'feedback.log')), 'a') as f:
-                    f.write('\n'.join(feedback) + '\n')
-            except Exception as e:
-                print(str(e))
+            log_error(status, exception)
 
     def _handle_communication(self):
         """ Periodically check if there are any new config files available or if there is any feedback that should be
