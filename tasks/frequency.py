@@ -76,10 +76,12 @@ class Frequency(task.Task):
         """
         config = api.check_config(config, cls.parameters(), {})
 
-        if config['frequency'] <= 0:
+        freq = config['frequency']
+        if freq <= 0:
             raise ValueError('frequency: {} Must be positive.'.format(freq))
 
-        if config['repetitions'] <= 0:
-            raise ValueError('repetitions: {} Must be positive'.format(str(reps)))
+        reps = config['repetitions']
+        if reps < 0:
+            raise ValueError('repetitions: {} Must not be negative.'.format(str(reps)))
 
         return config

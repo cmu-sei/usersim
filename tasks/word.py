@@ -108,6 +108,7 @@ class Word(task.Task):
         config = api.check_config(config, cls.parameters(), defaults)
 
         if not config['text_source']:
+            # In case someone supplied an empty string for whatever reason.
             config['text_source'] = 'aliceinwonderland.txt'
 
         if not config['file_types']:
