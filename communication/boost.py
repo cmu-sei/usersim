@@ -1,3 +1,5 @@
+# Copyright 2017 Carnegie Mellon University. See LICENSE.md file for terms.
+
 """ Handle communication over a Boost message queue in order to communicate using the XGA.
 
 May not successfully import if boostmq could not be imported.

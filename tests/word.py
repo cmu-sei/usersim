@@ -1,3 +1,5 @@
+# Copyright 2017 Carnegie Mellon University. See LICENSE.md file for terms.
+
 # Ali Kidwai
 # July 20, 2017
 # Tests for Word module for UserSim. Makes sure that Word rejects incorrect configs and accepts correct configs. Prints

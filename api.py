@@ -1,3 +1,5 @@
+# Copyright 2017 Carnegie Mellon University. See LICENSE.md file for terms.
+
 """ Module which contains all public user simulator operations. All functions contained in this module are thread-safe
 unless otherwise noted.
 """

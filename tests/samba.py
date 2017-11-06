@@ -1,3 +1,5 @@
+# Copyright 2017 Carnegie Mellon University. See LICENSE.md file for terms.
+
 # Ali Kidwai
 # July 18, 2017
 # Tests for Samba module for UserSim. Makes sure that SSH rejects incorrect configs and accepts correct configs. Prints
