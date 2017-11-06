@@ -33,4 +33,7 @@ This Software includes and/or makes use of the following Third-Party Software su
 7. PyInstaller (https://github.com/pyinstaller/pyinstaller/blob/develop/COPYING.txt)
    Copyright 2015. PyInstaller
 
+8. Boost C++ Libraries (http://www.boost.org/LICENSE_1_0.txt)
+   Copyright 2003. Boost Developers
+
 DM17-0888
