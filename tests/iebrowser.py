@@ -1,3 +1,5 @@
+# Copyright 2017 Carnegie Mellon University. See LICENSE.md file for terms.
+
 # Ali Kidwai
 # July 26, 2017
 # Tests for InternetExplorer module in UserSim. Makes sure that InternetExplorer rejects incorrect configs and accepts

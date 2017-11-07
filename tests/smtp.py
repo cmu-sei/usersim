@@ -1,3 +1,5 @@
+# Copyright 2017 Carnegie Mellon University. See LICENSE.md file for terms.
+
 # Ali Kidwai
 # August 3, 2017
 # Tests for SMTP module in UserSim. Makes sure that SMTP rejects incorrect configs and accepts correct configs. Prints

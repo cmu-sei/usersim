@@ -1,3 +1,5 @@
+# Copyright 2017 Carnegie Mellon University. See LICENSE.md file for terms.
+
 # Ali Kidwai
 # July 18, 2017
 # Adapted from code written by Rotem Guttman and Joe Vessella

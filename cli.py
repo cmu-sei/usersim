@@ -1,3 +1,5 @@
+# Copyright 2017 Carnegie Mellon University. See LICENSE.md file for terms.
+
 """ Gather and parse command line arguments.
 """
 import argparse

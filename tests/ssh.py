@@ -1,3 +1,5 @@
+# Copyright 2017 Carnegie Mellon University. See LICENSE.md file for terms.
+
 # Ali Kidwai
 # June 16, 2017
 # Tests for SSH module for UserSim. Makes sure that SSH rejects incorrect configs and accepts correct configs. Prints

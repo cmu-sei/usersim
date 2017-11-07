@@ -1,3 +1,5 @@
+# Copyright 2017 Carnegie Mellon University. See LICENSE.md file for terms.
+
 # Hook script for Firefox task to package the required geckodriver.
 import platform
 

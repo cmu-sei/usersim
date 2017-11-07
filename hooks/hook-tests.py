@@ -1,3 +1,5 @@
+# Copyright 2017 Carnegie Mellon University. See LICENSE.md file for terms.
+
 ### Hooks script for PyInstaller to correctly package all modules.
 ### PyInstaller must be run with the --additional-hooks-dir option.
 import os

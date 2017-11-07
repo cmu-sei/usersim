@@ -1,3 +1,5 @@
+# Copyright 2017 Carnegie Mellon University. See LICENSE.md file for terms.
+
 """ This file handles RPC communication between this usersim instance and a server. This offers more fine-grained
 control over the usersim than any of the other communication options.
 """
