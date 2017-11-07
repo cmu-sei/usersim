@@ -18,7 +18,7 @@ def lookup(var_name):
     need to be sanitized later.
 
     Returns:
-        str:
+        str: The variable's value if it was found. Otherwise, an empty string.
     """
     process = Popen(command.format(var_name), stdout=PIPE, stderr=PIPE, shell=True)
     if process.stderr.read():
