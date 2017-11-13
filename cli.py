@@ -69,6 +69,9 @@ def parse_and_initialize(feedback_queue):
 
     http_parser = subparsers.add_parser('http')
     http_parser.set_defaults(function=init_http)
+    http_parser.add_argument('name',
+            action='store',
+            help='An arbitrary identifier string for the http server to use.')
     http_parser.add_argument('-a', '--ip_address',
             nargs='?',
             action='store',
@@ -80,11 +83,6 @@ def parse_and_initialize(feedback_queue):
             default=5000,
             help='Server port to use.',
             type=int)
-    http_parser.add_argument('-n', '--name',
-            nargs='?',
-            action='store',
-            default=None,
-            help='An arbitrary identifier string for the http server to use.')
     http_parser.add_argument('-g', '--groups',
             nargs='+',
             action='store',
