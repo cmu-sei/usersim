@@ -11,6 +11,7 @@ except ImportError as e:
     boost = e
 from communication import local
 from communication import rpc
+from communication import httpcomm
 
 
 def init_boost(args, feedback_queue):
@@ -25,6 +26,9 @@ def init_local(args, feedback_queue):
 
 def init_rpc(args, feedback_queue):
     rpc.RPCCommunication(feedback_queue, args.ip_address, args.port, args.name)
+
+def init_http(args, feedback_queue):
+    httpcomm.HTTPCommunication(feedback_queue, args.ip_address, args.port, args.name, args.groups)
 
 def test_mode(*args):
     return True
@@ -62,6 +66,30 @@ def parse_and_initialize(feedback_queue):
             action='store',
             default=None,
             help='An arbitrary identifier string for the RPC server to use.')
+
+    http_parser = subparsers.add_parser('http')
+    http_parser.set_defaults(function=init_http)
+    http_parser.add_argument('-a', '--ip_address',
+            nargs='?',
+            action='store',
+            default='127.0.0.1',
+            help='The server IP address.')
+    http_parser.add_argument('-p', '--port',
+            nargs='?',
+            action='store',
+            default=5000,
+            help='Server port to use.',
+            type=int)
+    http_parser.add_argument('-n', '--name',
+            nargs='?',
+            action='store',
+            default=None,
+            help='An arbitrary identifier string for the http server to use.')
+    http_parser.add_argument('-g', '--groups',
+            nargs='+',
+            action='store',
+            default=None,
+            help='A list of groups this agent belongs to.')
 
     test_parser = subparsers.add_parser('test')
     test_parser.set_defaults(function=test_mode)
