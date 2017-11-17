@@ -8,6 +8,7 @@ except ImportError:
     # Tasks must be importable on any platform.
     pass
 
+import api
 from tasks import outlook
 
 

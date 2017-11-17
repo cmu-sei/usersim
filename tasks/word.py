@@ -16,6 +16,7 @@ except ImportError:
     # All tasks should be importable and then checked on initialization.
     pass
 
+import api
 from tasks import task
 
 
