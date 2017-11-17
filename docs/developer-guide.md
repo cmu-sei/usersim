@@ -89,6 +89,10 @@ python -m pip install pypiwin32
 ```
 in order to install the various Win32 API extensions, which are used extensively in controlling Office programs.
 
+**Please note that on 32-bit versions, you may need to install PyWin32 manually.** If you encounter a
+`ImportError: DLL Load Failed` error and installing the Visual Studio 2015 runtime doesn't fix the problem, and you're
+running a 32-bit interpreter and/or Windows, verify this next.
+
 ## Non-Python Dependencies
 
 You must also get the `geckodriver` for Firefox from <https://github.com/mozilla/geckodriver/releases>. If you are
