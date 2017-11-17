@@ -49,12 +49,17 @@ class HTTPCommunication(object):
                 print('Polled server for new instructions. Got the following:')
                 instructions = response.json()
                 print(instructions)
+                return_vals = []
                 for instruction in instructions:
+                    # TODO: These should probably send feedback messages.
                     func_name = instruction['function']
                     func = self._api_funcs[func_name]
                     kwargs = instruction['arguments']
-                    func(**kwargs)
+                    return_vals.append({'id': instruction['id'], 'value': func(**kwargs), 'name': self._name})
 
+            # TODO: This needs to be made into a bulk submission.
+            for submission in return_vals:
+                requests.post('http://{}:{}/return/agent'.format(self._server_addr, self._server_port), json=submission)
             # TODO: Get from command line, add randomness to spread out the requests.
             time.sleep(10)
 
