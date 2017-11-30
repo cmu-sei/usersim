@@ -86,7 +86,7 @@ def parse_and_initialize(feedback_queue):
     http_parser.add_argument('-g', '--groups',
             nargs='+',
             action='store',
-            default=None,
+            default=[],
             help='A list of groups this agent belongs to.')
 
     test_parser = subparsers.add_parser('test')
