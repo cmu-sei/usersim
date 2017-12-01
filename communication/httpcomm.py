@@ -22,12 +22,9 @@ class HTTPCommunication(object):
 
         # TODO: Put a check within get_instructions() to see if we need to reregister on the server, and move this
         # there.
-        try:
-            response = requests.post('http://{}:{}/register/agent'.format(ip_addr, port),
-                                     json={'name': name, 'groups': groups})
-        except requests.exceptions.RequestException as e:
-            print(str(e))
-            return
+        register_thread = threading.Thread(target=self.register)
+        register_thread.daemon = True
+        register_thread.start()
 
         poll_thread = threading.Thread(target=self.get_instructions)
         poll_thread.daemon = True
@@ -38,6 +35,7 @@ class HTTPCommunication(object):
         feedback_thread.start()
 
     def get_instructions(self):
+        return_vals = []
         while True:
             try:
                 response = requests.get('http://{}:{}/instructions/agent'.format(self._server_addr, self._server_port),
@@ -45,23 +43,54 @@ class HTTPCommunication(object):
             except requests.exceptions.RequestException as e:
                 print(str(e))
             else:
-                # TODO: Actually execute the instruction.
-                print('Polled server for new instructions. Got the following:')
                 instructions = response.json()
-                print(instructions)
-                return_vals = []
                 for instruction in instructions:
-                    # TODO: These should probably send feedback messages.
-                    func_name = instruction['function']
-                    func = self._api_funcs[func_name]
-                    kwargs = instruction['arguments']
-                    return_vals.append({'id': instruction['id'], 'value': func(**kwargs), 'name': self._name})
+                    try:
+                        func_name = instruction['function']
+                        func = self._api_funcs[func_name]
+                        kwargs = instruction['arguments']
+                        value = func(**kwargs)
+                    except Exception as e:
+                        value = str(e)
+                    # TODO: Probably want to separate exceptions and normal values.
+                    return_vals.append({'id': instruction['id'], 'value': value})
 
-            # TODO: This needs to be made into a bulk submission.
-            for submission in return_vals:
-                requests.post('http://{}:{}/return/agent'.format(self._server_addr, self._server_port), json=submission)
+                if return_vals:
+                    submissions = {'submissions': return_vals, 'name': self._name}
+                    try:
+                        requests.post('http://{}:{}/return/agent'.format(self._server_addr, self._server_port),
+                                      json=submissions)
+                    except requests.exceptions.RequestException as e:
+                        print(str(e))
+                    else:
+                        # If we can submit to the server, then we don't need to hold onto them anymore. Otherwise, we
+                        # hold them until we can contact the server again.
+                        return_vals = []
+
+
             # TODO: Get from command line, add randomness to spread out the requests.
             time.sleep(10)
 
     def send_feedback(self):
-        pass
+        while True:
+            fb_list = []
+            while not self._feedback_queue.empty():
+                fb_list.append(self._feedback_queue.get())
+
+            fb_dict = {'name': self._name, 'feedback': fb_list}
+
+            requests.post('http://{}:{}/feedback/agent'.format(self._server_addr, self._server_port), json=fb_dict)
+
+            time.sleep(30)
+
+    def register(self):
+        while True:
+            try:
+                response = requests.post('http://{}:{}/register/agent'.format(self._server_addr, self._server_port),
+                                         json={'name': self._name, 'groups': self._groups})
+            except requests.exceptions.RequestException as e:
+                print(str(e))
+                # Keep trying until we initially register.
+                time.sleep(30)
+            else:
+                return
