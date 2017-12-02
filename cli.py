@@ -14,6 +14,26 @@ from communication import rpc
 from communication import httpcomm
 
 
+def parse_server_file(path):
+    addresses = []
+    with open(path) as f:
+        try:
+            with open(path) as f:
+                lines = f.readlines()
+        except OSError as e:
+            print('Could not open the server file.')
+            raise
+
+        try:
+            for i, line in enumerate(lines):
+                addr, port = line.split(':')
+                addresses.append((addr, int(port)))
+        except ValueError as e:
+            print('Could not parse the server file. Check line number %d.' % (i+1,))
+            raise
+
+    return addresses
+
 def init_boost(args, feedback_queue):
     if isinstance(boost, ImportError):
         # Oops, Boost is needed but it couldn't be imported.
@@ -28,7 +48,10 @@ def init_rpc(args, feedback_queue):
     rpc.RPCCommunication(feedback_queue, args.ip_address, args.port, args.name)
 
 def init_http(args, feedback_queue):
-    httpcomm.HTTPCommunication(feedback_queue, args.ip_address, args.port, args.name, args.groups)
+    if not args.file:
+        args.file.append((args.ip_address, args.port))
+
+    httpcomm.HTTPCommunication(feedback_queue, args.file, args.name, args.groups)
 
 def test_mode(*args):
     return True
@@ -83,6 +106,14 @@ def parse_and_initialize(feedback_queue):
             default=5000,
             help='Server port to use.',
             type=int)
+    http_parser.add_argument('-f', '--file',
+            nargs='?',
+            action='store',
+            default=[],
+            help='A path to a file containing multiple server address:port lines, in the case where the server is '
+                 'sharded. The agent will pick from this list at random on startup and continue using that server '
+                 'instance for its lifetime.',
+            type=parse_server_file)
     http_parser.add_argument('-g', '--groups',
             nargs='+',
             action='store',

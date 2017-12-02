@@ -1,6 +1,7 @@
 # Copyright 2017 Carnegie Mellon University. See LICENSE.md file for terms.
 
 import inspect
+import random
 import threading
 import time
 
@@ -10,7 +11,8 @@ import api
 
 
 class HTTPCommunication(object):
-    def __init__(self, feedback_queue, ip_addr, port, name, groups):
+    def __init__(self, feedback_queue, server_list, name, groups):
+        ip_addr, port = random.choice(server_list)
         print('\nIP Address: {}\nPort: {}\nName: {}\nGroups: {}'.format(ip_addr, port, name, groups))
 
         self._feedback_queue = feedback_queue
