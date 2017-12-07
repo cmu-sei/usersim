@@ -73,8 +73,8 @@ class SharedDriver(object):
                 action()
             except Exception:
                 api.add_feedback(task_id, traceback.format_exc())
-            else:
-                time.sleep(delay)
+
+            time.sleep(delay)
 
     @classmethod
     def _add_action(cls, partial_function, task_id, delay):
