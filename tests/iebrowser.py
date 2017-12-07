@@ -78,13 +78,13 @@ def run_test():
     cnn = {'sites': ['www.cnn.com']}
     bbc = {'sites': ['www.bbc.co.uk']}
     npr = {'sites': ['www.npr.org']}
-    all_sites = {'sites': ['www.cmu.edu',
+    all_sites = {'sites': ['http://www.cmu.edu',
                            'https://www.google.com',
                            'http://en.wikipedia.org/wiki/Main_Page',
                            'http://www.amazon.com',
-                           'www.cnn.com',
-                           'www.bbc.co.uk',
-                           'www.npr.org']}
+                           'http://www.cnn.com',
+                           'http://www.bbc.co.uk',
+                           'http://www.npr.org']}
     close = {'sites': ['www.cmu.edu'], 'close_browser': True}
     bad_key_cases = [('empty', empty)]
     bad_value_cases = [('none_sites', none_sites), ('empty_sites', empty_sites), ('bad_sites', bad_sites)]
