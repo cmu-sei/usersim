@@ -8,6 +8,7 @@ import random
 import re
 import sys
 import threading
+import time
 import traceback
 
 import psutil
@@ -16,7 +17,7 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 import api
-from tasks import task
+from tasks import browser
 
 
 class SharedDriver(object):
@@ -41,23 +42,25 @@ class SharedDriver(object):
         return cls
 
     @classmethod
-    def get(cls, site, task_id):
+    def get(cls, site, task_id, delay=0):
         """ Adds the _get() action to the queue. This method is required in order to avoid driver initialization sync
         issues.
 
         Args:
             site (str): URL to visit.
         """
-        cls._add_action(functools.partial(cls._driver.get, site), task_id)
+        cls._add_action(functools.partial(cls._driver.get, site), task_id, delay)
+
+    @classmethod
+    def status(cls):
+        return cls._status()
 
     @classmethod
     def _action_executor(cls):
         """ Services actions in the queue, which are functools.partial objects.
         """
         while True:
-            action_details = cls._action_queue.get()
-            action = action_details[0]
-            task_id = action_details[1]
+            action, task_id, delay = cls._action_queue.get()
 
             try:
                 title = cls._driver.title
@@ -71,14 +74,16 @@ class SharedDriver(object):
             except Exception:
                 api.add_feedback(task_id, traceback.format_exc())
 
+            time.sleep(delay)
+
     @classmethod
-    def _add_action(cls, partial_function, task_id):
+    def _add_action(cls, partial_function, task_id, delay):
         """ Adds actions to the queue.
 
         Args:
             partial_function (functools.partial): The action to be called from within the driver thread.
         """
-        cls._action_queue.put((partial_function, task_id))
+        cls._action_queue.put((partial_function, task_id, delay))
 
     @classmethod
     def _make_driver(cls):
@@ -131,80 +136,9 @@ class SharedDriver(object):
         return 'Active Firefox driver.'
 
 
-class Firefox(task.Task):
+class Firefox(browser.Browser):
     """ Connects to specified websites using Firefox. Subsequent website visits will use the same window and tab.
     """
     def __init__(self, config):
-        """ Validates config and stores it as an attribute. Determines and stores as an attribute the operating system
-        of the system running UserSim.
-        """
-        self._sites = config['sites']
-
+        super().__init__(config)
         self._driver = SharedDriver()
-
-    def __call__(self):
-        """ Creates a SharedDriver based on the operating system. Randomly chooses and visits one of the provided
-        websites.
-        """
-        site_request = random.choice(self._sites)
-        self._driver.get(site_request, self._task_id)
-
-    def cleanup(self):
-        """ Doesn't need to do anything.
-        """
-        pass
-
-    def stop(self):
-        """ This task should be stopped after running one.
-
-        Returns:
-            True
-        """
-        return True
-
-    def status(self):
-        """ Called when status is polled for this task.
-
-        Returns:
-            str: An arbitrary string giving more detailed, task-specific status for the given task.
-        """
-        return self._driver._status()
-
-    @classmethod
-    def parameters(cls):
-        """ Returns a dictionary with the required and optional parameters of the class, with human-readable
-        descriptions for each.
-
-        Returns:
-            dict of dicts: A dictionary whose keys are 'required' and 'optional', and whose values are dictionaries
-                containing the required and optional parameters of the class as keys and human-readable (str)
-                descriptions and requirements for each key as values.
-        """
-        params = {'required': {'sites': '[str]| list of sites to connect to (must be FQDN).'
-                                        ' One will be randomly chosen each time the module is run.'},
-                  'optional': {}}
-
-        return params
-
-    @classmethod
-    def validate(cls, config):
-        """ Validates the given configuration dictionary.  Makes sure that config['sites'] is a list of strings.
-        Only checks that the strings start with http:// or https://
-
-        Args:
-            config (dict): The dictionary to validate. See parameters() for required format.
-
-        Raises:
-            KeyError: If a required configuration option is missing.  The error message relays the missing key.
-            ValueError: If a configuration option's value is not valid.  The error message relays the proper format.
-        """
-        config = api.check_config(config, cls.parameters(), {})
-
-        site_list = config['sites']
-
-        url_pattern = '^(http|https)://'
-        for item in site_list:
-            if not re.match(url_pattern, item):
-                raise ValueError('Incorrect URL pattern: {} - must start with http:// or https://'.format(item))
-
-        return config

@@ -24,7 +24,7 @@ except ImportError:
     pass
 
 import api
-from tasks import task
+from tasks import browser
 
 
 class IEManager(object):
@@ -45,7 +45,8 @@ class IEManager(object):
             t.daemon = True
             t.start()
 
-            cls._action_queue.put((cls._start_ie, 0))
+            cls._action_queue.put((cls._start_ie, 0, 10))
+        return cls
 
     @classmethod
     def _action_executor(cls):
@@ -57,7 +58,7 @@ class IEManager(object):
             try:
                 # Without the timeout, this would block forever if cls._persist is set to False after the get call
                 # already started.
-                action, task_id = cls._action_queue.get(timeout=1)
+                action, task_id, delay = cls._action_queue.get(timeout=1)
             except queue.Empty:
                 continue
             else:
@@ -65,6 +66,7 @@ class IEManager(object):
                     action()
                 except Exception:
                     api.add_feedback(task_id, traceback.format_exc())
+                time.sleep(delay)
 
         cls._action_queue = None
         cls._persist = True
@@ -83,11 +85,20 @@ class IEManager(object):
             cls._ie = None
 
     @classmethod
-    def visit_site(cls, site, task_id):
+    def get(cls, site, task_id, delay=0):
         """ Add a _visit_site action to the action queue.
         """
         # Use functools.partial so that the action doesn't need any arguments
-        cls._action_queue.put((functools.partial(cls._visit_site, site), task_id))
+        cls._action_queue.put((functools.partial(cls._visit_site, site), task_id, delay))
+
+    @classmethod
+    def status(cls):
+        if not cls._ie:
+            return 'IE has not yet been fully started.'
+        if cls._ie.Busy:
+            return 'IE reports that it is loading a web page.'
+        else:
+            return 'IE is idle.'
 
     @classmethod
     def close_browser(cls):
@@ -124,44 +135,20 @@ class IEManager(object):
                     win32api.CloseHandle(handle)
 
 
-class IEBrowser(task.Task):
+class IEBrowser(browser.Browser):
     """ Opens an instance of Internet Explorer and visits a website at random from the configuration. Windows-only.
     """
     def __init__(self, config):
-        """ Validates config and stores it as an attribute. Also creates the IEManager.
-        """
         if not platform.system() == 'Windows':
             raise OSError('This task is only compatible with Windows.')
-        self._config = config
-        IEManager()
+        super().__init__(config)
+        self._close = config['close_browser']
+        self._driver = IEManager()
 
     def __call__(self):
-        """ Visits a random site from self._config['sites'].
-        """
-        IEManager.visit_site(random.choice(self._config['sites']), self._task_id)
-        if self._config['close_browser']:
-            IEManager.close_browser()
-
-    def cleanup(self):
-        """ Doesn't need to do anything.
-        """
-        pass
-
-    def stop(self):
-        """ This task should be stopped after running once.
-
-        Returns:
-            True
-        """
-        return True
-
-    def status(self):
-        """ Called when status is polled for this task.
-
-        Returns:
-            str: An arbitrary string giving more detailed, task-specific status for the given task.
-        """
-        return ''
+        super().__call__()
+        if self._close:
+            self._driver.close_browser()
 
     @classmethod
     def parameters(cls):
@@ -173,9 +160,9 @@ class IEBrowser(task.Task):
                 containing the required and optional parameters of the class as keys and human-readable (str)
                 descriptions and requirements for each key as values.
         """
-        params = {'required': {'sites': '[str]| Possible websites to visit. One is chosen at random.'},
-                  'optional': {'close_browser': 'bool| If True, the browser window will close after visiting a website.'
-                                                ' Defaults to False.'}}
+        params = super().parameters()
+        params['optional']['close_browser'] = 'bool| If True, the browser window will close after visiting a website. '\
+                                              'Defaults to False.'
         return params
 
     @classmethod
@@ -194,9 +181,5 @@ class IEBrowser(task.Task):
         Returns:
             dict: The dict given as the config argument with missing optional parameters added with default values.
         """
-        config = api.check_config(config, cls.parameters(), {'close_browser': False})
-
-        if not config['sites']:
-            raise ValueError('sites: {} Must be non-empty'.format(str(config['sites'])))
-
-        return config
+        extra_defaults = {'close_browser': False}
+        return super().validate(config, extra_defaults=extra_defaults)

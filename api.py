@@ -190,7 +190,7 @@ def get_tasks(filter_result=True):
             The 'description' key contains a human-readable short summary of what the task tries to do, if such a
             description is provided by the task. Otherwise, it will be the string 'No description provided.'
     """
-    special_tasks = [re.compile('task$'), re.compile('test')]
+    special_tasks = [re.compile('task$'), re.compile('test'), re.compile('browser$')]
 
     available_tasks = {}
 

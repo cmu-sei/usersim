@@ -70,22 +70,22 @@ def run_test():
     empty = {}
     none_sites = {'sites': None}
     empty_sites = {'sites': []}
-    bad_sites = {'sites': ['www.cmu.edu', 1, True]}
-    cmu = {'sites': ['www.cmu.edu']}
+    bad_sites = {'sites': ['http://www.cmu.edu', 1, True]}
+    cmu = {'sites': ['http://www.cmu.edu']}
     google = {'sites': ['https://www.google.com']}
     wikipedia = {'sites': ['http://www.en.wikipedia.org/wiki/Main_Page']}
     amazon = {'sites': ['http://www.amazon.com']}
-    cnn = {'sites': ['www.cnn.com']}
-    bbc = {'sites': ['www.bbc.co.uk']}
-    npr = {'sites': ['www.npr.org']}
-    all_sites = {'sites': ['www.cmu.edu',
+    cnn = {'sites': ['http://www.cnn.com']}
+    bbc = {'sites': ['http://www.bbc.co.uk']}
+    npr = {'sites': ['http://www.npr.org']}
+    all_sites = {'sites': ['http://www.cmu.edu',
                            'https://www.google.com',
                            'http://en.wikipedia.org/wiki/Main_Page',
                            'http://www.amazon.com',
-                           'www.cnn.com',
-                           'www.bbc.co.uk',
-                           'www.npr.org']}
-    close = {'sites': ['www.cmu.edu'], 'close_browser': True}
+                           'http://www.cnn.com',
+                           'http://www.bbc.co.uk',
+                           'http://www.npr.org']}
+    close = {'sites': ['http://www.cmu.edu'], 'close_browser': True}
     bad_key_cases = [('empty', empty)]
     bad_value_cases = [('none_sites', none_sites), ('empty_sites', empty_sites), ('bad_sites', bad_sites)]
     good_cases = [('cmu', cmu), ('google', google), ('wikipedia', wikipedia), ('amazon', amazon), ('cnn', cnn),

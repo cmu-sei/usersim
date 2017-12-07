@@ -55,9 +55,10 @@ def test_good_cases(task, good_cases):
         task['config'] = config
         sim = usersim.UserSim(True)
         api.new_task(task)
-        result = sim.cycle()
-        for item in result:
-            print(item)
+        # Running this one is way too annoying.
+        #result = sim.cycle()
+        #for item in result:
+        #    print(item)
         print('Correctly accepted %s' % config_name)
 
 def run_test():
@@ -122,12 +123,12 @@ def run_test():
     baddynamic['dynamic'] = 0
 
     bad_value_cases = []
-    bad_value_cases.append(badusername)
-    bad_value_cases.append(baddestination)
-    bad_value_cases.append(badsubject)
-    bad_value_cases.append(badbody)
-    bad_value_cases.append(badattachments)
-    bad_value_cases.append(baddynamic)
+    bad_value_cases.append(('badusername', badusername))
+    bad_value_cases.append(('baddestination', baddestination))
+    bad_value_cases.append(('badsubject', badsubject))
+    bad_value_cases.append(('badbody', badbody))
+    bad_value_cases.append(('badattachments', badattachments))
+    bad_value_cases.append(('baddynamic', baddynamic))
 
     # Create valid configs.
     attachments = {}
@@ -144,10 +145,10 @@ def run_test():
     del nooptionals['dynamic']
 
     good_cases = []
-    good_cases.append(everything)
-    good_cases.append(attachments)
-    good_cases.append(dynamic)
-    good_cases.append(nooptionals)
+    good_cases.append(('everything', everything))
+    good_cases.append(('attachments', attachments))
+    good_cases.append(('dynamic', dynamic))
+    good_cases.append(('nooptionals', nooptionals))
 
     test_bad_key_cases(task, bad_key_cases)
     test_bad_value_cases(task, bad_value_cases)
