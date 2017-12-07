@@ -24,7 +24,7 @@ except ImportError:
     pass
 
 import api
-from tasks import task
+from tasks import browser
 
 
 class IEManager(object):
@@ -46,6 +46,7 @@ class IEManager(object):
             t.start()
 
             cls._action_queue.put((cls._start_ie, 0, 10))
+        return cls
 
     @classmethod
     def _action_executor(cls):
@@ -65,8 +66,7 @@ class IEManager(object):
                     action()
                 except Exception:
                     api.add_feedback(task_id, traceback.format_exc())
-                else:
-                    time.sleep(delay)
+                time.sleep(delay)
 
         cls._action_queue = None
         cls._persist = True
@@ -93,6 +93,8 @@ class IEManager(object):
 
     @classmethod
     def status(cls):
+        if not cls._ie:
+            return 'IE has not yet been fully started.'
         if cls._ie.Busy:
             return 'IE reports that it is loading a web page.'
         else:
@@ -133,7 +135,7 @@ class IEManager(object):
                     win32api.CloseHandle(handle)
 
 
-class IEBrowser(task.Task):
+class IEBrowser(browser.Browser):
     """ Opens an instance of Internet Explorer and visits a website at random from the configuration. Windows-only.
     """
     def __init__(self, config):
@@ -159,8 +161,8 @@ class IEBrowser(task.Task):
                 descriptions and requirements for each key as values.
         """
         params = super().parameters()
-        params['optional']['close_browser'] = 'bool| If True, the browser window will close after visiting a website.'
-                                              ' Defaults to False.'
+        params['optional']['close_browser'] = 'bool| If True, the browser window will close after visiting a website. '\
+                                              'Defaults to False.'
         return params
 
     @classmethod
@@ -180,4 +182,4 @@ class IEBrowser(task.Task):
             dict: The dict given as the config argument with missing optional parameters added with default values.
         """
         extra_defaults = {'close_browser': False}
-        return super().validate(config, extra_defaults)
+        return super().validate(config, extra_defaults=extra_defaults)
