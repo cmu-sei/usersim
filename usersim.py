@@ -14,6 +14,7 @@ class States(object):
     TO_PAUSE = 'Paused'
     TO_STOP = 'Stopping'
     UNKNOWN = 'Unknown'
+    PENDING = 'Pending'
 
 class UserSim(object):
     """ Share one _UserSim object to act like a singleton.
@@ -44,6 +45,11 @@ class _UserSim(object):
         # Works around the problems with initializing some tasks from threads that are not the main thread, such as
         # Outlook.
         self._new_tasks_queue = queue.Queue()
+        # Works around a bug where adding a task within a cycle, and then immediately checking the status of that task,
+        # would return that the task is stopped. Since the task had not yet been actually constructed yet, our below
+        # internal ID counter would increment because we returned a task ID, but _status_single would not see the task
+        # in any of the dictionaries and report that the task was stopped.
+        self._pending = []
 
         self._operation_lock = threading.Lock()
 
@@ -102,6 +108,7 @@ class _UserSim(object):
         with self._operation_lock:
             task_id = next(self._id_gen)
             self._current_id = task_id
+            self._pending.append(task_id)
 
             self._new_tasks_queue.put((task_id, task_class, task_config, start_paused))
 
@@ -296,11 +303,10 @@ class _UserSim(object):
         elif task_id in self._paused:
             task = self._paused[task_id]
             state = States.PAUSED
-        elif task_id in self._new:
-            # Actually, new tasks will always be in _to_pause or _to_schedule, so we should never get this status.
-            # It's fine to leave it for now.
-            task = self._new[task_id]
-            state = States.NEW
+        elif task_id in self._pending:
+            # Not ready yet, so we don't have any further information about the task.
+            task = None
+            state = States.PENDING
         elif task_id <= self._current_id:
             task = None
             state = States.STOPPED
@@ -317,6 +323,9 @@ class _UserSim(object):
         elif state == States.STOPPED:
             task_type = 'unknown'
             status = 'dead'
+        elif state == States.PENDING:
+            task_type = 'unknown'
+            status = 'pending'
         else:
             task_type = 'unknown'
             status = 'unknown'
@@ -368,6 +377,7 @@ class _UserSim(object):
         """ Handle task initialization while catching exceptions.
         """
         with self._operation_lock:
+            self._pending = []
             while not self._new_tasks_queue.empty():
                 # Here we do new task construction within the main thread.
                 task_id, task_class, task_config, start_paused = self._new_tasks_queue.get()
