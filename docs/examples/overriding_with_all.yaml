@@ -1,0 +1,33 @@
+# This example showcases the all task, which schedules multiple tasks immediately. This is primarily used when a task
+# accepts another task as a parameter, but you want to schedule more than one. We can also nest the all task within a
+# sequence task, so that one step of the sequence will not advance until all of that step's nested tasks are complete.
+#
+# Once the third task below is complete, check the timestamps for the three created files and you will see that
+# hello2.txt was created roughly 10 seconds after hello1.txt, and hello3.txt was created roughly 30 seconds after
+# hello2.txt
+- type: sequence
+  config:
+    tasks:
+      - type: all
+        config:
+          tasks:
+            - type: shell
+              config:
+                commands:
+                  - "touch hello1.txt"
+            - type: delay
+              config:
+                task:
+                  type: shell
+                  config:
+                    commands:
+                      - "touch hello2.txt"
+                seconds: 30
+      - type: delay
+        config:
+          task:
+            type: shell
+            config:
+              commands:
+                - "touch hello3.txt"
+          seconds: 30
