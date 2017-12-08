@@ -1,0 +1,18 @@
+# This is an example of executing a sequence of tasks in general, including a delay.
+# Note that the browser tasks in particular are executed asynchronously, which can make the actual page load take so
+# long that the second task in the sequence is completed first.
+- type: sequence
+  config:
+    tasks:
+      - type: firefox
+        config:
+          sites:
+            - http://www.cmu.edu
+      - type: delay
+        config:
+          task:
+            type: shell
+            config:
+              commands:
+                - "touch hello.txt"
+          seconds: 10

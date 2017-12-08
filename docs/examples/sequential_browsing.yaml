@@ -1,0 +1,9 @@
+# Simple example of sequentially browsing to some websites.
+- type: firefox
+  config:
+    sites:
+      - http://www.cnn.com
+      - https://www.cmu.edu
+      - http://www.youtube.com
+    sequential: true
+    delay: 10

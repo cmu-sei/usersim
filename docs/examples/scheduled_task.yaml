@@ -1,0 +1,10 @@
+# This demonstrates an example of the attime task to schedule a browsing task for 9 AM - today if it's before 9 AM, or
+# tomorrow if it's after.
+- type: attime
+  config:
+    time: "0900"
+    task:
+      type: firefox
+      config:
+        sites:
+          - http://www.cmu.edu

@@ -584,7 +584,7 @@ contains the following values, with their respective meanings:
 SCHEDULED - The task is currently scheduled to run.
 PAUSED - The task is currently paused.
 STOPPED - The task stopped at some point in the past, and no longer exists in memory.
-NEW - Should not occur in practice, as new tasks should be either paused or scheduled.
+PENDING - The task was just added within the current cycle. It **cannot be modified** yet.
 TO_SCHEDULE - The task will be scheduled at the beginning of the next cycle.
 TO_PAUSE - The task will be paused at the beginning of the next cycle.
 TO_STOP - The task will be stopped at the beginning of the next cycle.
